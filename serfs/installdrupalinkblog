@@ -1,0 +1,220 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs Drupal to blog.NAME.verb.ink
+## Drupal actually resides in www/vapps/drupal.inkblog
+## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
+## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## Any files conflicting with Drupal will be replaced by the new Drupal installation created by this script
+## Because Drupal is high-maintenance on the developer end, the domain becomes a guru domain and is linked for ftp access in guru/_domains
+
+# All options are optional, but must are sequential, omit last options first.
+
+# How to use:
+## ./installdrupalinkblog [drupal distro] [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=drupal.inkblog
+
+DD=$1
+DBASE=$2
+DBUSER=$3
+DBPASSWORD=$4
+CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
+
+# Check for existing inkblog
+. /var/local/verb/configs/siteinstallstatus
+if [ "${INKblog}" != "NOT_YET" ]; then
+echo "Um... How do I say this...
+Your blog at blog.${SITENAME}.verb.ink already has ${INKblog} installed. This just isn't going to work.
+"
+exit 0
+fi
+
+# Auto database
+if [ -z $4 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $2 ]; then
+DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
+if [ -z $3 ]; then
+DBUSER=${DBASE}; fi
+
+# Distro settings
+. /var/local/verb/serfs/showdrupaldistroes
+if [ -z "$DD" ]; then
+DRUPALFILE=$d8
+fi
+if [ "$DD" = "d8" ]; then
+DRUPALFILE=$d8
+fi
+if [ "$DD" = "d7" ]; then
+DRUPALFILE=$d7
+fi
+if [ "$DD" = "commerce_kickstart" ]; then
+DRUPALFILE=$commerce_kickstart
+fi
+if [ "$DD" = "panopoly" ]; then
+DRUPALFILE=$panopoly
+fi
+if [ "$DD" = "openatrium" ]; then
+DRUPALFILE=$openatrium
+fi
+if [ "$DD" = "opigno_lms" ]; then
+DRUPALFILE=$opigno_lms
+fi
+if [ "$DD" = "commons" ]; then
+DRUPALFILE=$commons
+fi
+if [ "$DD" = "zircon_profile" ]; then
+DRUPALFILE=$zircon_profile
+fi
+if [ "$DD" = "openchurch" ]; then
+DRUPALFILE=$openchurch
+fi
+if [ "$DD" = "lightning" ]; then
+DRUPALFILE=$lightning
+fi
+if [ "$DD" = "openoutreach" ]; then
+DRUPALFILE=$openoutreach
+fi
+if [ "$DD" = "openpublic" ]; then
+DRUPALFILE=$openpublic
+fi
+if [ "$DD" = "drupalife_store" ]; then
+DRUPALFILE=$drupalife_store
+fi
+if [ "$DD" = "openpublish" ]; then
+DRUPALFILE=$openpublish
+fi
+if [ "$DD" = "multipurpose_corporate_profile" ]; then
+DRUPALFILE=$multipurpose_corporate_profile
+fi
+if [ "$DD" = "bear" ]; then
+DRUPALFILE=$bear
+fi
+if [ "$DD" = "easy_booking" ]; then
+DRUPALFILE=$easy_booking
+fi
+if [ "$DD" = "cod" ]; then
+DRUPALFILE=$cod
+fi
+if [ "$DD" = "commerce_profile" ]; then
+DRUPALFILE=$commerce_profile
+fi
+if [ "$DD" = "openfolio" ]; then
+DRUPALFILE=$openfolio
+fi
+if [ "$DD" = "restaurant" ]; then
+DRUPALFILE=$restaurant
+fi
+if [ "$DD" = "brainstorm_profile" ]; then
+DRUPALFILE=$brainstorm_profile
+fi
+if [ "$DD" = "social" ]; then
+DRUPALFILE=$social
+fi
+if [ "$DD" = "farm" ]; then
+DRUPALFILE=$farm
+fi
+if [ "$DD" = "bigvideo_profile" ]; then
+DRUPALFILE=$bigvideo_profile
+fi
+if [ "$DD" = "erpal" ]; then
+DRUPALFILE=$erpal
+fi
+if [ "$DD" = "erpal_platform" ]; then
+DRUPALFILE=$erpal_platform
+fi
+if [ "$DD" = "idea" ]; then
+DRUPALFILE=$idea
+fi
+if [ "$DD" = "thunder" ]; then
+DRUPALFILE=$thunder
+fi
+if [ "$DD" = "classified_advertising" ]; then
+DRUPALFILE=$classified_advertising
+fi
+if [ "$DD" = "recruiter" ]; then
+DRUPALFILE=$recruiter
+fi
+if [ "$DD" = "drustack" ]; then
+DRUPALFILE=$drustack
+fi
+if [ "$DD" = "drustack7" ]; then
+DRUPALFILE=$drustack7
+fi
+if [ "$DD" = "sportsleague" ]; then
+DRUPALFILE=$sportsleague
+fi
+if [ "$DD" = "responsive_blog_theme_installation_profile" ]; then
+DRUPALFILE=$responsive_blog_theme_installation_profile
+fi
+## Show installed distro
+echo "Installing Drupal distro: $DD..."
+
+# Download and establish drupal in the server to pre-created domain
+cd /var/www/vapps
+wget https://ftp.drupal.org/files/projects/${DRUPALFILE}.zip
+if [ ! -f ${DRUPALFILE}.zip ]; then
+echo "Can't download Drupal. I quit."
+exit 44; fi
+unzip ${DRUPALFILE}.zip
+rm -f ${DRUPALFILE}.zip
+mv ${DRUPALFILE} ${CVAPPNAME}
+rm -rf /var/www/html/ink.blog
+ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/ink.blog
+ln -sfn /var/www/vapps/${CVAPPNAME} /srv/guru/_webapps/
+chown -R www-data:www-data /var/www/html/ink.blog
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Set up the Apache config
+cp /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-drupal /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
+service apache2 reload
+## inkCert SSL certs
+### Not setup
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.ink."
+fi
+### inkCert-LE DONE
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-LE is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
+fi
+### inkCert-IC DONE
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd blog.${SITENAME}.verb.ink
+fi
+
+# Set the site-wide inkblog config
+sed -i "s/INKblog=.*/INKblog=\"Drupal\"/g" /var/local/verb/configs/siteinstallstatus
+
+echo "These are setup for Drupal ${DD}:
+
+Database type: MySQL
+
+Database name: ${DBASE}
+Database username: ${DBUSER}
+Database password: ${DBPASSWORD}
+
+You also have ftp access to the folder in: guru/_domains/ink.blog
+
+Go to http://blog.${SITENAME}.verb.ink to install.
+"
+

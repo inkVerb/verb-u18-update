@@ -1,0 +1,133 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs WordPress to bb.NAME.verb.ink
+## WordPress actually resides in www/vapps/wp.inkbb
+
+# All options are optional, but must are sequential, omit last options first.
+
+# How to use:
+## ./installwpinkbb [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=wp.inkbb
+
+DBASE=$1
+DBUSER=$2
+DBPASSWORD=$3
+CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
+
+# Check for existing inkbb
+. /var/local/verb/configs/siteinstallstatus
+if [ "${INKbb}" != "NOT_YET" ]; then
+echo "Um... How do I say this...
+Your blog at bb.${SITENAME}.verb.ink already has ${INKblog} installed. This just isn't going to work.
+"
+exit 0
+fi
+
+# Auto database
+if [ -z $3 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $1 ]; then
+DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
+if [ -z $2 ]; then
+DBUSER=${DBASE}; fi
+
+# Download and establish wordpress in the server to pre-created domain
+cd /var/www/vapps
+wget https://wordpress.org/latest.tar.gz
+if [ ! -f latest.tar.gz ]; then
+echo "Can't download WordPress. I quit."
+exit 44; fi
+tar -xvf latest.tar.gz
+rm -f latest.tar.gz
+mv wordpress ${CVAPPNAME}
+rm -rf /var/www/html/ink.bb
+ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/ink.bb
+ln -sfn /var/www/html/ink.bb /srv/guru/_webapps/
+chown -R www-data:www-data /var/www/html/ink.bb
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+# Put the settings in the WordPress config file
+cd ${CVAPPNAME}
+cp wp-config-sample.php wp-config.php
+sed -i "s/database_name_here/${DBASE}/g" wp-config.php
+sed -i "s/username_here/${DBUSER}/g" wp-config.php
+sed -i "s/password_here/${DBPASSWORD}/g" wp-config.php
+
+# Add the secure salt and key strings
+AUTH_KEY=$(pwgen -s -1 27)
+SECURE_AUTH_KEY=$(pwgen -s -1 27)
+LOGGED_IN_KEY=$(pwgen -s -1 27)
+NONCE_KEY=$(pwgen -s -1 27)
+AUTH_SALT=$(pwgen -s -1 27)
+SECURE_AUTH_SALT=$(pwgen -s -1 27)
+LOGGED_IN_SALT=$(pwgen -s -1 27)
+NONCE_SALT=$(pwgen -s -1 27)
+sed -i "s/define('AUTH_KEY',         'put your unique phrase here');/define('AUTH_KEY',         '${AUTH_KEY}');/g" wp-config.php
+sed -i "s/define('SECURE_AUTH_KEY',  'put your unique phrase here');/define('SECURE_AUTH_KEY',  '${SECURE_AUTH_KEY}');/g" wp-config.php
+sed -i "s/define('LOGGED_IN_KEY',    'put your unique phrase here');/define('LOGGED_IN_KEY',    '${LOGGED_IN_KEY}');/g" wp-config.php
+sed -i "s/define('NONCE_KEY',        'put your unique phrase here');/define('NONCE_KEY',        '${NONCE_KEY}');/g" wp-config.php
+sed -i "s/define('AUTH_SALT',        'put your unique phrase here');/define('AUTH_SALT',        '${AUTH_SALT}');/g" wp-config.php
+sed -i "s/define('SECURE_AUTH_SALT', 'put your unique phrase here');/define('SECURE_AUTH_SALT', '${SECURE_AUTH_SALT}');/g" wp-config.php
+sed -i "s/define('LOGGED_IN_SALT',   'put your unique phrase here');/define('LOGGED_IN_SALT',   '${LOGGED_IN_SALT}');/g" wp-config.php
+sed -i "s/define('NONCE_SALT',       'put your unique phrase here');/define('NONCE_SALT',       '${NONCE_SALT}');/g" wp-config.php
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Set up the Apache config
+cp /var/local/verb/configs/site-files/bb.${SITENAME}.verb.ink.conf-wpbbb /etc/apache2/sites-available/bb.${SITENAME}.verb.ink.conf
+service apache2 reload
+## inkCert SSL certs
+### Not setup
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.ink."
+fi
+### inkCert-LE DONE
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-LE is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
+fi
+### inkCert-IC DONE
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd blog.${SITENAME}.verb.ink
+fi
+
+# Set the site-wide inkblog config
+sed -i "s/INKblog=.*/INKblog=\"WordPress\"/g" /var/local/verb/configs/siteinstallstatus
+
+# Get the themes and plugins form inkisaverb.com
+/var/local/verb/sefs/wpadd bb ink.bb
+
+# Set the site-wide inkblog config
+sed -i "s/INKbb=.*/INKbb=\"WordPress\"/g" /var/local/verb/configs/siteinstallstatus
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Finish
+echo "These are setup:
+
+Database: ${DBASE}
+Database user: ${DBUSER}
+Database password: ${DBPASSWORD}
+
+Go to http://${DOMAIN}/wp-admin/index.php to install.
+"
+

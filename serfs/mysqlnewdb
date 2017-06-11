@@ -1,0 +1,18 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates a new MySQL database and user with password
+
+# How to use:
+## ./mysqlnewdb [dbase] [dbuser] [dbpassword]
+
+
+DBASE=$1
+DBUSER=$2
+DBPASSWORD=$3
+
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"

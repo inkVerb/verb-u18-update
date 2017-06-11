@@ -1,0 +1,21 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This script changes the Apache config file for a domain or subdomain from a regular config to a cgi config without changing the web folder contents
+## This only changes contents of apache2/sites-available
+## This may also be used for sub.NAME.verb.guru sites or any full, public URI hosted on the server
+
+# How to use:
+## ./changedomtodomcgi [domain.tld or subdomain.domain.tld]
+
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+DOMAIN=$1
+
+rm -f /etc/apache2/sites-available/${DOMAIN}.conf
+cp /var/local/verb/configs/site-files/newdomain.tld.conf /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i "s/newdomain.tld/${DOMAIN}/g" /etc/apache2/sites-available/${DOMAIN}.conf
+service apache2 reload

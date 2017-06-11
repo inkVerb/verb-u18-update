@@ -1,0 +1,46 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads an app from the site-wide ink repo
+
+# How to use:
+## ./inkget [app repo name]
+
+# Eg:
+## ./inkget mediawiki.current
+## ./inkget owncloud.apps.current
+## ./inkget wpbb
+
+
+APPNAME=$1
+
+# Include the config files
+. /var/local/verb/configs/siteinkget
+
+if [ "${INKGET_REPO}" = "NOT_SET" ]; then
+echo "inkNet is not setup, so no repo is available. Can't download the necessary package."
+exit 22
+fi
+
+# wget
+if [ $INKGET_METHOD = "USE_WGET" ]; then
+wget https://${INKGET_REPO}/repo/${APPNAME}.zip --no-check-certificate
+fi
+
+# inker
+if [ $INKGET_METHOD = "INKER_CP" ]; then
+cp /var/local/ink/repo/${APPNAME}.zip .
+fi
+
+## DEV NOTE: Other secure methods are planned in the roadmap
+# SSH
+
+# SSL
+
+
+# Exit if failed
+if [ ! -f ${APPNAME}.zip ]; then
+echo "Couldn't get the file! I quit."
+exit 44; fi
+

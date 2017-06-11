@@ -1,0 +1,69 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This restores a backup .zip file from an inkVerb app backed-up using backup
+
+# Prereq: Either the app must already be installed (and will be totally replaced)
+## or you must create the symlink from the html/tld.app folder to the vapps/APP folder
+
+# Instructions:
+## The file can have any name, even if you changed it from the original, as long as it ends in .zip
+## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+
+# How to use:
+## ./backuprestore [app namespace] [filename, NO .zip]
+
+## This uses the same app namespace as installAPPNAME and verbapp.APPNAME configs
+## This does not work for ghost sites
+## For WordPress installed to a domain, the namespace follows the format: wp-DOMAIN.TLD or wp-SUB.DOMAIN.TLD
+
+# Eg:
+## ./backuprestore orangehrm verb.orangehrm.sF52.vbak
+
+
+APPNAME=$1
+FILENAME=$2
+
+# Include the site config
+. /var/local/verb/configs/sitenameip
+
+# Backup whatever the original status is
+. /var/local/verb/configs/verbapp.${APPNAME}
+cd /var/local/verb/serfs
+/var/local/verb/serfs/backupappdb ${APPDBASE} restore-originalbackedup -nl
+mv verb.${APPDBASE}.restore-originalbackedup.vbak.sql /var/www/vapps/${APPNAME}/
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+DROP DATABASE ${APPDBASE};"
+mv /var/local/verb/configs/verbapp.${APPNAME} /var/www/vapps/${APPNAME}/
+cd /var/www/vapps/
+zip -r verb.${APPNAME}.restore-originalbackedup.vbak.zip ${APPNAME}
+rm -rf ${APPNAME}
+mv verb.${APPNAME}.restore-originalbackedup.vbak.zip /var/www/guru/
+
+# Unzip the file
+cd /var/www/guru
+unzip ${FILENAME}.zip
+rm -f ${FILENAME}.zip
+mv ${APPNAME} /var/www/vapps/
+
+# Restore and include the app config
+mv /var/www/vapps/${APPNAME}/verbapp.${APPNAME} /var/local/verb/configs/
+. /var/local/verb/configs/verbapp.${APPNAME}
+
+# Restore the database
+/var/local/verb/serfs/mysqlnewdb ${APPDBASE} ${APPDDBUSR} ${APPDDBPAS}
+mv /var/www/vapps/${APPNAME}/${APPDBASE}.sql /var/local/verb/serfs/
+cd /var/local/verb/serfs/
+/var/local/verb/serfs/mysqlin ${APPDBASE}
+rm -f ${APPDBASE}.sql
+
+# Own
+chown -R www-data:www-data /var/www/vapps/${APPNAME}
+
+# Finish
+echo "${APPNAME} has been restored and all its backup files removed from this server.
+
+A backup of the previous ${APPNAME} on this server has been saved in the guru folder just in case.
+"
+

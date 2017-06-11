@@ -1,0 +1,33 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This redirects all http traffic to https
+## By definition of the web, this will conflict with the fixalias
+
+# How to use:
+## ./fixhttps [domain.tld or subdomain.domain.tld]
+
+
+DOMAIN=$1
+
+# Check to see if "fixalias" has already been added
+if grep -Fxq "INKALIASFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf
+then
+service apache2 reload
+	echo "${DOMAIN} already has the alias fix. The server was just reloaded so the site should work."
+else
+
+## Then add the config lins if it doesn't.
+echo "
+
+# Fixes https
+## inkVerb needs this line INKHTTPSFIX=fixed
+       <VirtualHost *:80>
+               ServerName ${DOMAIN}
+               Redirect permanent / https://${DOMAIN}/
+       </VirtualHost>" >> /etc/apache2/sites-available/${DOMAIN}.conf
+service apache2 reload
+	echo "${DOMAIN} now redirects all http traffic to SSL-secure https."
+fi
+

@@ -1,0 +1,65 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This script ininstalls the Apache credentials for inkCert-Letsencrypt certs for a domain and replaces the Snakeoil certificate
+## It also applies to all subdomains for that domain
+## Prerequesite: inkcertrevokele
+## This is intended as a subscript of inkcertundole
+
+# How to use:
+## ./inkcertremovele [domain.tld NO SUBDOMAINS]
+
+#Eg:
+## ./inkcertremovele inkisaverb.com
+## ./inkcertremovele YOURNAME.verb.blue
+
+
+DOMAIN=$1
+
+# Check Apache config status
+if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+echo "Removing inkCert-LE configs from ${DOMAIN}..."
+else
+ if grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+ echo "Apache configs use inkCert Proper. Use: inkcertremove"
+ exit 22
+ else
+  if grep -Fq "#INKVERB-INKCERT=NO" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  echo "inkCert certs aren't setup. Nothing to do."
+  exit 0
+  else
+  echo "Something's really wrong. No inkCert, no non-inkCert either. I quit."
+  exit 66
+  fi
+ fi
+fi
+
+
+# Apache
+## Check that the certs are no longer live
+if [ ! -d /etc/inkcert/le/live/${DOMAIN} ]; then
+## Uncomment the Snakeoil cert configs
+sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/SSLCertificateFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/SSLCertificateKeyFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
+
+## Remove the inkCert cert configs
+sed -i "s/#INKVERB-INKCERT=DONE_LE\n\t\tSSLCertificateFile\t\/etc\/inkcert\/live\/${DOMAIN}\/cert\.pem\n\t\tSSLCertificateKeyFile\t\/etc\/inkcert\/live\/${DOMAIN}\/privkey\.pem\n\t\tSSLCertificateChainFile\t\/etc\/inkcert\/live\/${DOMAIN}\/chain\.pem/#INKVERB-INKCERT=NO_REMOVED_LE/g" /etc/apache2/sites-available/${DOMAIN}.conf
+
+service apache2 restart
+
+echo "#!/bin/sh
+INKCERT=NO_REMOVED_LE" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
+
+# Finish
+echo "inkCert has been uninstalled from ${DOMAIN}. Using Snakeoil certs."
+exit 0
+else
+
+# If they are live
+echo "Something's wrong...
+
+The certs still seem to be live. Did you first run inkcertrevokele or sumply run inkcertundole?
+"
+fi
+

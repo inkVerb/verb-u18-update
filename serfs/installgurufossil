@@ -1,0 +1,26 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs a new, manually-uploaded version of Fossil, based on the "fossil" file uploaded by the customer to the /guru/fossil/ folder
+
+# How to use:
+## ./installgurufossil
+
+
+# Include config
+. /var/local/verb/configs/sitenameip
+
+cd /guru/fossil/
+/var/local/verb/serfs/inkget fossil.current
+unzip fossil.current.zip
+rm -f fossil.current.zip
+chmod +x /guru/fossil/fossil
+apt remove -y fossil
+mv /guru/fossil/fossil /usr/bin
+fossil all rebuild
+
+# Finish
+echo "
+New version of Fossil installed.
+"

@@ -1,0 +1,180 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This copies all original verb folders to www/html if they don't exist
+## This is used by killvapp and others
+## This is used by make-verber
+## This does not change ownership of folders to www-data, which must be done separately on a production server.
+
+# How to use:
+## ./updatehtmlverbs
+
+
+# Include the config
+. /var/local/verb/configs/sitenameip
+
+# Initial sites
+cd /var/www/html
+if [ ! -e 0sitedefaultInProgress ]; then
+cp -r /var/local/verb/configs/conflab/html/0sitedefaultInProgress .; fi
+if [ ! -e 0ne ]; then
+mkdir 0ne
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/0ne/index.php; fi
+
+# Block web folder listing
+echo "Options -Indexes" >> /var/www/html/.htaccess
+echo "Options -Indexes" >> /var/www/html/0ne/.htaccess
+echo "Options -Indexes" >> /var/www/html/0sitedefaultInProgress/.htaccess
+
+# Verb sites
+if [ ! -e ink ]; then cp -r 0sitedefaultInProgress ink; fi
+if [ ! -e email ]; then cp -r 0ne email; fi
+if [ ! -e one ]; then cp -r 0ne one
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/one/index-one.php
+echo "<?php header(\"Location: http://newonesub.${SITENAME}.verb.one\"); die(); ?>" > /var/www/html/one/index-newonesub.php
+fi
+if [ ! -e ink.ask ]; then cp -r 0ne ink.ask; fi
+if [ ! -e ink.bb ]; then cp -r 0ne ink.bb; fi
+if [ ! -e ink.blog ]; then cp -r 0ne ink.blog; fi
+if [ ! -e ink.code ]; then cp -r 0ne ink.code; fi
+if [ ! -e ink.home ]; then cp -r 0ne ink.home; fi
+if [ ! -e ink.pen ]; then cp -r 0ne ink.pen; fi
+if [ ! -e ink.shop ]; then cp -r 0ne ink.shop; fi
+if [ ! -e ink.sn ]; then cp -r 0ne ink.sn; fi
+if [ ! -e ink.wiki ]; then cp -r 0ne ink.wiki; fi
+if [ ! -e blue ]; then cp -r 0ne blue
+echo "<?php header(\"Location: http://chat.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-chat.php
+echo "<?php header(\"Location: http://collabora.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-collabora.php
+echo "<?php header(\"Location: http://nextcloud.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-nextcloud.php
+echo "<?php header(\"Location: http://owncloud.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-owncloud.php
+echo "<?php header(\"Location: http://pydio.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-pydio.php
+echo "<?php header(\"Location: http://seafile.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-seafile.php
+echo "<?php header(\"Location: http://xmpp.${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-xmpp.php
+echo "<?php header(\"Location: http://${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue/index-blue.php
+fi
+if [ ! -e blue.chat ]; then cp -r 0ne blue.chat; fi
+if [ ! -e blue.collabora ]; then cp -r 0ne blue.collabora; fi
+if [ ! -e blue.nextcloud ]; then cp -r 0ne blue.nextcloud; fi
+if [ ! -e blue.owncloud ]; then cp -r 0ne blue.owncloud; fi
+if [ ! -e blue.pydio ]; then cp -r 0ne blue.pydio; fi
+if [ ! -e blue.seafile ]; then cp -r 0ne blue.seafile; fi
+if [ ! -e blue.xmpp ]; then cp -r 0ne blue.xmpp; fi
+if [ ! -e guru ]; then cp -r 0ne guru
+echo "<?php header(\"Location: http://hrm.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-guru.php
+echo "<?php header(\"Location: http://newgurusub.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-newgurusub.php
+echo "<?php header(\"Location: http://cgi.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-cgi.php
+echo "<?php header(\"Location: http://ftp.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-ftp.php
+echo "<?php header(\"Location: http://files.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-files.php
+echo "<?php header(\"Location: http://fossil.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-fossil.php
+echo "<?php header(\"Location: http://net2ftp.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-net2ftp.php
+echo "<?php header(\"Location: http://repo.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-repo.php
+echo "<?php header(\"Location: http://sql.${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru/index-sql.php
+fi
+if [ ! -e guru.cgi ]; then cp -r 0ne guru.cgi; fi
+if [ ! -e guru.ftp ]; then cp -r 0ne guru.ftp; fi
+if [ ! -e guru.files ]; then cp -r 0ne guru.files; fi
+if [ ! -e guru.fossil ]; then cp -r 0ne guru.fossil; fi
+if [ ! -e guru.net2ftp ]; then cp -r 0ne guru.net2ftp; fi
+if [ ! -e guru.repo ]; then cp -r 0ne guru.repo; fi
+if [ ! -e guru.sql ]; then cp -r 0ne guru.sql; fi
+if [ ! -e kiwi ]; then cp -r 0ne kiwi
+echo "<?php header(\"Location: http://ampache.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-ampache.php
+echo "<?php header(\"Location: http://art.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-art.php
+echo "<?php header(\"Location: http://ejabberd.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-ejabberd.php
+echo "<?php header(\"Location: http://gallery.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-gallery.php
+echo "<?php header(\"Location: http://media.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-media.php
+echo "<?php header(\"Location: http://podcast.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-podcast.php
+echo "<?php header(\"Location: http://prosody.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-prosody.php
+echo "<?php header(\"Location: http://studio.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-studio.php
+echo "<?php header(\"Location: http://voip.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-voip.php
+echo "<?php header(\"Location: http://webrtc.${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi/index-webrtc.php
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/kiwi/index-kiwi.php
+fi
+if [ ! -e kiwi.ampache ]; then cp -r 0ne kiwi.ampache; fi
+if [ ! -e kiwi.art ]; then cp -r 0ne kiwi.art; fi
+if [ ! -e kiwi.ejabberd ]; then cp -r 0ne kiwi.ejabberd; fi
+if [ ! -e kiwi.gallery ]; then cp -r 0ne kiwi.gallery; fi
+if [ ! -e kiwi.media ]; then cp -r 0ne kiwi.media; fi
+if [ ! -e kiwi.podcast ]; then cp -r 0ne kiwi.podcast; fi
+if [ ! -e kiwi.prosody ]; then cp -r 0ne kiwi.prosody; fi
+if [ ! -e kiwi.studio ]; then cp -r 0ne kiwi.studio; fi
+if [ ! -e kiwi.voip ]; then cp -r 0ne kiwi.voip; fi
+if [ ! -e kiwi.webrtc ]; then cp -r 0ne kiwi.webrtc; fi
+if [ ! -e pink ]; then cp -r 0ne pink
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/rocks/index-pink.php
+fi
+if [ ! -e red ]; then cp -r 0ne red
+echo "<?php header(\"Location: http://act.${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red/index-act.php
+echo "<?php header(\"Location: http://crm.${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red/index-crm.php
+echo "<?php header(\"Location: http://erp.${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red/index-erp.php
+echo "<?php header(\"Location: http://hrm.${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red/index-hrm.php
+echo "<?php header(\"Location: http://odoo.${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red/index-odoo.php
+echo "<?php header(\"Location: http://scm.${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red/index-scm.php
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/red/index-red.php
+fi
+if [ ! -e red.act ]; then cp -r 0ne red.act; fi
+if [ ! -e red.crm ]; then cp -r 0ne red.crm; fi
+if [ ! -e red.erp ]; then cp -r 0ne red.erp; fi
+if [ ! -e red.hrm ]; then cp -r 0ne red.hrm; fi
+if [ ! -e red.odoo ]; then cp -r 0ne red.odoo; fi
+if [ ! -e red.scm ]; then cp -r 0ne red.scm; fi
+if [ ! -e rocks ]; then cp -r 0ne rocks
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/rocks/index-rocks.php
+fi
+if [ ! -e uno ]; then cp -r 0ne uno
+echo "<?php header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/uno/index-uno.php
+echo "<?php header(\"Location: http://newunosub.${SITENAME}.verb.uno\"); die(); ?>" > /var/www/html/uno/index-newunosub.php
+fi
+
+# Verb point defaults
+if [ ! -e email.email ]; then
+mkdir email.email
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.email\"); die(); ?>" > /var/www/html/email.email/index.php
+fi
+if [ ! -e one.one ]; then
+mkdir one.one
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.one\"); die(); ?>" > /var/www/html/one.one/index.php
+fi
+if [ ! -e ink.ink ]; then
+mkdir ink.ink
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.ink\"); die(); ?>" > /var/www/html/ink.ink/index.php
+fi
+if [ ! -e blue.blue ]; then
+mkdir blue.blue
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.blue\"); die(); ?>" > /var/www/html/blue.blue/index.php
+fi
+if [ ! -e guru.guru ]; then
+mkdir guru.guru
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.guru\"); die(); ?>" > /var/www/html/guru.guru/index.php
+fi
+if [ ! -e kiwi.kiwi ]; then
+mkdir kiwi.kiwi
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.kiwi\"); die(); ?>" > /var/www/html/kiwi.kiwi/index.php
+fi
+if [ ! -e pink.pink ]; then
+mkdir pink.pink
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.pink\"); die(); ?>" > /var/www/html/pink.pink/index.php
+fi
+if [ ! -e red.red ]; then
+mkdir red.red
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.red\"); die(); ?>" > /var/www/html/red.red/index.php
+fi
+if [ ! -e rocks.rocks ]; then
+mkdir rocks.rocks
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.rocks\"); die(); ?>" > /var/www/html/rocks.rocks/index.php
+fi
+if [ ! -e uno.uno ]; then
+mkdir uno.uno
+echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http://${SITENAME}.verb.uno\"); die(); ?>" > /var/www/html/uno.uno/index.php
+fi
+
+# Own
+## Check to see if web service is installed
+if [ $(grep -c '^www-data:' /etc/passwd) = 1 ]; then
+## Own all the html/ dirs
+chown -R www-data:www-data /var/www/html
+fi
+# Finish
+echo "Done. Except for any installed apps, Verber html folders have been set to original setup state."
+

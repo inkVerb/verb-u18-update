@@ -1,0 +1,35 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This kills a domain added with adddomain or adddomaincgi
+## This removes Apache files and inkCert-LE declarations, but not the inkCert-LE config file that may apply to subdomains.
+
+## This DOES NOT:
+### Remove the SSL certificate for the domain and all subdomains thereof.
+### Remove files formerly in the domain from the server, which are retained in the domains folder that an ftpguru can access
+### Remove files for subdomains in the domains folder, just the same.
+### Remove any subdomain folders belonging to the domain.
+### Remove opekDKIM/inkDKIM keys.
+
+# How to use:
+## ./killdomain [KILLDOMAIN.tld]
+
+
+KILLDOMAIN=$1
+
+# Remove Apache server config files
+rm -f /etc/apache2/sites-available/${KILLDOMAIN}.conf
+rm -f /etc/apache2/sites-emabled/${KILLDOMAIN}.conf
+service apache2 reload
+
+# Remove from inkCert
+sed -i "s/${KILLDOMAIN}, //g" /var/local/verb/configs/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
+
+# Remove http folder symlinks
+rm -f /var/www/html/${KILLDOMAIN}
+
+# Restart
+/etc/init.d/postfix reload
+/etc/init.d/postfix restart
+

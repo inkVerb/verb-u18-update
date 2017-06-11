@@ -1,0 +1,25 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs Docker, which is used by various apps, including Collabora Online for Nextcloud
+## Instructions per VPS service for advanced connections: https://docs.docker.com/engine/installation/#docker-cloud
+
+# How to use:
+## ./installdocker
+
+
+# Check if already installed
+if [ -f /var/local/verb/configs/dockerinstalled ]; then
+echo "Docker is already installed."
+exit 0; fi
+
+# Install Docker
+apt install docker.io
+
+# Record config
+touch /var/local/verb/configs/dockerinstalled
+
+# Finish
+echo "Docker installed."
+

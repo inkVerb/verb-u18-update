@@ -1,0 +1,169 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This sets the settings for this Verber to be an inkNet CA Verber
+## The inkNet domain MUST be the main verb tld and will be set that way automatically. This is for credentials in SSH signing.
+
+# How to use:
+## ./inknetmakeca
+
+
+# Include the config
+. /var/local/verb/configs/sitenameip
+NEWCAURI="${SITENAME}.verb.${SITETLD}"
+NEWCAFULLHOST="${SITEHOST}.${NEWCAURI}"
+NEWCANAME="${SITEHOST}_${SITENAME}_verb_${SITETLD}"
+
+# inkNet prerequisites
+## Verify that the main domain is installed (this is mainly a DNS record-ready check, the CA's actual URI stands as a subdomain to itself.)
+if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI} ]; then
+echo "Bunkertime! ${NEWCAURI} is not on this machine, but it should BE the machine!
+Something is really wronggg here!
+"
+exit 22
+fi
+## Verify that this CA Verber candidate is already a Client Verber itself
+if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+echo "Sorry, Bucko. This must be a Verber Client, even to itself, before it can become a CA to anything else.
+
+First run, according to instructions: inknetmakeverberclient
+"
+exit 22
+fi
+## Verify not already installed
+if [ -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
+echo "This Inker already has the inkNet CA installed. This is totally unnecessary.
+"
+exit 0
+fi
+## Verify web directory doesn't exist
+if [ -d /var/www/html/${NEWCAFULLHOST}/inknet ]; then
+echo "Fascinating, Captain. This is not an Inker CA, but the web folder for it (${NEWCAFULLHOST}/inknet) exists.
+There is no logical explanation. We must purge and begin anew.
+"
+exit 22
+fi
+
+# inkCert prerequisites
+. /var/local/verb/configs/inkcert/inkcertstatus
+if [ "${INKCERTINSTALLED}" = "NOT_YET" ]; then
+echo "inkCert not yet installed. Installing now...
+"
+/var/local/verb/serfs/inkcertinstall
+fi
+
+# Set based on web directory and Apache status
+if [ -e /var/www/html/${NEWCAFULLHOST} ]; then
+ if [ -f /etc/apache2/sites-available/${NEWCAFULLHOST}.conf ]; then
+  if [ -e /etc/apache2/sites-enabled/${NEWCAFULLHOST}.conf ]; then
+  echo "Great, ${NEWCAFULLHOST} already exists..."
+  else
+  echo "Enabling ${NEWCAFULLHOST}..."
+  a2ensite ${NEWCAFULLHOST}
+  fi
+ else
+ echo "Cute. The Apache config for ${NEWCAFULLHOST} does not exist, but the web directory does. Fix this how you want and start over, Tiger."
+ exit 22
+ fi
+else
+## Add the full URI as a subdomain
+### Make sure it the Inker has the repo properly setup
+ if [ ! -e /var/www/domains/${NEWCAFULLHOST} ]; then
+ echo "Creating ${NEWCAFULLHOST}..."
+## Remove any duplicate, because that can happen in the known plasmaverse and interwebverse.
+  if [ -f /etc/apache2/sites-available/${NEWCAFULLHOST}.conf ]; then
+  rm /etc/apache2/sites-available/${NEWCAFULLHOST}.conf; fi
+  if [ -e /etc/apache2/sites-enabled/${NEWCAFULLHOST}.conf ]; then
+  rm /etc/apache2/sites-enabled/${NEWCAFULLHOST}.conf; fi
+ /var/local/verb/serfs/addsubdomain ${SITEHOST} ${SITENAME}.verb.${SITETLD}
+### Set up SSL certs based on situation
+#### If not done
+  if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
+  echo "Need SSL certs for ${NEWCAURI}. Getting via inkCert-LE (Letsencrypt)..."
+  /var/local/verb/serfs/inkcertdole ${NEWCAURI}
+  fi
+#### If domain is already done via inkCert-LE
+  if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
+  echo "Need to update inkCert-LE (Letsencrypt) SSL certs for ${NEWCAURI} to include ${SITEHOST}.${NEWCAURI}..."
+  /var/local/verb/serfs/inkcertreqle ${NEWCAURI} r
+  /var/local/verb/serfs/inkcertaddallle ${NEWCAURI}
+  fi
+#### If domain is handled via inkCert Proper
+  if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
+  echo "Need to get inkCert SSL certs for ${SITEHOST}.${NEWCAURI}..."
+  /var/local/verb/serfs/inkcertdo ${SITEHOST}.${NEWCAURI}
+  fi
+## If the html link doesn't exist but the domain is in a folder on the server.
+ else
+ echo "Cute. The domain directory for ${NEWCAFULLHOST} exists, but isn't available in www/html. Fix this how you want and start over, Tiger."
+ exit 22
+ fi
+fi
+
+# In case web directory already existed and large if-section above was skipped, but still no inkCert
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
+echo "Need SSL certs for ${NEWCAURI}. Getting via inkCert-LE (Letsencrypt)..."
+/var/local/verb/serfs/inkcertdole ${NEWCAURI}
+else
+echo "And great, ${NEWCAFULLHOST} already has SSL certs..."
+fi
+
+# Set up download directories
+## For inkNet Certs
+if [ ! -d /var/www/html/${NEWCAFULLHOST}/inknet ]; then
+mkdir /var/www/html/${NEWCAFULLHOST}/inknet
+fi
+chown -R www-data:www-data /var/www/html/${NEWCAFULLHOST}
+
+# Make the CA directories
+if [ ! -d /var/local/verb/configs/inknet/clients ]; then
+mkdir /var/local/verb/configs/inknet/clients
+fi
+if [ ! -d ~/.ssh/inknet ]; then
+mkdir ~/.ssh/inknet
+fi
+mkdir ~/.ssh/inknet/ca
+mkdir /var/local/verb/configs/inknet/vrk
+mkdir /var/local/verb/configs/inknet/verber
+
+# Set CA Verber host key cert that will be made with inknetnewcahostkey
+## Prep addition comments to SSH config
+echo "### Below added by inkVerb's inkNet ###" >> /etc/ssh/sshd_config
+## Change the location of user keys (to avoid locations such as www-data/.ssh)
+mkdir /etc/ssh/authorized_keys
+### For root, so as not to interfere with other system functions
+cp /root/.ssh/authorized_keys /etc/ssh/authorized_keys/root
+### In case the user is not root
+cp ~/.ssh/authorized_keys /etc/ssh/authorized_keys/${USER}
+### Change the setting to recognize the new location
+echo "## inkNet: Change the location of user keys (to avoid locations such as www-data/.ssh)
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u" >> /etc/ssh/sshd_config
+## Comment any previous HostCerts - THEY WILL CONFLICT!! (which probably don't exist, but just in case...)
+sed -i "s/HostCertificate/#inkVerb-COMMENT HostCertificate/g" /etc/ssh/sshd_config
+## Add the standard key to the SSH config
+echo "HostKey /etc/ssh/inknet/inknet_CAverber_${NEWCANAME}_key" >> /etc/ssh/sshd_config
+## Echo in the new settings
+echo "HostCertificate /etc/ssh/inknet/inknet_CAverber_${NEWCANAME}_key-cert.pub" >> /etc/ssh/sshd_config
+
+# Reload SSH services
+service ssh restart
+service sshd restart
+
+# Write the CA inkNet configs
+echo "#!/bin/sh
+# inkNet config, verb.ink
+## This contains information about this CA Verber's credentials used in signing Verber/Vrk Client SSH keys for inkNet
+
+INKNETSTATUS=\"MADE_INSTALL_READY\"
+IAMCAHOST=\"${SITEHOST}\"
+IAMCAURI=\"${NEWCAURI}\"
+IAMCANAME=\"${NEWCANAME}\"
+" > /var/local/verb/configs/inknet/ca.verber.cnf
+
+# Secure the download bundle inknet/ directory
+/var/local/verb/serfs/inknetsecuredldircron
+
+# Finish
+echo "This server now considers itself an inkNet CA Verber, now just a little more work to do in the flow..."
+

@@ -1,0 +1,26 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This displays the inkNet Client key
+## This is useful for getting the key to have it signed by the inker
+
+# How to use:
+## ./showinknetverberclientkey
+
+
+# Check & include the config
+if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+echo "This is not yet connected to an Inker via inkNet."
+exit 22
+fi
+. /var/local/verb/configs/inknet/inker.client.cnf
+
+# Display info
+echo "
+Client Type: \"verber\"
+Client Name: \"${CLIENTNAME}\"
+Copy and paste the ENTIRE long key below, as is, into the \"Activate Client key\" area on the inkNet CA Inker:
+"
+cat /etc/ssh/inknet/inknet_client_${CLIENTNAME}_key.pub
+

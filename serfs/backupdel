@@ -1,0 +1,15 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This delets all backups from the server and their web-accessible symlinks
+
+# How to use:
+## ./backupdel
+
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+rm -f /var/www/guru/*.vbak.zip
+rm -f /var/www/html/${SITETLD}/*.vbak.zip -f

@@ -1,0 +1,28 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds a new subdomain to become newsub.your-name.verb.one.
+
+# How to use:
+## ./newonesub [newsub only]
+
+
+# Include the config file
+. /verb/local/verb/configs/sitenameip
+
+NEWONESUB=$1
+
+# Copy and prepare Apache server config files
+cp /var/local/verb/configs/site-files/newonesub.conf /etc/apache2/sites-available/${NEWONESUB}.${SITENAME}.verb.one.conf 
+sed -i "s/newonesub/${NEWONESUB}/g" /etc/apache2/sites-available/${NEWONESUB}.${SITENAME}.verb.one.conf
+cp -R /var/local/verb/configs/site-files/newonesubdir /var/www/one/${NEWONESUB}
+chown -R www-data:www-data /var/www/one/${NEWONESUB}
+a2ensite ${NEWONESUB}.${SITENAME}.verb.one
+service apache2 reload
+cp /var/www/html/one/index-newonesub.php /var/www/html/one/index-${NEWONESUB}.php
+chown -R www-data:www-data /var/www/html/one
+
+# inkCert, at end of the "domains =" line
+sed -i "/^domains =/ s/$/, ${NEWONESUB}.${SITENAME}.verb.one/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.one.ini
+

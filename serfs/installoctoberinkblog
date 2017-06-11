@@ -1,0 +1,186 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs OctoberCMS to blog.NAME.verb.ink 
+## October actually resides in www/vapps/october.inkblog
+## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
+## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## Any files conflicting with OctoberCMS will be replaced by the new OctoberCMS installation created by this script
+## Because OctoberCMS is high-maintenance on the developer end, the domain becomes a guru domain and is linked for ftp access in guru/_domains
+
+# All options are optional, but must are sequential, omit last options first.
+
+# How to use:
+## ./installoctoberinkblog [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=october.inkblog
+
+DBASE=$1
+DBUSER=$2
+DBPASSWORD=$3
+CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
+
+# Check for existing inkblog
+. /var/local/verb/configs/siteinstallstatus
+if [ "${INKblog}" != "NOT_YET" ]; then
+echo "Um... How do I say this...
+Your blog at blog.${SITENAME}.verb.ink already has ${INKblog} installed. This just isn't going to work.
+"
+exit 0
+fi
+
+# Auto database
+if [ -z $4 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $2 ]; then
+DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
+if [ -z $3 ]; then
+DBUSER=${DBASE}; fi
+
+# Download and establish drupal in the server to the site inkblog
+cd /var/www/vapps
+git clone https://github.com/octobercms/install
+if [ ! -d install ]; then
+echo "Can't download OctoberCMS. I quit."
+exit 44; fi
+mv install ${CVAPPNAME}
+## Install main themes and plugins
+### Plugins
+cd ${CVAPPNAME}/plugins
+wget https://github.com/rainlab/user-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/pages-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/anand-patel/oc-wysiwyg-editors/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/gergo85/oc-backend-plus/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/blog-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/vojtasvoboda/oc-userbanned-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/gergo85/oc-devtools/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/theone74/oc-telegram-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/googleanalytics-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/location-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/user-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/builder-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+### Themes
+cd ../themes
+wget https://github.com/octobercms/october/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/goeroe/semantic-october-sass/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rustytheitgod/Rusty-OctoberCMS-Bootstrap4-Blank/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/Hambern/octobercms.blank-bootstrap-4/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/laratify/laratify-octobercms-octaskin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/vanilla-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/responsiv/flat-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jtherczeg/multi-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/ChadStrat/travu-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jtherczeg/corlate-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jacoweb/freelanceTheme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jacoweb/AgencyTheme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+## Setup links
+rm -rf /var/www/html/ink.blog
+ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/ink.blog
+ln -sfn /var/www/html/ink.blog /srv/guru/_webapps/
+chown -R www-data:www-data /var/www/html/ink.blog
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+## MySQL port (may not be necessary, so commented)
+#ufw allow 3306
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Set up the Apache config
+cp /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-october /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
+service apache2 reload
+## inkCert SSL certs
+### Not setup
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.ink."
+fi
+### inkCert-LE DONE
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-LE is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
+fi
+### inkCert-IC DONE
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd blog.${SITENAME}.verb.ink
+fi
+
+# Set the site-wide inkblog config
+sed -i "s/INKblog=.*/INKblog=\"OctoberCMS\"/g" /var/local/verb/configs/siteinstallstatus
+
+echo "These are setup for OctoberCMS:
+
+Database Type: MySQL
+MySQL Host: localhost
+MySQL Port: 3306
+
+Database Name: ${DBASE}
+MySQL Login: ${DBUSER}
+MySQL Password: ${DBPASSWORD}
+
+You also have ftp access to the folder in: guru/_domains/ink.blog
+
+Go to http://blog.${SITENAME}.verb.ink/index.php to install.
+"
+

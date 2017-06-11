@@ -1,0 +1,40 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates config files for this Verber to connect to a secondary CA Verber, such as other than the Inker
+## This can be run to update an existing config
+
+# How to use:
+## ./inknetaddsecondarycaverber [CA Verber host] [CA Verber URI] [CA Verber name] [CA Verber IP]
+
+# Eg: (almost certainly exactly this, but verify from inkVerb instructions at registration and available Inkers, probably region-specific)
+## ./inknetaddsecondarycaverber ink ink.verb.ink ink_ink_verb_ink 999.999.99.999 (for ink namespace - the master Inker site)
+## ./inknetaddsecondarycaverber john john.verb.ink john_john_verb_ink 999.999.99.999 (for john namespace - if you want your own Verber to act as your keys)
+## ./inknetaddsecondarycaverber ink2 ink.inkisaverb.com ink2_ink_inkisaverb_com 999.999.99.999 (for Domain Verber mod)
+
+
+NEWCAVERBERHOST=$1
+NEWCAVERBERURI=$2
+FULLCAVNAME=$3
+NEWCAVERBERNAME=$(echo $FULLCAVNAME | cut -c1-18)
+NEWCAVERBERIP=$4
+
+# Set configs
+## For the secondary CA Verber
+echo "#!/bin/sh
+# inkNet config, verb.ink
+## This contains information about this a secondary CA Verber
+
+CAVERBERHOST=\"${NEWCAVERBERHOST}\"
+CAVERBERURI=\"${NEWCAVERBERURI}\"
+CAVERBERNAME=\"${NEWCAVERBERNAME}\"
+CAVERBERIP=\"${NEWCAVERBERIP}\"
+" > /var/local/verb/configs/inknet/secondarycav.${NEWCAVERBERNAME}.cnf
+
+# Get the secondary CA Verber's pub key
+/var/local/verb/serfs/inknetaddcaverberpubkey ${NEWCAVERBERNAME}
+
+# Finish
+echo "The secondary CA Verber credentials have been added for ${NEWCAVERBERNAME} at ${NEWCAVERBERHOST}.${NEWCAVERBERURI} with IP ${NEWCAVERBERIP}"
+

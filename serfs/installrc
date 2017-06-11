@@ -1,0 +1,164 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs roundcube
+## Prerequisite: verbemail IF using a verb domain other than verb.email
+
+# Auxiliary Prereqs...
+## Prerequisite: installpostfix (so that the installer can work)
+## Prerequisite: installpfa (to create the email inbox so the installer can work)
+## Prerequisite: * installpostfix and installpfa and this script are included in installemail. Run installemail to meet these auxiliary prerequisites
+
+# How to use:
+## ./installrc [path folder]
+
+# Eg:
+## (To use at rc.NAME.verb.email/mysecretpath do:)
+## ./installrc easy mysecretpath
+
+
+# Include the config files
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/sitemailpass
+. /var/local/verb/configs/sitemailpath
+
+# Check to see if already installed
+if [ ${SITERCPATH} = "RC_NOT_ALLOWED" ]; then
+echo "
+This is a backup email server and Roundcube is not allowed.
+"
+exit 0
+fi
+if [ ${SITERCPATH} != "RC_NOT_INSTALLED" ]; then
+echo "
+Roundcube is already installed.
+"
+exit 0
+fi
+
+RCFOLDER=$1
+RCPASSGEN=$(pwgen -s -1 5)
+DESSALTGEN=$(pwgen -s -1 24)
+
+# Get inkVerb's latest and install
+cd /var/www/email
+/var/local/verb/serfs/inkget roundcube.current
+rm -rf roundcube
+unzip roundcube.current.zip
+rm -f roundcube.current.zip
+/var/local/verb/serfs/inkget roundcube.plugins.current
+unzip roundcube.plugins.current.zip
+cp -R plugins roundcube/
+rm -rf plugins
+rm -f roundcube.plugins.current.zip
+
+# Create the MySQL database and user
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  rcmail;
+GRANT ALL PRIVILEGES ON rcmail.* TO 'rcmailusr'@'localhost' IDENTIFIED BY 'rcpass${RCPASSGEN}';
+FLUSH PRIVILEGES;"
+
+# Set the config for backup
+sed -i "s/SITERCPASSAPG.*/SITERCPASSAPG=${RCPASSGEN}/g" /var/local/verb/configs/sitemailpass
+sed -i "s/SITERCPATH.*/SITERCPATH=${RCFOLDER}/g" /var/local/verb/configs/sitemailpath
+
+# Set Apache
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.rc
+ln -s /var/www/email/roundcube /var/www/html/${SITEEMAILTLD}.rc/${RCFOLDER}
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
+chown -R www-data:www-data /var/www/email/roundcube
+a2ensite rc.${SITENAME}.verb.${SITEEMAILTLD}
+service apache2 reload
+
+# inkCert
+## This adds the declared domain to the end of the "domains =" line
+sed -i "/^domains =/ s/$/, rc.${SITENAME}.verb.${SITEEMAILTLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${SITEEMAILTLD}.ini
+
+# Roundcube system apps
+apt install -y \
+  php-mail \
+  php-mail-mimedecode \
+  php-mime-type \
+  php-mail-mime \
+  php7.0-intl \
+  php7.0-zip \
+  libpspell-dev \
+  php-pspell \
+  aspell-en
+pear install Net_IDNA2-0.1.1
+## Should already be enabled, but enable just in case, Ex Ratione had some problems
+phpenmod intl zip
+service apache2 restart
+
+# Settings
+cp /var/local/verb/configs/conflab/email/roundcube/config/roundcube286-config.inc.php /var/www/email/roundcube/config/config.inc.php
+cp /var/local/verb/configs/conflab/email/roundcube/config/roundcube286-defaults.inc.php /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/name286/${SITENAME}/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/name286/${SITENAME}/g" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/tld286/${SITETLD}/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/tld286/${SITETLD}/g" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/email286/${SITEEMAILTLD}/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/email286/${SITEEMAILTLD}/g" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/rcpass286/rcpass${RCPASSGEN}/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/rcpass286/rcpass${RCPASSGEN}/g" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/rcemailconfdeskeysalt286/${DESSALTGEN}/g" /var/www/email/roundcube/config/config.inc.php
+# In the event that installpfa was run first
+sed  -i "s/rcfolder286/${RCFOLDER}/g" /var/www/email/postfixadmin/config.inc.php
+
+# Copy the branding files
+cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/verbink_logo.png /var/www/email/roundcube/skins/larry/images/
+cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/verbink_logo.png /var/www/email/roundcube/
+cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/watermark.jpg /var/www/email/roundcube/skins/larry/images/
+cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/favicon.ico /var/www/email/roundcube/skins/larry/images/
+cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/favicon.ico /var/www/email/roundcube/
+
+# Composer Plugins
+## This is excerpted from installrcinkplugins
+cd /var/www/email/roundcube
+curl -s https://getcomposer.org/installer | php
+cp composer.json-dist composer.json
+## Plugins
+### Unfortuntately, I only know how to sed this one line at a time.
+sed -i '/\"require\": {/ a\
+        \"johndoh\/contextmenu\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"cor\/keyboard_shortcuts\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"johndoh\/markasjunk2\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"kitist\/html5_notifier\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"roundcube\/chbox\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"roundcube\/authres_status\": \"dev-master",' composer.json
+sed -i '/\"require\": {/ a\
+        \"roundcube\/custom-from\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"elm\/identity_smtp\": \"dev-master\",' composer.json
+## Now finish the composer installation
+### First, update just in case, if you want
+#php composer.phar update -n
+### Then, run install ( -n / --no-interaction = no interaction)
+php composer.phar install -n
+
+# Set up PFA forwarding plugin
+cp /var/www/email/roundcube/plugins/forward/config.inc.php.dist /var/www/email/roundcube/plugins/forward/config.inc.php
+sed -i "s/$rcmail_config\['forward_sql_dsn'\].*/$rcmail_config\['forward_sql_dsn'\] = 'mysql:\/\/mail:mailpass${SITEMAILPASSAPG}@localhost\/mail';/g" /var/www/email/roundcube/plugins/forward/config.inc.php
+## Commented legacy pfadmin_forwarding
+#sed -i "s/mailpassword/mailpass${SITEMAILPASSAPG}/g" /var/www/email/roundcube/plugins/pfadmin_forwarding/config/config.inc.php
+
+# Set up password to change at first login
+## Copy config commented because installing via Compser
+#cp /var/local/www/email/roundcube/plugins/password/config.inc.php.dist /var/local/www/email/roundcube/plugins/password/config.inc.php
+cp /var/www/email/roundcube/plugins/password/config.inc.php.dist /var/www/email/roundcube/plugins/password/config.inc.php
+sed -i "s/$config\['password_force_new_user'\].*/$config\['password_force_new_user'\] = true;/g" /var/www/email/roundcube/plugins/password/config.inc.php
+
+# Finished
+echo "
+Roundcube is ready to be installed at:
+
+ https://rc.${SITENAME}.verb.${SITEEMAILTLD}/${RCFOLDER}/installer
+
+- Then run ./postinstallrc
+"

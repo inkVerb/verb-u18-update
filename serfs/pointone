@@ -1,0 +1,41 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This script points your-name.verb.one to custom-made subdomains, 
+
+# How to use:
+## ./pointone [subdomain only]
+
+# Eg: (This will point your-name.verb.one to lucky.your-name.verb.one)
+## ./pointone lucky
+
+# Type ./pointone -h for help
+
+
+if [ "$1" = "-h" ]; then
+    echo "Usage: ./pointone [subdomain only]
+Examples:
+ ./pointone lucky (points ${SITENAME}.verb.one to lucky.${SITENAME}.verb.one
+ ./pointone verb.one (resets ${SITENAME}.verb.one to point to itself)
+
+ Make sure the .${SITENAME}.verb.one subdomain exists
+ Then, you may use any subdomain you want except
+ verb.one
+ which will reset ${SITENAME}.verb.one"
+exit 0
+fi
+
+if [ "$1" = "verb.one" ]; then
+    cp /var/www/html/one/index-one.php /var/www/html/one/index.php
+    echo "Reset, done."
+exit 0
+fi
+
+NEWONESUB=$1
+
+    cp /var/www/html/one/index-newonesub.php /var/www/html/one/index.php
+    sed -i "s/newonesub/${NEWONESUB}/g" /var/www/html/one/index.php
+    echo "Pointing to http://${NEWONESUB}.${SITENAME}.verb.one, done."
+exit 0
+

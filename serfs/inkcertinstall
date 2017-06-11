@@ -1,0 +1,51 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs the inkCert SSL certificare service
+## Currently, inkCert uses letsencrypt for main websites with options for "inkCert proper", the non-standard inkVerb CA service.
+## To use letsencrypt for websites, run -le variants of inkcert- serfs, such as inkcertdole
+
+# How to use:
+## ./inkcertinstall
+
+
+# Include and check the config
+. /var/local/verb/configs/inkcert/inkcertstatus
+
+if [ "${INKCERTINSTALLED}" = "DONE" ]
+then
+echo "inkCert already installed."
+exit 0
+fi
+
+# Install
+## Letsencrypt - Currently, inkCert is largely powered by Letsencrypt, so it uses links. This will eventually change, but file paths won't.
+apt install -y python-letsencrypt-apache
+## inkCert proper
+apt install -y openssl
+mkdir /etc/inkcert
+mkdir /etc/inkcert/client
+mkdir /etc/inkcert/live
+mkdir /etc/inkcert/csr
+mkdir /etc/inkcert/req
+ln -sfn /etc/letsencrypt /etc/inkcert/le
+ln -sfn /etc/inkcert/req /var/local/verb/
+ln -sfn /etc/inkcert/req /var/www/guru/
+cp /var/local/verb/configs/inkcert/verber-openssl.cnf /etc/inkcert/client/openssl.cnf
+
+# Set configs
+sed -i "s/INKCERTINSTALLED=NOT_YET/INKCERTINSTALLED=DONE/g" /var/local/verb/configs/inkcert/inkcertstatus
+
+## Set up the symlink and cronjob
+if [! -f /etc/cron.daily/inkcert-renew-all.sh ]; then
+ln -sfn /var/local/verb/configs/inkcert/inkcert-renew-all.sh /etc/cron.weekly/
+fi
+
+# Finish
+echo "
+inkCert is now installed and ready to make CSRs for SSL domains and SSH keys.
+
+The CA URLs have been set to defaults and can work now. But, if you want a different CA on the inkCert list, such as in a region closer to your Verber, run setinkcertsslca and setinkcertsshca before making any CSRs.
+"
+

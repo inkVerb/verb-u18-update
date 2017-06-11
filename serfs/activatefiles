@@ -1,0 +1,44 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This activates the files....verb.guru folder so it the web will give an index
+## Prerequisite: installvsftpd
+
+# How to use:
+## ./activatefiles [on/off]
+
+# Eg:
+## ./activatefiles on
+## ./activatefiles off
+
+
+if [ "$1" = "-h" ]
+then
+    echo "Usage: ./activatefiles [on/off]
+
+Examples:
+ ./activatefiles on
+ ./activatefiles off
+
+ allowed arguments:
+ on	(files.${SITENAME}.verb.guru becomes a web-accessible folder)
+ off	(files.${SITENAME}.verb.guru returns to a redirect to ${SITENAME}.verb.ink)"
+exit 0
+fi
+
+if [ "$1" = "on" ]
+then
+    rm -rf /var/www/html/guru.files
+    ln -s /var/www/guru/files /var/www/html/guru.files
+    echo "files on."
+exit 0
+fi
+
+if [ "$1" = "off" ]
+then
+    rm -f /var/www/html/guru.files
+    cp -R /var/www/html/0ne /var/www/html/guru.files
+    echo "files off."
+exit 0
+fi

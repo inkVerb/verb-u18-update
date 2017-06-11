@@ -1,0 +1,34 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This prepares core Verber config files for a domain, with OpenDKIM profiles and keys and inkCert configs, WITHOUT including the actual domain itself or its Apache configs and html folder.
+## This is intended as a subscript to be used by adddomain or adddomaincgi
+## This does NOT:
+### Add the domain to inkCert for SSL requests
+### Create Apache folders or configs for the domain
+## For inkCert and Apache configs, use adddomain or adddomaincgi
+
+# How to use:
+## ./newdomainshell [newdomain.tld]
+
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/inkcert/inkcertstatus
+
+NEWDOMAIN=$1
+
+# inkCert
+cp /var/local/verb/configs/inkcert/cli-ini/cli.new.ini /var/local/verb/configs/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+sed -i "s/inkcertemail589/${INKCERTEMAIL}/g" /var/local/verb/configs/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+echo "#!/bin/sh
+INKCERTED=NOT_YET
+" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWDOMAIN}
+
+# OpenDKIM
+/var/local/verb/serfs/addinkdkim ${NEWDOMAIN}
+
+# Finish
+echo "Great! With no error messages, ${NEWDOMAIN} is ready to be added on the Verber."
+

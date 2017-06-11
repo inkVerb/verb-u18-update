@@ -1,0 +1,78 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs ownCloud manually from inkisaverb.com/repo and linnks it to ....verb.blue
+
+# All options are optional, but must are sequential, omit last options first.
+
+# How to use:
+## ./installowncloud [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=owncloud
+
+DBASE=$1
+DBUSER=$2
+DBPASSWORD=$3
+CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
+
+# Check if already installed
+if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
+echo "This is already installed. I quit."
+exit 0; fi
+
+# Auto database
+if [ -z $3 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $1 ]; then
+DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
+if [ -z $2 ]; then
+DBUSER=${DBASE}; fi
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+# Do it
+cd /var/www/vapps
+## Get and unpack
+/var/local/verb/serfs/inkget ${CVAPPNAME}.current
+unzip ${CVAPPNAME}.current.zip
+rm -f ${CVAPPNAME}.current.zip
+## Apps
+cd ${CVAPPNAME}/apps
+/var/local/verb/serfs/inkget ${CVAPPNAME}.apps.current
+unzip ${CVAPPNAME}.apps.current.zip
+rm -f ${CVAPPNAME}.apps.current.zip
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+rm -rf /var/www/html/blue.owncloud
+## Link & own
+ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/blue.owncloud
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+chown -R www-data:www-data /var/www/html/blue.owncloud
+
+# Set "remember me" in the login #(legacy)
+#sed -i "s/<rememberlogin>false<\/rememberlogin>/<rememberlogin>true<\/rememberlogin>/g" /var/www/vapps/owncloud/apps/files_external/appinfo/info.xml
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+echo "These are setup:
+
+Database user: ${DBUSER}
+Database password: ${DBPASSWORD}
+Database name: ${DBASE}
+
+*Don't make any other changes during the install!
+Go to http://owncloud.${SITENAME}.verb.blue to install.
+"
+

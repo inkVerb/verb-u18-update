@@ -1,0 +1,29 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds a new subdomain to become newsub.your-name.verb.guru, accessible in the _subs.guru folder, and enables CGI.
+# Prereq: vsftpd and ftpguru or ftpfiler
+
+# How to use:
+## ./newgurusub [newsub only]
+
+
+# Include the config file
+. /verb/local/verb/configs/sitenameip
+
+NEWGURUSUB=$1
+
+# Copy and prepare Apache server config files
+cp /var/local/verb/configs/site-files/newgurusubcgi.conf /etc/apache2/sites-available/${NEWGURUSUB}.${SITENAME}.verb.guru.conf 
+sed -i "s/newgurusub/${NEWGURUSUB}/g" /etc/apache2/sites-available/${NEWGURUSUB}.${SITENAME}.verb.guru.conf
+cp -R /var/local/verb/configs/site-files/newgurusubdir /var/www/guru/_subs.guru/${NEWGURUSUB}
+chown -R www-data:www-data /var/www/guru/_subs.guru/${NEWGURUSUB}
+a2ensite ${NEWGURUSUB}.${SITENAME}.verb.guru
+service apache2 reload
+cp /var/www/html/guru/index-newgurusub.php /var/www/html/guru/index-${NEWGURUSUB}.php
+chown -R www-data:www-data /var/www/html/guru
+
+# inkCert, at end of the "domains =" line
+sed -i "/^domains =/ s/$/, ${NEWONESUB}.${SITENAME}.verb.guru/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.guru.ini
+

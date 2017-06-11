@@ -1,0 +1,15 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This drops (deletes) a MySQL user
+
+# How to use:
+## ./mysqlkilldb [dbase]
+
+
+DBASE=$1
+
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+DROP DATABASE ${DBASE};"
+

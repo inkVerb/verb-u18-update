@@ -1,0 +1,13 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This removes an existing domain from guru/_domains.guru
+
+# How to use:
+## ./killdomainguru [olddomain.tld]
+
+
+OLDDOMAIN=$1
+
+rm -f /srv/guru/_domains.guru/${OLDDOMAIN}

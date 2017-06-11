@@ -1,0 +1,38 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This removes the forwarding for a domain forwarded via pointdomain
+
+# How to use:
+## ./pointdomainrm [forwarded domain]
+
+
+FWDDOM=$1
+
+# Set and own
+rm /var/www/html/${FWDDOM}/index.php
+
+# In the event of index.php
+if [ -f /var/www/html/${FWDDOM}/index.php ]; then
+mv /var/www/html/${FWDDOM}/index.php.vback /var/www/html/${FWDDOM}/index.php
+echo "${FWDDOM}'s index.php file has been restored."
+fi
+
+# In the event of index.html
+if [ -f /var/www/html/${FWDDOM}/index.html ]; then
+mv /var/www/html/${FWDDOM}/index.html.vback /var/www/html/${FWDDOM}/index.html
+echo "${FWDDOM}'s index.html file has been restored."
+fi
+
+# In the event of index.htm
+if [ -f /var/www/html/${FWDDOM}/index.htm ]; then
+mv /var/www/html/${FWDDOM}/index.htm.vback /var/www/html/${FWDDOM}/index.htm
+echo "${FWDDOM}'s index.htm file has been restored."
+fi
+
+chown -R www-data:www-data /var/www/html/${FWDDOM}
+
+# Finish
+echo "${FWDDOM} is no longer forwarding."
+

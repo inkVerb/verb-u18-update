@@ -1,0 +1,29 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates a new fossil available at fossil.your-name.verb.guru/FOSSIL-NAME.cgi
+## Prereq: fossil
+
+# How to use:
+## ./newfossiluser [existing-fossil-name] [username] [user-email] [userpassword]
+
+# Example:
+## ./newfossiluser dinosaur adam adam@verb.ink Adamp4$$w0RD
+
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+
+OLDFOSSIL=$1
+NEWUSER=$2
+NEWEMAIL=$3
+NEWPASS=$4
+
+cd /var/www/guru/fossil
+
+# Add the user
+fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository ${OLDFOSSIL}.fossil
+
+echo "New user ${NEWUSER} added to ${OLDFOSSIL}.fossil.
+Available on web at fossil.${SITENAME}.verb.guru/${OLDFOSSIL}.cgi"

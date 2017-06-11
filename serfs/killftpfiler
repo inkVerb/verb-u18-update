@@ -1,0 +1,19 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This deletes an ftp filer and his vsftpd folder and home folder
+
+# How to use:
+## ./killftpfiler [user]
+
+
+DELFTPFILER=$1
+
+# Delete the user
+userdel ${DELFTPFILER}
+
+# Remove directories
+rm -rf /srv/guru/filers/${DELFTPFILER}
+rm -rf /home/${DELFTPFILER}
+rm -rf /var/www/guru/files/${NEWFTPFILER}

@@ -1,0 +1,58 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This backs up an installed webapp by exporting the database, app folder, and siteconfig file into one downloadable zip file in the "guru" folder and symlinked to the main site domain.
+
+# How to use:
+## ./backup [app namespace] [securename 0-9, a-z, and A-Z only] [-nl for no link, optional]
+
+## This uses the same app namespace as installAPPNAME and verbapp.APPNAME configs
+## This does not work for ghost sites
+## For WordPress installed to a domain, the namespace follows the format: wp-DOMAIN.TLD or wp-SUB.DOMAIN.TLD
+
+# Eg:
+## ./backup orangehrm 583
+## ./backup wp.inkisaverb.com 7aJk -nl
+## ./backup wpinkblog b
+
+
+APPNAME=$1
+SECNAME=$2
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/verbapp.${APPNAME}
+
+# Export the database
+cd /var/local/verb/serfs
+/var/local/verb/serfs/mysqlex ${APPDBASE}
+mv /var/local/verb/serfs/${APPDBASE}.sql /var/www/vapps/${APPNAME}/
+
+# Copy the config
+cp /var/local/verb/configs/verbapp.${APPNAME} /var/www/vapps/${APPNAME}/
+
+# Zip the directory
+cd /var/www/vapps
+zip -r verb.${APPNAME}.${SECNAME}.vbak.zip ${APPNAME}
+mv verb.${APPNAME}.${SECNAME}.vbak.zip /var/www/guru/
+
+# Finish
+if [ "$3" = "-nl" ]
+then
+	echo "${APPNAME} has been backed up to the 'guru' folder.
+
+Note that the app remains live.
+"
+exit 0
+fi
+
+ln -s /var/www/guru/verb.${APPNAME}.${SECNAME}.vbak.zip /var/www/html/${SITETLD}/
+chown -R www-data:www-data /var/www/html/${SITETLD}/verb.${APPNAME}.${SECNAME}.vbak.zip
+echo "${APPNAME} has been backed up to the 'guru' folder and can also be downloaded at:
+
+http://${SITENAME}.verb.${SITETLD}/verb.${APPNAME}.${SECNAME}.vbak.zip
+
+Note that the app remains live.
+"
+

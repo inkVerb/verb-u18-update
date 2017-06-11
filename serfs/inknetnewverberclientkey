@@ -1,0 +1,30 @@
+#!/bin/sh
+# inkVerb serf/surfer, verb.ink
+
+# This creates an Verber Client key to be signed by a CA Verber that will be used to sign into the CA Verber
+## Prerequisite: inknetmakeverberclient
+
+# How to use:
+## ./inknetnewverberclientkey
+
+
+# Check and include the config
+if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+echo "Out of order. This is not a Client yet.
+
+First run inknetmakeverberclient
+"
+exit 22
+fi
+
+# Include the config
+. /var/local/verb/configs/inknet/inker.client.cnf
+
+# Generate signing keys
+ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/inknet_client_${CLIENTNAME}_key
+
+# Finish
+echo "Ready for the next step...
+"
+/var/local/verb/serfs/showinknetverberclientkey
+

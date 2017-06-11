@@ -1,0 +1,42 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This forwards an already-created domain to another URI
+
+# How to use:
+## ./pointdomain [forwarded domain] [destination]
+
+## The destination may include 'http://' or 'https://'
+
+## The forwarded domain can be any domain or subdomain created with adddomain or addsubdomain (and -cgi)
+
+
+FWDDOM=$1
+DEST=$2
+
+# In the event of index.php
+if [ -f /var/www/html/${FWDDOM}/index.php ]; then
+mv /var/www/html/${FWDDOM}/index.php /var/www/html/${FWDDOM}/index.php.vback
+echo "${FWDDOM}'s index.php file has been moved to index.php.vback."
+fi
+
+# Set and own
+echo "<?php header(\"Location: ${DEST}\"); die(); ?>" > /var/www/html/${FWDDOM}/index.php
+chown -R www-data:www-data /var/www/html/${FWDDOM}
+
+# In the event of index.html
+if [ -f /var/www/html/${FWDDOM}/index.html ]; then
+mv /var/www/html/${FWDDOM}/index.html /var/www/html/${FWDDOM}/index.html.vback
+echo "${FWDDOM}'s index.html file has been moved to index.html.vback."
+fi
+
+# In the event of index.htm
+if [ -f /var/www/html/${FWDDOM}/index.htm ]; then
+mv /var/www/html/${FWDDOM}/index.htm /var/www/html/${FWDDOM}/index.htm.vback
+echo "${FWDDOM}'s index.htm file has been moved to index.htm.vback."
+fi
+
+# Finish
+echo "${FWDDOM} now forwarding to ${DEST}"
+

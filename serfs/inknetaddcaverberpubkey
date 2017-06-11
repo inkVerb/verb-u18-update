@@ -1,0 +1,74 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds/updates a CA Verber's public signing key to the known_hosts of the local Verber Client
+## Prerequisite: inknetmakeverberclient (which runs this automatically at the end)
+# Client Config - to have the CA public cert on the Client, so the Client can recognize the known remote host via CA cert
+## With this, theoretically, the CA Verber can change its own host certificate and Clients will still recognize it
+
+# How to use:
+## ./inknetaddcaverberpubkey [secondary CA Verber name - optional]
+
+# Eg:
+## ./inknetaddcaverberpubkey (for primary CA Verber / Inker)
+## ./inknetaddcaverberpubkey two_two_verb_ink (for secondary "two" CA Verber)
+
+
+SECONDARYCAVNAME=$1
+
+# Include the config
+if [ -z "$1" ]; then
+. /var/local/verb/configs/inknet/inker.client.cnf
+else
+. /var/local/verb/configs/inknet/secondarycav.${SECONDARYCAVNAME}.cnf
+fi
+
+# Check to acknowledge if already added
+if [ -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub ]; then
+echo "This Inker CA key is already installed. Updating it..."
+fi
+
+# Download the CA Server pub key to the Client
+## Make sure the directory exists
+if [ ! -d "/etc/ssh/inknet" ]; then
+echo "inkNet doesn't have a folder in /etc/ssh/ So, I quit."
+exit 22; fi
+## Get to the directory
+cd /etc/ssh/inknet
+## Backup any existing key
+if [ -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub ]; then
+echo "A key from this inkNet CA is already installed. Fine, getting the new one..."
+ if [ -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub ]; then
+ rm /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub
+ fi
+mv /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub
+fi
+## Get the new key
+wget -q https://${CAVERBERHOST}.${CAVERBERURI}/inknet/inknet_ca_${CAVERBERNAME}_key.pub --no-check-certificate
+## Check if done correctly 
+if [ -f inknet_ca_${CAVERBERNAME}_key.pub ]; then
+rm -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub
+else
+mv /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub
+echo "Can't download CA key. You're using the old one. I quit."
+exit 44
+fi
+
+# Add the CA Verber key to the Client's global known_hosts
+## Make sure known_hosts exists
+if [ ! -f "~/.ssh/known_hosts" ];then
+touch ~/.ssh/known_hosts; fi
+## Remove any previous keys for this CA (sed delete the line with the pattern)
+sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" ~/.ssh/known_hosts
+## Include this new CA key
+echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub).${CAVERBERURI}"  >> ~/.ssh/known_hosts
+#######OR THIS: (add URI to the end, but as of 2017 makes no difference)
+### Remove any previous keys for this CA (sed delete the line with the pattern)
+#sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" ~/.ssh/known_hosts
+### Include this new CA key
+#echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub)"  >> ~/.ssh/known_hosts
+
+# Finish
+echo "Inker CA key from ${CAVERBERURI} has been added and is up to date."
+

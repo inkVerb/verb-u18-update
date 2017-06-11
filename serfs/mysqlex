@@ -1,0 +1,13 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This exports a MySQL database to a .sql file with the same name
+
+# How to use:
+## ./mysqlex [dbase]
+
+
+DBASE=$1
+
+mysqldump --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf ${DBASE} > ${DBASE}.sql

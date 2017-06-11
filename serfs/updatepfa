@@ -1,0 +1,89 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This updates an existing Postfix Admin installation once it has been updated in the inkVerb repo
+## After, ensure that Postfix Admin works correctly, then run updatepfarmvbak
+
+# How to use:
+## ./updatepfa
+
+
+PFAPASS=$1
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/sitemailpath
+
+# Download and unzip
+cd /var/www/email
+/var/local/verb/serfs/inkget postfixadmin.current
+if [ -d /var/www/email/postfixadmin.vbak ]; then
+rm -rf /var/www/email/postfixadmin.vbak; fi
+mv /var/www/email/postfixadmin /var/www/email/postfixadmin.vbak
+unzip postfixadmin.current.zip
+rm -f postfixadmin.current.zip
+
+# Normal settings
+cp /var/www/email/postfixadmin.vbak/config.local.php /var/www/email/postfixadmin/config.local.php
+
+# Copy the branding files
+cp /var/local/verb/configs/conflab/email/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
+
+# Own
+chown -R www-data:www-data /var/www/email/postfixadmin
+
+# Setup password
+if [ "${PFAPASS}" != "secure" ]
+then
+sed -i "s/$CONF\['setup_password'\] = .*/$CONF\['setup_password'\] = '6eb7d8657903da15ba69349209a1c4f9:4b0f638a1fc2788682cee2f1c7416c883cfa33e9';/g" /var/www/email/postfixadmin/config.local.php
+fi
+
+# Finish
+if [ "${PFAPASS}" = "secure" ]
+then
+echo "
+Postfix Admin update complete.
+
+IF... you don't have an administrator, run Setup at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/setup.php
+- You must create your own password on the Setup page, then add it via: setpfapass
+- Go back to the Setup page and finish the process.
+- Then run ./postinstallpfa
+
+...If you have an administrator already, no need to create another.
+
+IMPORTANT:
+Now, you NEED to run the database upgrade at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/upgrade.php
+- Then run ./postinstallpfa
+- Then login at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}
+
+...That's it.
+If all works well, you may delete the backup wtih updatepfarmvbak before updating again.
+"
+exit 0
+fi
+
+echo "
+Postfix Admin update complete.
+
+IF... you don't have an administrator, run Setup at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/setup.php
+- Use the install password 'inkverb77'
+- Then run ./postinstallpfa
+
+...If you have an administrator already, no need to create another.
+
+IMPORTANT:
+Now, you NEED to run the database upgrade at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/upgrade.php
+- Then run ./postinstallpfa
+- Then login at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}
+
+...That's it.
+If all works well, you may delete the backup wtih updatepfarmvbak before updating again.
+"
+

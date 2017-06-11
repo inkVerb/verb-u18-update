@@ -1,0 +1,42 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This completely removes an inkVerb web app, it's database, and it's config file
+## WARNING: This does not backup the app, it just destroys it
+## This is useful if you want to reinstall the app afresh or to remove every trace of it.
+## This does not remove an actual domain, if a webapp was installed to it, but it will break the domain.
+
+# NOTE: If this is a domain app, such as WordPress or Drupal, etc., installed to a domain, after this, run: killdomain
+
+# How to use:
+## ./killvapp [app namespace]
+
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/verbapp.${APPNAME}
+
+APPNAME=$1
+
+# Kill the database and user
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+DROP DATABASE ${APPDBASE};
+DROP USER ${APPDDBUSR}@localhost;
+FLUSH PRIVILEGES;"
+
+# Kill the config
+rm -f /var/local/verb/configs/verbapp.${APPNAME}
+
+# Kill the directories
+rm -rf /var/www/vapps/${APPNAME}
+rm -rf /srv/guru/_webapps/${APPNAME}
+rm -rf /var/www/html/*.${APPNAME}
+/var/local/verb/serfs/updatehtmlverbs
+
+# Finish
+echo "Taps...
+
+${APPNAME} is now dead.
+"
+

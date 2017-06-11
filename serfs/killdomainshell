@@ -1,0 +1,30 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This completely removes a domain's inkCert, Letsencrypt, and inkDKIM (OpenDKIM) profiles
+## This does NOT:
+### Remove any subdomains
+### Remove any web or Apache folders or configs
+
+# How to use:
+## ./killdomainshell [domain]
+
+
+KILLDOMSHELL=$1
+
+# Remove inkCert (including Letsencrypt) configs
+rm -f /var/local/verb/configs/inkcert/cli-ini/cli.${KILLDOMSHELL}.ini
+rm -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${KILLDOMSHELL}
+rm -f /etc/inkcert/cli.${KILLDOMAIN}.ini
+rm -rf /etc/inkcert/le/live/${KILLDOMAIN}
+
+# Remove OpenDKIM entries
+/var/local/verb/serfs/killinkdkim ${KILLDOMSHELL}
+
+# Finish
+echo "No more papers...
+
+The inkCert, Letsencrypt, and OpenDKIM profiles for ${KILLDOMSHELL} are gone.
+"
+

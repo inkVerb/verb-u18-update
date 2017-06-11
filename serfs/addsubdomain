@@ -1,0 +1,81 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds a subdomain to an existing domain's inkCert certificate with OpenDKIM profiles and keys after everything in the inkVerb server is already setup via setupverb.
+## Neither the domain nor the domain shell need to be installed already. This can be run first, all by itself.
+
+# How to use:
+## ./addsubdomain [subdomain-only] [olddomain.tld]
+
+
+SUBDOMAIN=$1
+OLDDOMAIN=$2
+
+# Check the domain shell
+if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN} ]; then
+echo "The shell for ${OLDDOMAIN} does not exist yet. Creating it..."
+/var/local/verb/serfs/newdomainshell ${OLDDOMAIN}
+fi
+
+# Check if it already exists
+if [ -f /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf ]; then
+ if [ -f /etc/apache2/sites-enabled/${SUBDOMAIN}.${OLDDOMAIN}.conf ]; then
+ echo "That subdomain already exists."
+ exit 11
+ else
+ echo "That site's config exists, but it doesn't seem to be active on Apache. Something's not right."
+ exit 22
+ fi
+fi
+
+# Copy and prepare Apache server config files
+cp /var/local/verb/configs/site-files/newdomain.tld.conf /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
+sed -i "s/newdomain.tld/${SUBDOMAIN}.${OLDDOMAIN}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
+cp -R /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
+ln -s /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN} /var/www/html/
+chown -R www-data:www-data /var/www/html/${SUBDOMAIN}.${OLDDOMAIN}
+chown -R www-data:www-data /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
+a2ensite ${SUBDOMAIN}.${OLDDOMAIN}
+service apache2 reload
+
+# inkCert
+## This adds the declared domain to the end of the "domains =" line
+sed -i "/^domains =/ s/$/, ${SUBDOMAIN}.${OLDDOMAIN}/" /var/local/verb/configs/inkcert/cli-ini/cli.${OLDDOMAIN}.ini
+
+# inkCert status
+## Not setup
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
+echo "FYI: inkCert hasn't been setup for this domain.
+You are ready to run inkCert for ${OLDDOMAIN}, if you haven't already or unless you want to add more subdomains first."
+fi
+## inkCert-LE DONE
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
+echo "FYI: inkCert has already been setup for this domain with Letsencrypt. So, your other certs will need inkCert-LE certs also.
+The Letsencrypt certs will include this subdomain next time your Letsencrypt certs renew. But, that hasn't happened yet.
+To refresh and thus get certs for this subdomain, run inkcertreqle for ${OLDDOMAIN} with the \"r\" option, unless you want to add more subdomains first.
+Note: Don't get Letsencrypt certs for the same core domain.tld too often or Letsencrypt will make you wait to get more.
+
+In summary: ${SUBDOMAIN}.${OLDDOMAIN} will not have SSL certs until you run:
+ inkcertreqle ${OLDDOMAIN} r
+"
+fi
+## inkCert-IC DONE
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
+echo "FYI: inkCert has already been setup for this domain from inkCert Proper. So, your other certs will need inkCert Proper certs also.
+To refresh and thus get certs for this subdomain, run inkcertreq for ${OLDDOMAIN} with the \"r\" option, unless you want to add more subdomains first.
+Note: Don't get inkCert certs for the same core domain.tld too often or inkCert will make you wait to get more.
+
+In summary: ${SUBDOMAIN}.${OLDDOMAIN} will not have SSL certs under the domain until you run:
+either...
+ inkcertreq ${OLDDOMAIN} r
+or...
+ inkcertreq ${SUBDOMAIN}.${OLDDOMAIN}
+"
+fi
+
+# Finish
+echo "There is no inkDKIM email record for this specific subdomain, unless you want to add one with addinkdkim. That's if you want your subdomain in an email address.
+
+So, ${SUBDOMAIN}.${OLDDOMAIN} is good to go!"
+

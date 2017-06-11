@@ -1,0 +1,12 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This opens MySQL with root in the terminal without entering any password
+
+# How to use:
+## ./mysqlboss
+
+
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf
+

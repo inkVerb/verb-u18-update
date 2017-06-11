@@ -1,0 +1,17 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates a new MySQL database root user with password
+
+# How to use:
+## ./mysqlnewboss [dbruser] [dbpassword]
+
+
+DBBUSER=$1
+DBBPASSWORD=$2
+
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+GRANT ALL PRIVILEGES ON *.* TO '${DBBUSER}'@'localhost' IDENTIFIED BY '${DBBPASSWORD}' WITH GRANT OPTION;
+FLUSH PRIVILEGES;"
+

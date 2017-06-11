@@ -1,0 +1,50 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This updates owncloud to the latest version from the inkVerb repo
+
+# How to use:
+## ./updateowncloud
+
+
+CVAPPNAME=owncloud
+
+# Check if installed
+if [ ! -f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
+echo "ownCloud not installed. Nothing to upgrade."
+exit 22; fi
+
+# Get everything set
+#service apache2 stop
+cd /var/www/vapps
+## Backup
+rm -f ${CVAPPNAME}.vbak
+mv ${CVAPPNAME} ${CVAPPNAME}.vbak
+## Get and unpack
+/var/local/verb/serfs/inkget ${CVAPPNAME}.current
+unzip ${CVAPPNAME}.current.zip
+rm -f ${CVAPPNAME}.current.zip
+## Apps
+cd ${CVAPPNAME}/apps
+/var/local/verb/serfs/inkget ${CVAPPNAME}.apps.current
+unzip ${CVAPPNAME}.apps.current.zip
+rm -f ${CVAPPNAME}.apps.current.zip
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+## Config & Data
+cp /var/www/vapps/${CVAPPNAME}.vbak/config/config.php /var/www/vapps/${CVAPPNAME}/config/
+mv /var/www/vapps/${CVAPPNAME}.vbak/data /var/www/vapps/${CVAPPNAME}/
+## Link & own
+ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/blue.owncloud
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+chown -R www-data:www-data /var/www/html/blue.owncloud
+
+# Update  # May not be necessary
+#service apache2 start
+#cd /var/www/vapps/${CVAPPNAME}
+#sudo -u apache php occ upgrade
+#sudo -u www-data php occ maintenance:mode --off
+
+# Finish
+echo "ownCloud upgrade finished."
+

@@ -1,0 +1,24 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates a user who can read everything on the server and has a guru symlink in the home folder
+
+# How to use:
+## ./newserverguru [new user] [new user password]
+
+
+NEWFILEGURU=$1
+NEWUSERPASS=$2
+
+# Create the user with password
+adduser ${NEWFILEGURU} --gecos ",,," --disabled-password
+echo "${NEWFILEGURU}:${NEWUSERPASS}" | chpasswd
+
+## This was created with the following base script
+# sudo adduser myuser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+# echo "myuser:password" | sudo chpasswd
+
+# Create the www symlink
+ln -s /var/www/guru /home/${NEWFILEGURU}/guru
+

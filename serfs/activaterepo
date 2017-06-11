@@ -1,0 +1,45 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This activates the repo....verb.guru folder so it the web will give an index
+
+# How to use:
+## ./activaterepo [on/off]
+
+# Eg:
+## ./activaterepo on
+## ./activaterepo off
+
+# Include config
+. /var/local/verb/configs/sitenameip
+
+if [ "$1" = "-h" ]
+then
+    echo "Usage: ./activaterepo [on/off]
+
+Examples:
+ ./activaterepo on
+ ./activaterepo off
+
+ allowed arguments:
+ on	(repo.${SITENAME}.verb.guru becomes a web-accessible folder)
+ off	(repo.${SITENAME}.verb.guru returns to a redirect to ${SITENAME}.verb.ink)"
+exit 0
+fi
+
+if [ "$1" = "on" ]
+then
+    rm -rf /var/www/html/guru.repo
+    ln -s /var/www/guru/repo /var/www/html/guru.repo
+    echo "repo on."
+exit 0
+fi
+
+if [ "$1" = "off" ]
+then
+    rm -f /var/www/html/guru.repo
+    cp -R /var/www/html/0ne /var/www/html/guru.repo
+    echo "repo off."
+exit 0
+fi

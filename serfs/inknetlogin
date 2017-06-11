@@ -1,0 +1,31 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This logs into a CA Verber
+## Don't use any options if logging into the primary CA Verbe, such as the Inker
+
+# How to use:
+## ./inknetlogin [secondary CA Verber - optional]
+
+
+# Check & include the config
+if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+echo "This is not yet connected to a CA Verber via inkNet."
+exit 22
+fi
+
+# Include the correct config
+. /var/local/verb/configs/inknet/inker.client.cnf
+## Add secondary CA Verber credentials if present
+if [ -n "$1" ]; then
+FULLCAVNAME=$1
+LOGINCAV=$(echo $FULLCAVNAME | cut -c1-18)
+. /var/local/verb/configs/inknet/secondarycav.${LOGINCAV}.cnf
+else
+. /var/local/verb/configs/inknet/client.${CAVERBERNAME}.inker.login.cnf
+fi
+
+# Login
+ssh -o HostName=${CAVERBERHOST}.${CAVERBERURI} -p ${CLIENTPORT} ${CLIENTUSERNAME}@${CAVERBERIP}
+

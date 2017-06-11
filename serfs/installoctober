@@ -1,0 +1,176 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs OctoberCMS as a vapp with www/html/DOMAIN.TLD link from newdomain
+## October actually resides in www/vapps/october.DOMAIN.TLD
+## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
+## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## Any files conflicting with OctoberCMS will be replaced by the new OctoberCMS installation created by this script
+## Because OctoberCMS is high-maintenance on the developer end, the domain becomes a guru domain and is linked for ftp access in guru/_domains
+
+# All options after the domain are optional, but are sequential
+
+# How to use:
+## ./installoctober [domain.tld] [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=october
+
+DOMAIN=$1
+DBASE=$2
+DBUSER=$3
+DBPASSWORD=$4
+CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
+
+# Check if already installed
+## Config
+if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN} ]; then
+echo "This is already installed."
+exit 0; fi
+## Directory
+if [ -d /var/www/vapps/${CVAPPNAME}.${DOMAIN} ]; then
+echo "That October site already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
+exit 22; fi
+
+
+# Options
+if [ -z $1 ]; then
+echo "You must designate a domain."
+exit 22; fi
+
+# Auto database
+if [ -z $4 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $2 ]; then
+DBASE=oct$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 6); fi
+if [ -z $3 ]; then
+DBUSER=${DBASE}; fi
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+# Download and establish October in the server to pre-created domain
+cd /var/www/vapps
+git clone https://github.com/octobercms/install
+if [ ! -d install ]; then
+echo "Can't download OctoberCMS. I quit."
+exit 44; fi
+mv install ${CVAPPNAME}.${DOMAIN}
+
+## Install main themes and plugins
+### Plugins
+cd ${DOMAIN}/plugins
+wget https://github.com/rainlab/user-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/pages-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/anand-patel/oc-wysiwyg-editors/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/gergo85/oc-backend-plus/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/blog-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/vojtasvoboda/oc-userbanned-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/gergo85/oc-devtools/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/theone74/oc-telegram-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/googleanalytics-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/location-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/user-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/builder-plugin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+### Themes
+cd ../themes
+wget https://github.com/octobercms/october/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/goeroe/semantic-october-sass/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rustytheitgod/Rusty-OctoberCMS-Bootstrap4-Blank/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/Hambern/octobercms.blank-bootstrap-4/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/laratify/laratify-octobercms-octaskin/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/rainlab/vanilla-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/responsiv/flat-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jtherczeg/multi-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/ChadStrat/travu-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jtherczeg/corlate-theme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jacoweb/freelanceTheme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+wget https://github.com/jacoweb/AgencyTheme/archive/master.zip
+unzip master.zip
+rm -f master.zip
+## Setup links
+rm -f /var/www/html/${DOMAIN}
+ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}
+ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/guru/_webapps/
+chown -R www-data:www-data /var/www/html/${DOMAIN}
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+## MySQL port (may not be necessary, so commented)
+#ufw allow 3306
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+
+echo "These are setup for OctoberCMS:
+
+Database Type: MySQL
+MySQL Host: localhost
+MySQL Port: 3306
+
+Database Name: ${DBASE}
+MySQL Login: ${DBUSER}
+MySQL Password: ${DBPASSWORD}
+
+You also have ftp access to the folder in: guru/_domains/${DOMAIN}
+
+Go to http://${DOMAIN}/index.php to install.
+"
+

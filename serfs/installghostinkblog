@@ -1,0 +1,122 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs ghost as an app to be connected to blog.your-name.verb.ink
+
+# You MUST HAVE EMAIL SETUP with an email address. Once you set this password you can't change it. Probably ghost@your-name.verb.ink
+
+# Ghost Port: Only the blog.YOU.verb.ink URI uses 2368, domains use higher ports.
+
+# NOTE: Put the email password in "double quotes" to avoid problems with special characters.
+
+# How to use:
+## ./installghostinkblog [emailusername] "[emailpassword]"
+
+
+CVAPPNAME=ghost.inkblog
+
+EMAILUSER=$1
+EMAILPASS=$2
+
+# Basic credential check
+if [ -z $2 ]; then
+echo "You need to set two variables (email and password) to install Ghost to a domain. See \"How to use\" in the serf."
+exit 55
+fi
+
+# Check for existing inkblog
+. /var/local/verb/configs/siteinstallstatus
+if [ "${INKblog}" != "NOT_YET" ]; then
+echo "Awkward...
+Your blog at blog.${SITENAME}.verb.ink already has ${INKblog} installed. This just isn't going to work."
+exit 0
+fi
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+
+# Install Node.js (LTS req by Ghost) and npm
+curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+apt install -y nodejs
+
+# Install Ghost
+cd /var/local/ghost
+curl -L https://ghost.org/zip/ghost-latest.zip -o ghost.zip
+unzip -uo ghost.zip -d ghostblog
+rm -f ghost.zip
+
+## Now install it with npm
+cd /var/local/ghost/ghostblog
+npm install --production
+
+# Set up the Ghost config
+cd /var/local/ghost/ghostblog
+cp config.example.js config.js
+sed -i "s/url: 'http:\/\/my-ghost-blog.com'/url: 'http:\/\/blog.${SITENAME}.verb.ink'/g" config.js
+sed -i "s/host: '127.0.0.1'/host: '${SITEIP}'/g" config.js
+sed -i "s/mail: {}/mail: {transport: 'SMTP', options: {host: 'localhost', port: 25, service: 'dovecot', auth: {user: '${EMAILUSER}', pass: '${EMAILPASS}'}}}/g" config.js
+
+# Set UFW to allow the Ghost port
+ufw allow 2368
+
+# Apache
+## Remove static-Apache html folder
+rm -rf /var/www/html/ink.blog
+echo "Ghost" > /var/www/html/ink.blog
+## Set the IP address in the Apache config file
+cp /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-ghost /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
+sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
+service apache2 reload
+## inkCert SSL certs
+### Not setup
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.ink."
+fi
+### inkCert-LE DONE
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-LE is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
+fi
+### inkCert-IC DONE
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
+echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd blog.${SITENAME}.verb.ink
+fi
+
+# Make it a service at startup
+cp /var/local/verb/configs/site-files/ghost.conf /etc/init/ghost.conf
+
+# Set the site-wide inkblog config
+sed -i "s/INKblog=.*/INKblog=\"Ghost\"/g" /var/local/verb/configs/siteinstallstatus
+
+# Write the config for backup
+echo "#!/bin/sh
+GHOSTEMAIL=\"${EMAILUSER}\"
+GHOSTEMLPAS=\"${EMAILPASS}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+### Below (Forever) is expirimental on inkVerb, but working, and should be replaced with a way to run Ghost as a proper service at startup
+# Run Ghost with Forever
+npm install -g forever
+## Production forever
+cd /var/local/ghost/ghostblog && NODE_ENV=production forever start index.js
+## Non-production / developer forever
+#forever start index.js
+## If you want, stop Forever with:
+### cd /var/local/ghost/ghostblog && forever stop index.js
+
+##### Don't use this normally because it halts the current script and does not finish the rest of the jobs
+## Start Ghost only for this server session
+#cd /var/local/ghost/ghostblog
+#npm start --production
+#####
+
+# Finish
+echo "Ghost is setup.
+Go to http://blog.${SITENAME}.verb.ink/ghost to install."
+
+# Optional server restart
+#echo "But first, wait two minutes for the server to restart."
+#sleep 3
+#reboot
+

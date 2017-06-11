@@ -1,0 +1,232 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs Postfix as the email server wtih Dovecot and OpenDKIM
+## Prerequisite: sertupverb
+## This only performs basic back-end server setup and creates no mail accounts
+## Once this is done it is set for the server permanently.
+
+# How to use:
+## ./installpostfix
+
+
+# Include the config files
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/sitemailpath
+
+# Check to see if already installed
+if [ ${SITEMAILSTATUS} = "EMAIL_SERVER" ]; then
+echo "
+Email server already installed.
+"
+exit 0
+fi
+if [ ${SITEMAILSTATUS} = "EMAIL_BACKUP_MX" ]; then
+echo "
+Email server is already a backup server.
+"
+exit 0
+fi
+
+# Generate the mailpassword appendage (just a little more secure, wink)
+MAILPASSGEN=$(pwgen -s -1 5)
+
+# Choose Internet Site options in advance
+echo "postfix postfix/mailname string ${SITEHOST}.${SITENAME}.verb.${SITETLD}" | debconf-set-selections
+echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
+#echo "postfix postfix/relayhost string smtp.localdomain" | debconf-set-selections 
+apt install -y mail-server^
+apt install -y \
+  postfix-mysql \
+  dovecot-mysql \
+  postgrey \
+  amavis \
+  clamav \
+  clamav-daemon \
+  spamassassin \
+  libdbi-perl \
+  libdbd-mysql-perl \
+  php7.0-imap
+service apache2 restart
+
+# Add other tools for spam and antivirus
+apt install -y \
+  pyzor \
+  razor \
+  arj \
+  cabextract \
+  lzop \
+  nomarch \
+  p7zip-full \
+  ripole \
+  rpm2cpio \
+  tnef \
+  unzip \
+  unrar-free \
+  zip \
+  zoo
+# Create the MySQL database and user
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE mail;
+GRANT ALL PRIVILEGES ON mail.* TO 'mail'@'localhost' IDENTIFIED BY 'mailpass${MAILPASSGEN}';
+FLUSH PRIVILEGES;"
+# OR try:
+#/var/local/verb/serfs/newmysqldb mail mail mailpass${MAILPASSGEN}
+
+# Add the virtual user to handle mail
+useradd -r -u 150 -g mail -d /var/vmail -s /sbin/nologin -c "Virtual maildir handler" vmail
+mkdir /var/vmail
+chmod 770 /var/vmail
+chown vmail:mail /var/vmail
+
+# Dovecot
+## Copy config files
+cp /var/local/verb/configs/conflab/email/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/
+cp /var/local/verb/configs/conflab/email/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/
+cp /var/local/verb/configs/conflab/email/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/
+cp /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/
+cp /var/local/verb/configs/conflab/email/dovecot/conf.d/15-lda.conf /etc/dovecot/conf.d/
+cp /var/local/verb/configs/conflab/email/dovecot/dovecot-sql.conf.ext /etc/dovecot/
+## Replace configs
+sed  -i "s/name286/${SITENAME}/g" /etc/dovecot/conf.d/10-ssl.conf
+sed  -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-SNAKEOIL.conf
+sed  -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-INKCERT.conf
+sed  -i "s/email286/${SITEEMAILTLD}/g" /etc/dovecot/conf.d/10-ssl.conf
+sed  -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-SNAKEOIL.conf
+sed  -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-INKCERT.conf
+sed  -i "s/name286/${SITENAME}/g" /etc/dovecot/conf.d/15-lda.conf
+sed  -i "s/tld286/${SITETLD}/g" /etc/dovecot/conf.d/15-lda.conf
+sed  -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/dovecot/dovecot-sql.conf.ext
+## Own
+chown -R vmail:dovecot /etc/dovecot
+chmod -R o-rwx /etc/dovecot
+
+# Amavis, ClamAV, and SpamAssassin
+adduser clamav amavis
+adduser amavis clamav
+## Copy config files
+cp -R /var/local/verb/configs/conflab/email/amavis/conf.d/15-content_filter_mode /etc/amavis/conf.d/
+cp -R /var/local/verb/configs/conflab/email/amavis/conf.d/50-user /etc/amavis/conf.d/
+cp -R /var/local/verb/configs/conflab/email/clamav/clamd.conf /etc/clamav/
+cp /var/local/verb/configs/conflab/email/default/spamassassin /etc/default/
+## Replace configs
+sed  -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/amavis/conf.d/50-user
+## Restart and stuff
+freshclam
+service clamav-daemon restart
+service amavis restart
+service spamassassin restart
+
+# Postfix
+## Copy configs
+cp /var/local/verb/configs/conflab/email/postfix/mysql_virtual_alias_domainaliases_maps.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/mysql_virtual_alias_maps.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/mysql_virtual_domains_maps.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/mysql_virtual_mailbox_domainaliases_maps.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/mysql_virtual_mailbox_maps.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/mysql_virtual_sender_login_maps.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/main.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/master.cf /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/header_checks /etc/postfix/
+cp /var/local/verb/configs/conflab/email/postfix/main_orig.cf /etc/postfix/
+## Replace configs
+sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_alias_domainaliases_maps.cf
+sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_alias_maps.cf
+sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_domains_maps.cf
+sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_mailbox_domainaliases_maps.cf
+sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_mailbox_maps.cf
+sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_sender_login_maps.cf
+sed -i "s/name286/${SITENAME}/g" /etc/postfix/main.cf
+sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
+sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
+sed -i "s/host286/${SITEHOST}/g" /etc/postfix/main.cf
+sed -i "s/email286/${SITEEMAILTLD}/g" /etc/postfix/main.cf
+sed -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
+sed -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
+sed -i "s/tld286/${SITETLD}/g" /etc/postfix/main.cf
+sed -i "s/tld286/${SITETLD}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
+sed -i "s/tld286/${SITETLD}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
+# Grand Restart
+service postfix restart
+systemctl restart postfix
+service spamassassin restart
+service clamav-daemon restart
+service amavis restart
+service dovecot restart
+
+# Set the config for backup
+sed -i "s/SITEMAILPASSAPG.*/SITEMAILPASSAPG=${MAILPASSGEN}/g" /var/local/verb/configs/sitemailpass
+
+# UFW (services and ports below them if known)
+ufw allow postfix
+ufw allow smtp
+ufw allow 25
+ufw allow 587
+ufw allow smtps
+ufw allow 465
+ufw allow pop3
+ufw allow 110
+ufw allow pop3s
+ufw allow 995
+ufw allow pop2
+ufw allow 109
+ufw allow imap
+ufw allow 143
+ufw allow imaps
+ufw allow 993
+# for OpenDKIM
+ufw allow 8891
+ufw allow 12301
+
+# OpenDKIM
+## Create/reset OpenDKIM files
+apt install -y opendkim opendkim-tools
+cp /var/local/verb/configs/conflab/email/default/opendkim /etc/default/
+cp /var/local/verb/configs/conflab/email/opendkim.conf /etc/
+mkdir /etc/opendkim
+mkdir /etc/opendkim/keys
+echo "127.0.0.1
+localhost
+${SITEIP}
+${SITEHOST}.${SITENAME}.verb.${SITETLD}" > /etc/opendkim/TrustedHosts
+echo "inkdkim._domainkey.${SITENAME}.verb.${SITETLD} ${SITENAME}.verb.${SITETLD}:inkdkim:/etc/opendkim/keys/${SITENAME}.verb.${SITETLD}/inkdkim.private" > /etc/opendkim/KeyTable
+echo "${SITENAME}.verb.${SITETLD} inkdkim._domainkey.${SITENAME}.verb.${SITETLD}" > /etc/opendkim/SigningTable
+## OpenDKIM Key for initial site
+mkdir -p /etc/opendkim/keys/${SITENAME}.verb.${SITETLD}
+cd /etc/opendkim/keys/${SITENAME}.verb.${SITETLD}
+opendkim-genkey -r -S -s inkdkim -d ${SITENAME}.verb.${SITETLD}
+chmod 660 inkdkim.private
+chown root:opendkim inkdkim.private
+chown opendkim:opendkim inkdkim.private
+service opendkim start
+
+# Postgres Whitelist
+cp /etc/postgrey/whitelist_clients /etc/postfix/postgrey_whitelist_clients
+cp /etc/postgrey/whitelist_recipients /etc/postfix/postgrey_whitelist_recipients
+
+# Set Apache subdomains
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.mail
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.mail
+#a2ensite mail.${SITENAME}.verb.${SITEEMAILTLD}
+service apache2 reload
+
+# inkCert
+## This adds the declared domain to the end of the "domains =" line
+#sed -i "/^domains =/ s/$/, mail.${SITENAME}.verb.${SITEEMAILTLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${SITEEMAILTLD}.ini
+
+# Monit
+cp /var/local/verb/configs/conflab/email/monit/monitrc.d/amavis /etc/monit/monitrc.d/
+cp /var/local/verb/configs/conflab/email/monit/monitrc.d/dovecot /etc/monit/monitrc.d/
+cp /var/local/verb/configs/conflab/email/monit/monitrc.d/opendkim /etc/monit/monitrc.d/
+cp /var/local/verb/configs/conflab/email/monit/monitrc.d/postfix /etc/monit/monitrc.d/
+cp /var/local/verb/configs/conflab/email/monit/monitrc.d/spamassassin /etc/monit/monitrc.d/
+service monit restart
+
+# Config settings to "EMAIL_INSTALLED"
+sed -i "s/SITEMAILSTATUS=.*/SITEMAILSTATUS=EMAIL_SERVER/g" /var/local/verb/configs/sitemailpath
+
+# Finish
+echo "Postfix and friends for inkVerb has been installed.
+
+The email server is https://${SITENAME}.verb.${SITEEMAILTLD}"

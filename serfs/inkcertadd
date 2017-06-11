@@ -1,0 +1,102 @@
+#!/bin/bash
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs inkCert Apache credentials for a given domain, including inkVerb namespace domains
+## It applies only to one domain/subdomain at a time
+## Prereq: inkcertreq
+## This is intended as a subscript of inkcertdo
+
+# How to use:
+## ./inkcertadd [domain.tld or sub.domain.tld]
+
+#Eg:
+## ./inkcertadd inkisaverb.com
+## ./inkcertadd blog.inkisaverb.com
+## ./inkcertadd YOURNAME.verb.one
+## ./inkcertadd owncloud.YOURNAME.verb.blue
+## ./inkcertadd smtp.YOURNAME.verb.email
+
+
+SITEDOMAIN=$1
+CERTDOMAIN=$2
+
+# Check variables
+if [ -z $1 ]; then
+echo "You need to specify a domain. Read the instructions."; exit 0
+fi
+
+# Set variable for same certificate as domain (most all scenarios)
+if [ -z $2 ]; then
+CERTDOMAIN=$1
+fi
+
+# Include and check the inkCert install config
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/inkcert/inkcertstatus
+
+# Certs should already be in place from inkcertreq
+## This is a test for the inkcert directories:
+if [ ! -d "/etc/inkcert/live/${CERTDOMAIN}" ]; then
+echo "Something's wrong...
+
+inkCert certs are not installed. Common problems can include:
+  - DNS records: ${SITEDOMAIN} should point to ${SITEIP}
+  - DNS for ${SITEDOMAIN} may need a \"wildcard\" * CNAME record that points to ${SITEDOMAIN} as the \"hostname\"
+  - DNS records can take about 4 hours to have effect
+  - You need to first run: inkcertreq
+  - Do not run for individual subdomains with a shared certificate, but only for: ${SITENAME}.verb.blue, ${SITENAME}.verb.rocks, inkisaverb.com, etc.
+"
+exit 22
+fi
+
+# Check Apache config status
+if grep -Fq "#INKVERB-INKCERT=INK_NO" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+echo "Setting inkCert configs for ${SITEDOMAIN}..."
+else
+ if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+ echo "Already certified by inkCert-LE: ${SITEDOMAIN}. Moving on..."
+ exit 0
+ else
+  if grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+  echo "Already certified by inkCert-IC: ${SITEDOMAIN}. Moving on..."
+  exit 0
+  else
+   if grep -Fq "#INKVERB-INKCERT=NA" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+   echo "inkCert certs do not apply here: ${SITEDOMAIN}. Moving on..."
+   exit 0
+   else
+   echo "Something's really wrong with ${SITEDOMAIN}. No inkCert, no non-inkCert either. I quit here."
+   exit 66
+   fi
+  fi
+ fi
+fi
+
+# Comment the Snakeoil certs
+sed -i "s/SSLCertificateFile/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/g" /etc/apache2/sites-available/${SITEDOMAIN}.conf
+sed -i "s/SSLCertificateKeyFile/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/g" /etc/apache2/sites-available/${SITEDOMAIN}.conf
+
+# Insert the inkCert certs
+sed -i "s/#INKVERB-INKCERT=INK_.*/#INKVERB-INKCERT=DONE_IC\n\t\tSSLCertificateFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.cert\.pem\n\t\tSSLCertificateKeyFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.key\.pem\n\t\tSSLCertificateChainFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.ca-chain\.cert\.pem/g" /etc/apache2/sites-available/${SITEDOMAIN}.conf
+service apache2 start
+
+# Create the inkCert-DOMAIN config file
+echo "#!/bin/sh
+INKCERTED=DONE_IC" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITEDOMAIN}
+
+# inkCert status & exit
+if [ "${FIRSTINKCERTADD}" = "NOT_YET" ]; then
+## Config status: first inkCert done
+sed -i "s/FIRSTINKCERTADD=NOT_YET/FIRSTINKCERTADD=DONE/g" /var/local/verb/configs/inkcert/inkcertstatus
+## Create the cron job
+### Add inkCertLE's auto updater to the cron
+echo "3 3 * * * root /var/local/verb/configs/inkcert/inkcert-renew-all.sh" >> /var/local/verb/configs/verbcron
+### Set cron to run the verbcron
+cp /var/local/verb/configs/verbcron /etc/cron.d/verber
+fi
+
+# Finish
+echo "
+${SITEDOMAIN} certs installed.
+"

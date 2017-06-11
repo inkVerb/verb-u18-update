@@ -1,0 +1,40 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This displays the inkNet Client info to be used by a Client by inknetaddverberclient
+
+# How to use:
+## ./showinknetclientinfo
+
+
+# Check & include the config
+if [ -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+. /var/local/verb/configs/inknet/inker.client.cnf
+ if [ -n "${CLIENTHOST}" ]; then
+ echo "Here's the info for this Client Verber..."
+ else
+ echo "This is not a Client. No info to show.
+First run: inknetmakeverberclient
+"
+ exit 22
+ fi
+else
+echo "This is not a Client. No info to show.
+First run: inknetmakeverberclient
+"
+exit 22
+fi
+
+# Include the config
+. /var/local/verb/configs/sitenameip
+
+# Display info
+echo "
+Host: ${CLIENTHOST}
+URI:  ${CLIENTURI}
+Client Name: ${CLIENTNAME}
+Client Type: \"verber\"
+IP:   ${SITEIP}
+"
+

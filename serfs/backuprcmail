@@ -1,0 +1,52 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This backs up the RoundCube app, including folders and database
+## This may not be important, but is available just in case.
+
+# How to use:
+## ./backuprcmail [securename 0-9, a-z, and A-Z only] [-nl for no link, optional]
+
+# Eg:
+## ./backuprcmail 583
+## ./backuprcmail aF9 -nl
+
+
+SECNAME=$1
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Export the database
+cd /var/local/verb/serfs
+/var/local/verb/serfs/mysqlex rcmail
+mv /var/local/verb/serfs/rcmail.sql /var/www/email/roundcube/
+
+# Copy the config
+cp /var/local/verb/configs/sitemailpath /var/www/roundcube/sitemailpath-old
+cp /var/local/verb/configs/sitemailpass /var/www/roundcube/sitemailpass-old
+cp /var/local/verb/configs/sitenameip /var/www/roundcube/sitenameip-old
+
+# Zip the directory
+cd /var/email
+zip -r verb.roundcube.${SECNAME}.vbak.zip roundcube
+
+# Move to web-download area
+mv verb.roundcube.${SECNAME}.vbak.zip /var/www/guru/
+chown -R www-data:www-data /var/www/html/${SITETLD}/verb.roundcube.${SECNAME}.vbak.zip
+
+if [ "$2" = "-nl" ]
+then
+	echo "The email server data has been backed up to the 'guru' folder.
+Note that the email server remains live."
+exit 0
+fi
+
+ln -s /var/www/guru/verb.roundcube.${SECNAME}.vbak.zip /var/www/html/${SITETLD}/
+echo "The email server data has been backed up to the 'guru' folder and can also be downloaded at
+http://${SITENAME}.verb.roundcube.${SECNAME}.vbak.zip
+Note that the email server remains live."
+
+
+

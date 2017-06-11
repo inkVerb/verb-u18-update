@@ -1,0 +1,91 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds a Vrk Client for this inkNet CA Verber to host
+## This can be run to update an existing config
+## Prerequisite: inknetinstallca
+
+# How to use:
+## ./inknetaddvrkclient [username on machine] [machine name - AKA 'computer name'] [vrk ip - if known]
+
+# Eg:
+## ./inknetaddvrkclient jimmy uWorkStudioJimmy
+
+
+# Prerequesites
+if [ -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
+. /var/local/verb/configs/inknet/ca.verber.cnf
+ if [ "${INKNETSTATUS}" != "INSTALLED" ]; then
+echo "inkNet not quite installed. First, run inknetinstallca"
+exit 0
+ fi
+else
+echo "inkNet not installed. First, run inknetinstallca"
+exit 0
+fi
+
+ADDUSER=$1
+ADDMACHINE=$2
+ADDIP=$3
+FULLCLIENTNAME="${ADDUSER}_${ADDMACHINE}"
+ADDCLIENTNAME=$(echo $FULLCLIENTNAME | cut -c1-18)
+if [ -z "$3" ]; then
+ADDIP="NOT_SET"
+fi
+ADDAPG=$(pwgen -1 -0 -A 4)
+ADDPASSWORD=$(pwgen -1 -s 15)
+# New username based on user, random appendage, and computer name
+FULLUSERNAME=${ADDUSER}${ADDAPG}${ADDMACHINE}
+## Truncate the new username to the 32 character limit
+ADDUSERNAME=$(echo $FULLUSERNAME | cut -c1-32)
+
+# Just in case user already exists
+if [ -f /var/local/verb/configs/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf ]; then
+echo "Umm... How do I say this...
+
+A config already exists for that Vrk Station name.
+
+Note: Your name \"${FULLCLIENTNAME}\" is cut to 18 characters at \"${ADDCLIENTNAME}\" because of system filename limits. Even if your full \"computer name\" is different, this could create a conflict, in theory. If that's the case, create a different user on your Vrk Station computer, re-install Vrk again for that user, then try again from that user.
+
+If you really need to continue and replace the existing profile by this name, first delete the profile for ${ADDCLIENTNAME} at inknet/clients/client.vrk.${ADDCLIENTNAME}.cnf in configs on the Verber
+...then run this again.
+"
+exit 0
+fi
+
+# Create the config
+. /var/local/verb/configs/siteport
+ADDLOGINPORT=${SITEPORT}
+echo "#!/bin/sh
+# inkNet config, verb.ink
+## This contains information about a Vrk Client's credentials used in signing SSH keys for inkNet on this CA Verber
+## Note that a local Vrk Station only uses the local username as the URI for SSH key and cert purposes
+
+CLIENTUSER=\"${ADDUSER}\"
+CLIENTURI=\"${ADDMACHINE}\"
+CLIENTNAME=\"${ADDCLIENTNAME}\"
+CLIENTIP=\"${ADDIP}\"
+CLIENTUSERNAME=\"${ADDUSERNAME}\"
+CLIENTPASSWORD=\"${ADDPASSWORD}\"
+CLIENTPORT=\"${ADDLOGINPORT}\"
+" > /var/local/verb/configs/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf
+
+# Create the jailed user
+/var/local/verb/serfs/inknetaddjailkituser ${ADDUSERNAME} ${ADDPASSWORD}
+
+# Create the inkNet Client tool links
+ln -sfn /var/local/verb/tools /srv/jail/home/${ADDUSERNAME}/
+
+# FInish
+echo "All set. Your Vrk Station has been added as a Client to this Verber.
+
+That machine's user account will be known here as: ${ADDCLIENTNAME}"
+
+## Serf message
+echo "
+Now, as a Serf, you need to add the client ssh-rsa key via: inknetaddclientkey
+
+Then follow instructions.
+"
+

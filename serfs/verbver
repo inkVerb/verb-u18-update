@@ -1,0 +1,12 @@
+#!/bin/sh
+#inkVerbKnight! verb.ink
+set -e
+
+# This displays the current Verber version number
+
+# How to use:
+## ./inkver
+
+. /var/local/verb/configs/inklists/verberverno
+echo "${VERNO}"
+

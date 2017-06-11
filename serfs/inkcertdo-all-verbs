@@ -1,0 +1,45 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This script runs doinkcert for all native Verber domains... verb.ink, verb.blue, etc.
+
+# DEV NOTE: This should probably be removed because the DNS record for all verb namespaces is not presumed.
+
+# How to use:
+## ./inkcertdo-all-verbs
+
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+if [ $VERBemail=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.email
+fi
+if [ $VERBone=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.one
+fi
+if [ $VERBink=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.ink
+fi
+if [ $VERBblue=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.blue
+fi
+if [ $VERBguru=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.guru
+fi
+if [ $VERBkiwi=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.kiwi
+fi
+if [ $VERBpink=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.pink
+fi
+if [ $VERBred=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.red
+fi
+if [ $VERBrocks=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.rocks
+fi
+if [ $VERBuno=true ]; then
+/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.uno
+fi
+

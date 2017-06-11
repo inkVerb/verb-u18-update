@@ -1,0 +1,63 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This script revokes the inkCert Proper certs for a specified domain
+## It applies only to one domain/subdomain at a time
+## Prerequesite: inkcertdo (or both subscripts thereof: inkcertreq, inkcertadd)
+## This is intended as a subscript of inkcertundo
+
+# Dev NOTE:
+## The portion of this script that calls the CA to revoke the cert has not been written yet.
+
+# How to use:
+## ./inkcertrevoke [domain.tld or sub.domain.tld]
+
+#Eg:
+## ./inkcertrevoke inkisaverb.com
+## ./inkcertrevoke YOURNAME.verb.one
+## ./inkcertrevoke owncloud.YOURNAME.verb.blue
+
+
+DOMAIN=$1
+
+# Include and check the inkCert domain config
+## Verify that the domain is installed
+if [ ! -f /var/local/verb/configs/inkcert/csr-inf/siteinkcert-${DOMAIN} ]; then
+echo "Sorry, Bucko. ${DOMAIN} is not even installed.
+
+Why revoke a cert for a domain that isn't even installed here?
+"; exit 0
+fi
+## Domain cert status
+. /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
+if [ "${INKCERTED}" != "DONE_IC" ]; then
+ if [ "${INKCERTED}" = "DONE_LE" ]; then
+echo "inkCert used Letsencrypt for ${DOMAIN}. This is for inkCert Proper.
+
+Instead use: inkcertundole (or, individually: inkcertrevokele, inkcertremovele)
+"; exit 0
+ fi
+echo "inkCert is not setup for ${DOMAIN}, it only has Snakeoil.
+
+There is nothing to revoke until you run inkcertdo or inkcertdole... And then, certs are cool. Why would you want to revoke them? Are you just revoking stuff at random?
+"; exit 0
+fi
+
+# Signal inkCert server to revoke the certs and remove them from being live
+##### This has not been written yet
+### This should be a separate serf to handle ONLY the revoke request itself, which may be useful in other certs, such as a way to replace a cert
+#inkcertgetrevoke-verber (talk to CA Inker) inkNet Verber runs on Inker: 
+# inkNet Inker runs on Verber: inkcertgetrevokedone-inker
+
+# Remove any CSR or Keys on this Verber
+if [ -d /etc/inkcert/csr/${DOMAIN}/ ]; then
+echo "Removing these keys for ${DOMAIN}..."
+shred -f -x /etc/inkcert/csr/${DOMAIN}/pemfraez
+rm -rf /etc/inkcert/csr/${DOMAIN}/
+else
+echo "Keys for ${DOMAIN} not found. Nothing here to remove. All set."
+
+# Echo alliswell
+echo "Unless there is an error message above, the certs should have been revoked from the CA, now uninstall them..."
+

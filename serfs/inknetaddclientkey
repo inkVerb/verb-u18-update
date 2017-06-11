@@ -1,0 +1,85 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds a Vrk/Verber Client's public SSH key to "authorized_hosts" on the CA Verber
+## If the key is not included in the initial command, it will be read interactively.
+## Prerequisite: inknetaddvrkclient/inknetaddverberclient
+
+# How to use:
+## ./inknetaddclientkey [vrk/verber type] [verb-namespace - ONLY IF VERBER] [client name] ["FULL KEY" - in quotes! - optional]
+
+# Eg: (In exactly this format! Check the Client settings to get the client name.)
+## ./inknetaddclientkey verber joeysite joeyhost_joeysite_verb_ink (for Verber)
+## ./inknetaddclientkey vrk joey_gCodingStationJoey (for Vrk Station)
+## ./inknetaddclientkey verber joeysite joeyhost_joeysite_verb_ink "ssh-rsa AAAAOmIOMIWhfsdfENFSDFaffJLKfsSDJsdSDKjWdsfsadfOkEjMCAfdSDKFLOIjhWESF.....WWLKqhOIMhgbSDF boss@joey
+## ./inknetaddclientkey vrk joey_gCodingStationJoey "ssh-rsa AAAAOmIOMIWhfsdfENFSDFaffJLKfsSDJsdSDKjWdsfsadfOkEjMCAfdSDKFLOIjhWESF.....WWLKqhOIMhgbSDF joey@gCodingStationJoey
+
+
+VTYPE=$1
+# Determine vrk or verber
+if [ "${VTYPE}" = "vrk" ]; then
+## Truncate the name in case the full name was used
+VCNAME=$(echo $2 | cut -c1-18)
+VCKEY=$3
+else
+ if [ "${VTYPE}" = "verber" ]; then
+VCNSPACE=$2
+## Truncate the name in case the full name was used
+VCNAME=$(echo $3 | cut -c1-18)
+VCKEY=$4
+ else
+ echo "You need to specify \"vrk\" or \"verber\". Read the instructions."
+ exit 22
+ fi
+fi
+
+# Check if the Client has been added
+if [ "${VTYPE}" = "vrk" ]; then
+ if [ ! -e "/var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
+ echo "You must add the Client first using: inknetaddvrkclient."
+ exit 22
+ fi
+fi
+if [ "${VTYPE}" = "verber" ]; then
+ if [ ! -e "/var/local/verb/configs/inknet/verber/${VCNSPACE}/client.verber.${VCNAME}.cnf" ]; then
+ echo "You must add the Client first using: inknetaddverberclient."
+ exit 22
+ fi
+fi
+
+# Include the configs
+if [ "${VTYPE}" = "vrk" ]; then
+. /var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf; fi
+if [ "${VTYPE}" = "verber" ]; then
+. /var/local/verb/configs/inknet/verber/${VCNSPACE}/client.verber.${VCNAME}.cnf; fi
+. /var/local/verb/configs/inknet/ca.verber.cnf
+
+# Prompt for the copy-paste
+if [ -z "${VCKEY}" ]; then
+echo "
+ Activate Client key area...
+
+Please copy and paste the entire contents of the Client public key, then press <Enter>...
+"
+read CPKEY
+VCKEY="${CPKEY}"
+fi
+
+# Add the key
+if [ "${VTYPE}" = "vrk" ]; then
+echo "${VCKEY}"  > /etc/ssh/authorized_keys/${CLIENTUSERNAME}
+fi
+if [ "${VTYPE}" = "verber" ]; then
+echo "${VCKEY}.${CLIENTURI}"  > /etc/ssh/authorized_keys/${CLIENTUSERNAME}
+fi
+
+# Finish
+echo "Success! The Client key for ${CLIENTURI} has been added."
+
+## Serf message
+echo "
+Now, as a Serf, you need to run inknetzipclientpkg
+
+Follow the instructions."
+

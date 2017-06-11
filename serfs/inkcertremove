@@ -1,0 +1,69 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This script ininstalls the Apache credentials for inkCert Proper certs for a domain and replaces the Snakeoil certificate
+## It applies only to one domain/subdomain at a time
+## Prerequesite: inkcertrevoke
+## This is intended as a subscript of inkcertundo
+
+
+# Dev NOTE:
+## The portion of this script that calls the CA to revoke the cert has not been written yet.
+
+# How to use:
+## ./inkcertremove [domain.tld or sub.domain.tld]
+
+#Eg:
+## ./inkcertremove inkisaverb.com
+## ./inkcertremove YOURNAME.verb.one
+## ./inkcertremove owncloud.YOURNAME.verb.blue
+
+
+DOMAIN=$1
+
+# Check Apache config status
+if grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+echo "Removing inkCert-IC configs from ${DOMAIN}..."
+else
+ if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+ echo "Apache configs use inkCert-LE. Use: inkcertremovele"
+ exit 22
+ else
+  if grep -Fq "#INKVERB-INKCERT=NO" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  echo "inkCert certs aren't setup. Nothing to do."
+  exit 0
+  else
+  echo "Something's really wrong. No inkCert, no non-inkCert either. I quit."
+  exit 66
+  fi
+ fi
+fi
+
+# Apache
+## Check that the certs are no longer live
+if [ ! -d /etc/inkcert/live/${DOMAIN} ]; then
+## Uncomment the Snakeoil cert configs
+sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/SSLCertificateFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/SSLCertificateKeyFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
+
+## Remove the inkCert cert configs
+sed -i "s/#INKVERB-INKCERT=DONE_IC\n\t\tSSLCertificateFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/cert\.crt\n\t\tSSLCertificateKeyFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/privkey\.key\n\t\SSLCACertificateFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/ca\.interm\.crt\n\t\tSSLCertificateChainFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/chain\.pem/#INKVERB-INKCERT=NO_REMOVED_IC/g" /etc/apache2/sites-available/${DOMAIN}.conf
+
+service apache2 restart
+
+echo "#!/bin/sh
+INKCERT=NO_REMOVED_IC" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
+
+# Finish
+echo "inkCert has been uninstalled from ${DOMAIN}. Using Snakeoil certs."
+exit 0
+else
+
+# If they are live
+echo "Something's wrong...
+
+The certs still seem to be live. Did you first run inkcertrevoke or sumply run inkcertundo?
+"
+fi
+

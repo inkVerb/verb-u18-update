@@ -1,0 +1,27 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This changes the path of the PostfixAdmin web path
+## This changes the path already set by installfpa
+
+# How to use:
+## ./setpfapath [folder]
+
+# Eg:
+## To use at boxes.NAME.verb.email/mysecretpath do: ./installpfa easy mysecretpath
+
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/sitemailpath
+
+PFAFOLDER=$1
+
+rm -rf /var/www/html/${SITEEMAILTLD}.boxes
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.boxes
+ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.boxes/${PFAFOLDER}
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.boxes
+sed -i "s/SITEPFAPATH=.*/SITEPFAPATH=${PFAFOLDER}/g" /var/local/verb/configs/sitemail
+sed -i "s/$CONF\['postfix_admin_url'\] = 'https:\/\/.*/$CONF\['postfix_admin_url'\] = 'https:\/\/boxes\.${SITENAME}\.verb\.${SITEEMAILTLD}\/${PFAFOLDER}';/g" /var/www/email/postfixadmin/config.inc.php
+

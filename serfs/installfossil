@@ -1,0 +1,64 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs fossil to be available at fossil.your-name.verb.guru/...
+
+# How to use:
+## ./installfossil [username] [user-email] [userpassword]
+
+# Example:
+## ./installfossil adam adam@verb.ink Adamp4$$w0RD
+
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+
+NEWUSER=$1
+NEWEMAIL=$2
+NEWPASS=$3
+
+# Install and set up directories
+apt install -y fossil
+mkdir /var/www/guru/fossil
+rm -rf /var/www/html/guru.fossil
+ln -s /var/www/guru/fossil /var/www/html/guru.fossil
+chown -R www-data:www-data  /var/www/html
+chown -R www-data:www-data /var/www/guru
+
+# Create the first default fossil
+cd /var/www/guru/fossil
+fossil new index.fossil
+chown www-data:www-data index.fossil
+echo "#!/usr/bin/fossil
+repository: /fossil/index.fossil
+
+# If you didn't figure it out, your first fossil is called index.fossil.
+# Change the .fossil file name on line 2 of this file to have the default url point to any .fossil file you want.
+# dinosaur.fossil is an example of another .fossil file." > index.cgi
+chmod +x index.cgi
+
+# Create a second demo fossil, dinosaur
+cd /var/www/guru/fossil
+fossil new dinosaur.fossil
+echo "#!/usr/bin/fossil
+repository: /fossil/dinosaur.fossil" > dinosaur.cgi
+chmod +x dinosaur.cgi
+
+# Final chown to allow database to be writable
+chown -R www-data:www-data /var/www/guru/fossil
+
+# Add the user
+fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository index.fossil
+fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository dinosaur.fossil
+
+# Ending message
+echo "
+Fossil installed. The first, default fossil will be available at:
+fossil.${SITENAME}.verb.guru
+
+The another demo fossil, dinosaur.fossil, is available at:
+fossil.${SITENAME}.verb.guru/dinosaur.cgi
+
+All relevant files appear via ftp in the \"guru/fossil\" folder.
+"

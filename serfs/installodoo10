@@ -1,0 +1,73 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs Odoo 10 as an app to be connected to odoo.your-name.verb.red
+
+# How to use:
+## ./installodoo10
+
+
+CVAPPNAME=odoo.red
+
+# Check for existing Odoo
+. /var/local/verb/configs/siteinstallstatus
+if [ "${REDodoo}" != "NOT_YET" ]; then
+echo "${REDodoo} is already installed at odoo.${SITENAME}.verb.red.
+It's all been done."
+exit 0; fi
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+
+# Debian Install
+## Based on http://www.odoo.com/documentation/10.0/setup/install.html#setup-install-packaged
+wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
+echo "deb http://nightly.odoo.com/10.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
+apt update && apt install odoo
+
+# Set UFW to allow the Odoo port
+## HTTP
+ufw allow 8069
+## TCP
+ufw allow 8072
+
+# Apache
+## Remove static-Apache html folder
+rm -rf /var/www/html/red.odoo
+echo "Odoo 10" > /var/www/html/red.odoo
+## Set the IP address in the Apache config file
+cp /var/local/verb/configs/site-files/odoo.${SITENAME}.verb.red.conf-odoo /etc/apache2/sites-available/odoo.${SITENAME}.verb.red.conf
+sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/odoo.${SITENAME}.verb.red.conf
+service apache2 reload
+## inkCert SSL certs
+### Not setup
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.red; then
+echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.red."
+fi
+### inkCert-LE DONE
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.red; then
+echo "inkCert-LE is already setup for ${SITENAME}.verb.red. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddle odoo.${SITENAME}.verb.red
+fi
+### inkCert-IC DONE
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.red; then
+echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd odoo.${SITENAME}.verb.red
+fi
+
+# Set the site-wide app-install config
+sed -i "s/REDodoo=.*/REDodoo=\"Odoo10\"/g" /var/local/verb/configs/siteinstallstatus
+
+# Write the config for backup
+echo "#!/bin/sh
+Odoo was installed as red.
+" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+# Record the port in the Odoo port inklist
+echo "odoo.${SITENAME}.verb.red 8069" >> /var/local/verb/configs/inklists/odoositeports
+
+# Finish
+echo "Odoo is setup.
+Go to http://odoo.${SITENAME}.verb.red to install."
+

@@ -1,0 +1,125 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This installs postfix admin
+## Prerequisite: verbemail IF using a verb domain other than verb.email
+## Prerequisite: installpostfix, installrc
+
+# How to use:
+## ./installpfa [path folder] [secure option]
+### PostfixAdmin setup secure option: use "secure" for a password required, otherwise anything else including empty
+
+# Eg: (To use at boxes.NAME.verb.email/mysecretpath do:)
+## ./installpfa mysecretpath
+## ./installpfa mysecretpath secure
+
+
+# Include the config files
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/sitemailpass
+. /var/local/verb/configs/sitemailpath
+
+# Check to see if already installed
+if [ ${SITEPFAPATH} = "PFA_NOT_ALLOWED" ]; then
+echo "
+This is a backup email server and PostfixAdmin is not allowed.
+"
+exit 0
+fi
+if [ ${SITEPFAPATH} != "PFA_NOT_INSTALLED" ]; then
+echo "
+PostfixAdmin is already installed.
+"
+exit 0
+fi
+
+PFAFOLDER=$1
+PFAPASS=$2
+
+# Download from repo
+cd /var/www/email
+/var/local/verb/serfs/inkget postfixadmin.current
+unzip postfixadmin.current.zip
+rm -f postfixadmin.current.zip
+
+# Settings
+## Whether secure or standard password
+### If using 'secure', you must set the hash via pfapass
+if [ "${PFAPASS}" != "secure" ]
+then
+    cp /var/local/verb/configs/conflab/email/postfixadmin/postfixadmin286-config.inc.php /var/www/email/postfixadmin/config.local.php
+fi
+
+if [ "${PFAPASS}" = "secure" ]
+then
+    cp /var/local/verb/configs/conflab/email/postfixadmin/postfixadmin286-secure-config.inc.php /var/www/email/postfixadmin/config.local.php
+fi
+
+# Write the config
+sed -i "s/SITEPFAPATH.*/SITEPFAPATH=${PFAFOLDER}/g" /var/local/verb/configs/sitemailpath
+
+# Settings
+sed -i "s/name286/${SITENAME}/g" /var/www/email/postfixadmin/config.inc.php
+sed -i "s/tld286/${SITETLD}/g" /var/www/email/postfixadmin/config.inc.php
+sed -i "s/email286/${SITEEMAILTLD}/g" /var/www/email/postfixadmin/config.inc.php
+sed  -i "s/mailpassword/mailpass${SITEMAILPASSAPG}/g" /var/www/email/postfixadmin/config.inc.php
+sed  -i "s/rcfolder286/${SITERCPATH}/g" /var/www/email/postfixadmin/config.inc.php
+sed  -i "s/pfafolder286/${PFAFOLDER}/g" /var/www/email/postfixadmin/config.inc.php
+
+# Copy the branding files
+cp /var/local/verb/configs/conflab/email/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
+
+### Should be depreciated after fixed in source
+# Fix the bad password message
+sed -i "s/Your password must contain at least %s character(s)/Your password must contain at least %s letters (A-Z, a-z)/g" /var/local/verb/configs/conflab/email/postfixadmin/languages/*
+
+# Set Apache
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.boxes
+ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.boxes/${PFAFOLDER}
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.boxes
+chown -R www-data:www-data /var/www/email/postfixadmin
+a2ensite boxes.${SITENAME}.verb.${SITEEMAILTLD}
+service apache2 reload
+
+# inkCert
+## This adds the declared domain to the end of the "domains =" line
+sed -i "/^domains =/ s/$/, boxes.${SITENAME}.verb.${SITEEMAILTLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${SITEEMAILTLD}.ini
+
+# Finished
+if [ "${PFAPASS}" = "secure" ]
+then
+	echo "
+Everything looks good.
+
+For setup, note:
+- You must create your own password on the Setup page, then add it via: setpfapass
+  Then...
+- Use any email you want admin, the admin password must include two numbers and two letters
+- Then, login:
+  - Add the domain: ${SITENAME}.verb.${SITETLD}
+  - Create a user, such as me@${SITENAME}.verb.ink etc
+  - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
+
+Set up all this at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${PFAFOLDER}/setup.php
+
+- Then run ./postinstallpfa
+"
+exit 0
+fi
+
+echo "
+Everything looks good.
+For setup, note:
+- Use the install password 'inkverb77'
+- Use any email you want admin, the admin password must include two numbers and two letters
+- Then, login:
+  - Add the domain: ${SITENAME}.verb.${SITETLD}
+  - Create a user, such as me@${SITENAME}.verb.${SITETLD} etc
+  - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
+Set up all this at:
+ https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${PFAFOLDER}/setup.php
+- Then run ./postinstallpfa
+"
+

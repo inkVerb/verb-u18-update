@@ -1,0 +1,29 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This sets a cron job to delete directories in NAME.NAME.verb.ink/inknet/ older than 30 minutes every 14 and 44 minutes past the hour.
+## This is used by inknetmakeca
+
+# How to use:
+## ./inknetsecuredldircron
+
+
+# Include the config
+. /var/local/verb/configs/sitenameip
+CAURI="${SITENAME}.verb.${SITETLD}"
+CAFULLHOST="${SITEHOST}.${CAURI}"
+CANAME="${SITEHOST}_${SITENAME}_verb_${SITETLD}"
+
+# Create cron to delete inkNet download directories
+echo "#!/bin/sh
+# inkNet cron, verb.ink
+find /var/www/html/${CAFULLHOST}/inknet/* -type d -mmin +30 -exec rm -rf {} \;
+" > /var/local/verb/configs/inknet/inknetrmcertdldirs.sh
+chmod +x /var/local/verb/configs/inknet/inknetrmcertdldirs.sh
+echo "14,44 * * * * root /var/local/verb/configs/inknet/inknetrmcertdldirs.sh" >> /var/local/verb/configs/verbcron
+cp /var/local/verb/configs/verbcron /etc/cron.d/verber
+
+# Finish
+echo "This server is now keeping the web inknet/ folder cleaned at 14 and 44 minutes past each hour."
+

@@ -1,0 +1,37 @@
+#!/bin/bash
+#inkVerbSerf! verb.ink
+set -e
+
+# This batch runs inkCert-Letsencrypt request and install scripts for a given domain, including inkVerb namespace domains
+## It also applies to all subdomains for that domain
+## Prereqesite: inkcertinstall
+
+# How to use:
+## ./inkcertdole [domain.tld NO SUBDOMAINS]
+
+#Eg:
+## ./inkcertdole inkisaverb.com
+## ./inkcertdole YOURNAME.verb.blue
+
+
+DOMAIN=$1
+
+# Check variables
+if [ -z $1 ]; then
+echo "You need to specify a domain. Read the instructions."; exit 0
+fi
+
+# Request and get the certs
+/var/local/verb/serfs/inkcertreqle ${DOMAIN}
+
+# Install the certs
+/var/local/verb/serfs/inkcertaddallle ${DOMAIN}
+
+# Finish
+echo "
+Excellent!
+Verify above exits - IMPORTANT NOTES: ... - Congratulations!
+
+If so, then ${DOMAIN} and all subdomains are now live with inkCert Letsencrypt certificates.
+"
+

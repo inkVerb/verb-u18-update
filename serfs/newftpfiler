@@ -1,0 +1,35 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates a user with more powers than a normal ftp user, owning a unique ftp folder containing a symlink to the global guru/_filecabinet and the "files.guru" web accessible folder available at files.NAME.verb.guru/FTPFILERUSERNAME
+## Requires installvsftpd
+
+# How to use:
+## ./newftpfiler [new user] [new user password]
+
+
+NEWFTPFILER=$1
+NEWUSERPASS=$2
+
+# Create the user with password
+adduser ${NEWFTPFILER} --gecos ",,," --disabled-password
+echo "${NEWFTPFILER}:${NEWUSERPASS}" | chpasswd
+
+# Change the user's directory to the vsftpd filers directory
+mkdir /srv/guru/filers/${NEWFTPFILER}
+usermod -d /srv/guru/filers/${NEWFTPFILER} ${NEWFTPFILER}
+
+# Create the domains folder for the user
+mkdir /srv/guru/filers/${NEWFTPFILER}/_domains
+
+# Let the filer have a guru/_filecabinet link
+ln -s /srv/guru/_filecabinet /srv/guru/filers/${NEWFTPFILER}/
+
+# Create the link to access the folder via web
+mkdir /srv/guru/filers/${NEWFTPFILER}/files.guru
+ln -s /srv/guru/filers/${NEWFTPFILER}/files.guru /var/www/guru/files/${NEWFTPFILER}
+
+# Own the user's web accessible symlink folder
+chown -R www-data:www-data /srv/guru/filers/${NEWFTPFILER}/files.guru
+chown -R www-data:www-data /var/www/guru/files/${NEWFTPFILER}

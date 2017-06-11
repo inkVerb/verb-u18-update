@@ -1,0 +1,120 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs WordPress as a vapp with www/html/DOMAIN.TLD link from adddomain
+## WordPress actually resides in www/vapps/wp.DOMAIN.TLD
+## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
+## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## Any files conflicting with WordPress will be replaced by the new WordPress installation created by this script
+## The domain will automatically be added with DKIM credentials if it has not been already
+## This will NOT run inkCert for the domain, but inkCert will be prepped at least and used if inkCert certs already exist.
+
+# All options after the domain are optional, but are sequential
+
+# How to use:
+## ./installwp [domain.tld] [dbase] [dbuser] [dbpassword]
+## ./installwp [domain.tld]  # This will use default usernames and passwords
+
+
+CVAPPNAME=wp
+
+DOMAIN=$1
+DBASE=$2
+DBUSER=$3
+DBPASSWORD=$4
+CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
+
+# Basic credential check
+if [ -z $1 ]; then
+echo "You must designate a domain. Read the How to use. Can't continue."
+exit 22; fi
+# Check if already installed
+## Config
+if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN} ]; then
+echo "This is already installed."
+exit 0; fi
+## Directory
+if [ -d /var/www/vapps/${CVAPPNAME}.${DOMAIN} ]; then
+echo "That WordPress site already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
+exit 0; fi
+
+# Domain presence check
+if [ ! -d "/var/www/domains/${DOMAIN}" ]; then
+/var/local/verb/serfs/adddomain ${DOMAIN}
+fi
+
+# Auto database
+if [ -z $4 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $2 ]; then
+DBASE=wp$(echo $CLEANNAME | cut -c1-24)$(pwgen -s -1 6); fi
+if [ -z $3 ]; then
+DBUSER=${DBASE}
+fi
+
+# Download and establish wordpress in the server to pre-created domain
+cd /var/www/vapps
+wget https://wordpress.org/latest.tar.gz
+if [ ! -f latest.tar.gz ]; then
+echo "Can't download WordPress. I quit."
+exit 44; fi
+tar -xvf latest.tar.gz
+rm -f latest.tar.gz
+mv wordpress ${CVAPPNAME}.${DOMAIN}
+rm -f /var/www/html/${DOMAIN}
+ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}
+ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/guru/_webapps/
+chown -R www-data:www-data /var/www/html/${DOMAIN}
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+
+# Put the settings in the WordPress config file
+cd wp.${DOMAIN}
+cp wp-config-sample.php wp-config.php
+sed -i "s/database_name_here/${DBASE}/g" wp-config.php
+sed -i "s/username_here/${DBUSER}/g" wp-config.php
+sed -i "s/password_here/${DBPASSWORD}/g" wp-config.php
+
+# Add the secure salt and key strings
+AUTH_KEY=$(pwgen -s -1 27)
+SECURE_AUTH_KEY=$(pwgen -s -1 27)
+LOGGED_IN_KEY=$(pwgen -s -1 27)
+NONCE_KEY=$(pwgen -s -1 27)
+AUTH_SALT=$(pwgen -s -1 27)
+SECURE_AUTH_SALT=$(pwgen -s -1 27)
+LOGGED_IN_SALT=$(pwgen -s -1 27)
+NONCE_SALT=$(pwgen -s -1 27)
+sed -i "s/define('AUTH_KEY',         'put your unique phrase here');/define('AUTH_KEY',         '${AUTH_KEY}');/g" wp-config.php
+sed -i "s/define('SECURE_AUTH_KEY',  'put your unique phrase here');/define('SECURE_AUTH_KEY',  '${SECURE_AUTH_KEY}');/g" wp-config.php
+sed -i "s/define('LOGGED_IN_KEY',    'put your unique phrase here');/define('LOGGED_IN_KEY',    '${LOGGED_IN_KEY}');/g" wp-config.php
+sed -i "s/define('NONCE_KEY',        'put your unique phrase here');/define('NONCE_KEY',        '${NONCE_KEY}');/g" wp-config.php
+sed -i "s/define('AUTH_SALT',        'put your unique phrase here');/define('AUTH_SALT',        '${AUTH_SALT}');/g" wp-config.php
+sed -i "s/define('SECURE_AUTH_SALT', 'put your unique phrase here');/define('SECURE_AUTH_SALT', '${SECURE_AUTH_SALT}');/g" wp-config.php
+sed -i "s/define('LOGGED_IN_SALT',   'put your unique phrase here');/define('LOGGED_IN_SALT',   '${LOGGED_IN_SALT}');/g" wp-config.php
+sed -i "s/define('NONCE_SALT',       'put your unique phrase here');/define('NONCE_SALT',       '${NONCE_SALT}');/g" wp-config.php
+
+# Reset all permissions and reload
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+service apache2 reload
+
+echo "These are setup:
+
+Database: ${DBASE}
+Database user: ${DBUSER}
+Database password: ${DBPASSWORD}
+
+Go to http://${DOMAIN}/wp-admin/index.php to install.
+"
+

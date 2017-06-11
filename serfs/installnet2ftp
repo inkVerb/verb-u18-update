@@ -1,0 +1,44 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs net2ftp manually from inkisaverb.com/repo and linnks it to net2ftp....verb.guru
+# Prereq: vsftp and an ftpguru or ftpfiler for login
+
+# How to use:
+## ./installvsftpd
+
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+# Download and unzip
+cd /var/www/vapps
+/var/local/verb/serfs/inkget net2ftp.current
+unzip net2ftp.current.zip
+rm -f net2ftp.current.zip
+rm -rf /var/www/html/guru.net2ftp
+ln -s /var/www/vapps/net2ftp /var/www/html/guru.net2ftp
+chown -R www-data:www-data /var/www/html/guru.net2ftp
+chown -R www-data:www-data /var/www/vapps/net2ftp
+
+# Settings
+cd net2ftp
+cp settings.inc.php settings.inc.php.dist
+cp settings_authorizations.inc.php settings_authorizations.inc.php.dist
+cp settings_screens.inc.php settings_screens.inc.php.dist
+sed -i "s/\$net2ftp_settings\[\"email_feedback\"\] = \"webmaster@enter-your-domain-here.com\";/\$net2ftp_settings\[\"email_feedback\"\] = \"postmaster@${SITENAME}.verb.ink\";/g" settings.inc.php
+sed -i "s/462E16CB7C3F369BD9F4DBEE0A926F8F14FFB3/462E16CB7C3F369HD9F4DAEE0A926FLF14F9B3/g" settings.inc.php
+sed -i "s/\$net2ftp_settings\[\"max_filesize\"\]  = \"10000000\";/\$net2ftp_settings\[\"max_filesize\"\]  = \"1000000000\";/g" settings.inc.php
+sed -i "s/\$net2ftp_settings\[\"allowed_ftpservers\"\]\[1\] = \"ALL\";/\/\/\$net2ftp_settings\[\"allowed_ftpservers\"\]\[1\] = \"ALL\";/g" settings_authorizations.inc.php
+sed -i "s/\/\/\$net2ftp_settings\[\"allowed_ftpservers\"\]\[3\] = \"ftp.mydomain2.org\";/\$net2ftp_settings\[\"allowed_ftpservers\"\]\[1\] = \"${SITEIP}\";/g" settings_authorizations.inc.php
+sed -i "s/\$net2ftp_settings\[\"allowed_ftpserverport\"\] = \"ALL\";/\/\/\$net2ftp_settings\[\"allowed_ftpserverport\"\] = "ALL";/g" settings_authorizations.inc.php
+sed -i "s/\/\/\$net2ftp_settings\[\"allowed_ftpserverport\"\] = \"21\";/\$net2ftp_settings\[\"allowed_ftpserverport\"\] = "2121";/g" settings_authorizations.inc.php
+
+# Finish
+echo "net2ftp is enabled and clipping along!
+
+After creating an FTP Guru (or FTP Filer for private file access also)
+
+Login at http://net2ftp.${SITENAME}.verb.guru
+"

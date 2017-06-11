@@ -1,0 +1,31 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds inkDKIM (OpenDKIM) records for a specific domain
+## This is used by newdomain and newdomaincgi
+## This is not used by addsubdomain or addsubdomaincgi
+## This is not used by any serfs that create new verb subdomains
+
+# How to use:
+## ./addinkdkim [domain.tld or subdomain.domain.tld etc]
+
+
+DKIMDOMAIN=$1
+
+# Create the declared domain key
+mkdir -p /etc/opendkim/keys/${DKIMDOMAIN}
+cd /etc/opendkim/keys/${DKIMDOMAIN}
+opendkim-genkey -r -S -s inkdkim -d ${DKIMDOMAIN}
+chmod 660 inkdkim.private
+chown root:opendkim inkdkim.private
+chown opendkim:opendkim inkdkim.private
+
+# Add the new domain key to the config files
+echo "inkdkim._domainkey.${DKIMDOMAIN} ${DKIMDOMAIN}:inkdkim:/etc/opendkim/keys/${DKIMDOMAIN}/inkdkim.private" >> /etc/opendkim/KeyTable
+echo "${DKIMDOMAIN} inkdkim._domainkey.${DKIMDOMAIN}" >> /etc/opendkim/SigningTable
+echo "${DKIMDOMAIN}" >> /etc/opendkim/TrustedHosts
+/etc/init.d/opendkim restart
+/etc/init.d/postfix reload
+/etc/init.d/postfix restart
+

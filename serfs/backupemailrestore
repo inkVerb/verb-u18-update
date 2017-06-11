@@ -1,0 +1,54 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This restores a back up of the entire email server, including folders and database, that was made using backupemail
+## This only restores the users and their mailboxes as created in PostfixAdmin. Any PostfixAdmin setup will be overwritten.
+
+# Prereq: Postfix and PostfixAdmin installed, but PostfixAdmin setup is irrelevant. postinstallpfa can be run before or after this.
+
+# Instructions:
+## The file can have any name, even if you changed it from the original, as long as it ends in .zip
+## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+## This can be run before or after running installemail or installpostfix, etc.
+
+# How to use:
+## ./backupemailrestore [filename, NO .zip]
+
+# Eg:
+## ./backupemailrestore verb.vmail.hR21.vbak
+
+
+FILENAME=$1
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/sitemailpath
+. /var/local/verb/configs/sitemailpass
+
+# Unzip the file
+cd /var/www/guru
+unzip ${FILENAME}.zip
+rm -f ${FILENAME}.zip
+cp -R vmail /var/
+chmod -R 770 /var/vmail
+chown -R vmail:mail /var/vmail
+rm -rf vmail
+
+# Restore the database
+## Re-create the database first (so the entire MySQL doesn't break and take the server with it)
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+DROP DATABASE mail;
+CREATE DATABASE mail;
+GRANT ALL PRIVILEGES ON mail.* TO 'mail'@'localhost' IDENTIFIED BY 'mailpass${SITEMAILPASSAPG}';
+FLUSH PRIVILEGES;"
+mv /var/vmail/mail.sql /var/local/verb/serfs/
+cd /var/local/verb/serfs/
+/var/local/verb/serfs/mysqlin mail
+rm -f mail.sql
+
+# Finish
+echo "
+The email server data has been restored from the backup and all its backup files removed from this server.
+"
+

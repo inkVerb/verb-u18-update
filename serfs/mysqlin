@@ -1,0 +1,13 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This imports a MySQL database from a .sql file with the same name
+
+# How to use:
+## ./mysqlin [dbase]
+
+
+DBASE=$1
+
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf ${DBASE} < ${DBASE}.sql

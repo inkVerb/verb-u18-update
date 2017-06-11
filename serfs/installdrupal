@@ -1,0 +1,228 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs WordPress as a vapp with www/html/DOMAIN.TLD link from newdomain
+## Drupal actually resides in www/vapps/drupal.DOMAIN.TLD
+## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
+## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## Any files conflicting with Drupal will be replaced by the new Drupal installation created by this script
+## Because Drupal is high-maintenance on the developer end, the domain becomes a guru domain and is linked for ftp access in guru/_domains
+
+# All options after the domain are optional, but are sequential
+
+# How to use:
+## ./installdrupal [domain.tld] [drupal distro - optional, req for dbase options] [dbase] [dbuser] [dbpassword]
+
+# Eg:
+## ./installdrupal inkisaverb.com (This installs the most current version from the Inker.)
+## ./installdrupal inkisaverb.com d7
+## ./installdrupal inkisaverb.com openchurch drupaldbase drplusr51 drplpswrd51
+## ./installdrupal inkisaverb.com current drupaldbase drplusr51 drplpswrd51 (This installs the most current version from the Inker and specifies databases.)
+
+
+CVAPPNAME=drupal
+
+DOMAIN=$1
+DD=$2
+DBASE=$3
+DBUSER=$4
+DBPASSWORD=$5
+CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
+
+# Check if already installed
+## Config
+if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN} ]; then
+echo "This is already installed."
+exit 0; fi
+## Directory
+if [ -d /var/www/vapps/${CVAPPNAME}.${DOMAIN} ]; then
+echo "That Drupal site already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
+exit 22; fi
+
+# Verify that a domain is specified
+if [ -z $1 ]; then
+echo "You must designate a domain."
+exit 22; fi
+
+# Audo Drupal distro
+if [ -z $2 ]; then
+DD="CURRENT_INK_REPO"; fi
+
+# If Drupal version set to "current"
+if [ "$2" = "current" ]; then
+DD="CURRENT_INK_REPO"; fi
+
+# Auto database
+if [ -z $5 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $3 ]; then
+DBASE=drupal$(echo $CLEANNAME | cut -c1-20)$(pwgen -s -1 6); fi
+if [ -z $2 ]; then
+DBUSER=${DBASE}; fi
+
+# Distro settings
+. /var/local/verb/serfs/showdrupaldistroes
+if [ -z "$DD" ]; then
+DRUPALFILE=$d8
+fi
+if [ "$DD" = "d8" ]; then
+DRUPALFILE=$d8
+fi
+if [ "$DD" = "d7" ]; then
+DRUPALFILE=$d7
+fi
+if [ "$DD" = "commerce_kickstart" ]; then
+DRUPALFILE=$commerce_kickstart
+fi
+if [ "$DD" = "panopoly" ]; then
+DRUPALFILE=$panopoly
+fi
+if [ "$DD" = "openatrium" ]; then
+DRUPALFILE=$openatrium
+fi
+if [ "$DD" = "opigno_lms" ]; then
+DRUPALFILE=$opigno_lms
+fi
+if [ "$DD" = "commons" ]; then
+DRUPALFILE=$commons
+fi
+if [ "$DD" = "zircon_profile" ]; then
+DRUPALFILE=$zircon_profile
+fi
+if [ "$DD" = "openchurch" ]; then
+DRUPALFILE=$openchurch
+fi
+if [ "$DD" = "lightning" ]; then
+DRUPALFILE=$lightning
+fi
+if [ "$DD" = "openoutreach" ]; then
+DRUPALFILE=$openoutreach
+fi
+if [ "$DD" = "openpublic" ]; then
+DRUPALFILE=$openpublic
+fi
+if [ "$DD" = "drupalife_store" ]; then
+DRUPALFILE=$drupalife_store
+fi
+if [ "$DD" = "openpublish" ]; then
+DRUPALFILE=$openpublish
+fi
+if [ "$DD" = "multipurpose_corporate_profile" ]; then
+DRUPALFILE=$multipurpose_corporate_profile
+fi
+if [ "$DD" = "bear" ]; then
+DRUPALFILE=$bear
+fi
+if [ "$DD" = "easy_booking" ]; then
+DRUPALFILE=$easy_booking
+fi
+if [ "$DD" = "cod" ]; then
+DRUPALFILE=$cod
+fi
+if [ "$DD" = "commerce_profile" ]; then
+DRUPALFILE=$commerce_profile
+fi
+if [ "$DD" = "openfolio" ]; then
+DRUPALFILE=$openfolio
+fi
+if [ "$DD" = "restaurant" ]; then
+DRUPALFILE=$restaurant
+fi
+if [ "$DD" = "brainstorm_profile" ]; then
+DRUPALFILE=$brainstorm_profile
+fi
+if [ "$DD" = "social" ]; then
+DRUPALFILE=$social
+fi
+if [ "$DD" = "farm" ]; then
+DRUPALFILE=$farm
+fi
+if [ "$DD" = "bigvideo_profile" ]; then
+DRUPALFILE=$bigvideo_profile
+fi
+if [ "$DD" = "erpal" ]; then
+DRUPALFILE=$erpal
+fi
+if [ "$DD" = "erpal_platform" ]; then
+DRUPALFILE=$erpal_platform
+fi
+if [ "$DD" = "idea" ]; then
+DRUPALFILE=$idea
+fi
+if [ "$DD" = "thunder" ]; then
+DRUPALFILE=$thunder
+fi
+if [ "$DD" = "classified_advertising" ]; then
+DRUPALFILE=$classified_advertising
+fi
+if [ "$DD" = "recruiter" ]; then
+DRUPALFILE=$recruiter
+fi
+if [ "$DD" = "drustack" ]; then
+DRUPALFILE=$drustack
+fi
+if [ "$DD" = "drustack7" ]; then
+DRUPALFILE=$drustack7
+fi
+if [ "$DD" = "sportsleague" ]; then
+DRUPALFILE=$sportsleague
+fi
+if [ "$DD" = "responsive_blog_theme_installation_profile" ]; then
+DRUPALFILE=$responsive_blog_theme_installation_profile
+fi
+## Show installed distro
+echo "Installing Drupal distro: $DD..."
+
+# Download and establish drupal in the server to pre-created domain
+cd /var/www/vapps
+## For current verison of Drupal in the Inker repo
+if [ "$DD" = "CURRENT_INK_REPO" ]; then
+/var/local/verb/serfs/inkget ${CVAPPNAME}.current
+unzip ${CVAPPNAME}.current.zip
+rm -f ${CVAPPNAME}.current.zip
+mv ${CVAPPNAME} ${CVAPPNAME}.${DOMAIN}
+## For other versions of Drupal
+else
+ wget https://ftp.drupal.org/files/projects/${DRUPALFILE}.zip
+ if [ ! -f ${DRUPALFILE}.zip ]; then
+ echo "Can't download Drupal. I quit."
+ exit 44; fi
+ unzip ${DRUPALFILE}.zip
+ rm -f ${DRUPALFILE}.zip
+ mv ${DRUPALFILE} ${CVAPPNAME}.${DOMAIN}
+fi
+rm -f /var/www/html/${DOMAIN}
+ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}
+ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/guru/_webapps/
+chown -R www-data:www-data /var/www/html/${DOMAIN}
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+
+echo "These are setup for Drupal ${DD}:
+
+Database type: MySQL
+
+Database name: ${DBASE}
+Database username: ${DBUSER}
+Database password: ${DBPASSWORD}
+
+You also have ftp access to the folder in: guru/_domains/${DOMAIN}
+
+Go to http://${DOMAIN} to install.
+"
+

@@ -1,0 +1,55 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds domains with OpenDKIM profiles and keys and inkCert and Apache configs.
+## This also creates a folder for the domain in www/domains which an ftpguru can access
+
+# How to use:
+## ./adddomain [newdomain.tld]
+
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/inkcert/inkcertstatus
+
+NEWDOMAIN=$1
+
+# Check the domain shell
+if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWDOMAIN} ]; then
+echo "The shell for ${NEWDOMAIN} does not exist yet. Creating it..."
+/var/local/verb/serfs/newdomainshell ${NEWDOMAIN}
+fi
+
+# Check if it already exists
+if [ -f /etc/apache2/sites-available/${NEWDOMAIN}.conf ]; then
+ if [ -f /etc/apache2/sites-enabled/${NEWDOMAIN}.conf ]; then
+ echo "That subdomain already exists."
+ exit 0
+ else
+ echo "That site's config exists, but it doesn't seem to be active on Apache. Something's not right."
+ exit 0
+ fi
+fi
+
+# Copy and prepare Apache server config files
+cp /var/local/verb/configs/site-files/newdomain.tld.conf /etc/apache2/sites-available/${NEWDOMAIN}.conf
+sed -i "s/newdomain.tld/${NEWDOMAIN}/g" /etc/apache2/sites-available/${NEWDOMAIN}.conf
+if [ ! -d /var/www/domains/${NEWDOMAIN} ]; then
+cp -R /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${NEWDOMAIN}
+fi
+ln -sfn /var/www/domains/${NEWDOMAIN} /var/www/html/
+chown -R www-data:www-data /var/www/html/${NEWDOMAIN}
+chown -R www-data:www-data /var/www/domains/${NEWDOMAIN}
+a2ensite ${NEWDOMAIN}
+service apache2 reload
+
+# inkCert
+## Ensure that you don't get double entries
+sed -i "s/ ${NEWDOMAIN}/ /g" /var/local/verb/configs/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+## Add it to the cli-ini
+sed -i "/^domains =/ s/$/${NEWDOMAIN}/" /var/local/verb/configs/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+
+# Finish
+echo "Great! With no error messages, you are ready to run inkCert for ${NEWDOMAIN}, unless you want to add subdomains."
+

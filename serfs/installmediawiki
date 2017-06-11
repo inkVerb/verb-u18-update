@@ -1,0 +1,72 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs MediaWiki from the inkisaverb.com repository and links it to wiki.your-name.verb.ink
+
+# All options are optional, but must are sequential, omit last options first.
+
+# How to use:
+## ./installmediawiki [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=mediawiki
+
+DBASE=$1
+DBUSER=$2
+DBPASSWORD=$3
+CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
+
+# Check if already installed
+if [-f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
+echo "This is already installed. I quit."
+exit 0; fi
+
+# Auto database
+if [ -z $3 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $1 ]; then
+DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
+if [ -z $2 ]; then
+DBUSER=${DBASE}; fi
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+# Download and establish mediawiki from the inkVerb repo
+cd /var/www/vapps
+/var/local/verb/serfs/inkget ${CVAPPNAME}.current
+unzip ${CVAPPNAME}.current.zip
+rm -f ${CVAPPNAME}.current.zip
+rm -rf /var/www/html/ink.wiki
+ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/ink.wiki
+chown -R www-data:www-data /var/www/html/ink.wiki
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+
+# Create the database and credentials
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+
+echo "These are setup:
+
+Host: localhost
+Database name: ${DBASE}
+Database username: ${DBUSER} (NOT root)
+Database password: ${DBPASSWORD}
+Storage engine: InnoDB
+Character Set: UTF-8
+Return email address: use anything real, maybe yourname@${SITENAME}.verb.ink, NOT something@wiki.${SITENAME}.verb.ink
+
+Go to http://wiki.${SITENAME}.verb.ink to install.
+
+After installing, download the LocalSettings.php file, then upload it to the "guru" web folder, then run postinstallmediawiki to complete in installation.
+"
+

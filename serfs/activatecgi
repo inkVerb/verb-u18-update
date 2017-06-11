@@ -1,0 +1,43 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This activates the cgi....verb.guru folder so it the web will give an index
+
+# How to use:
+## ./activatecgi [on/off]
+
+# Eg:
+## ./activatecgi on
+## ./activatecgi off
+
+
+if [ "$1" = "-h" ]
+then
+    echo "Usage: ./activatecgi [on/off]
+
+Examples:
+ ./activatecgi on
+ ./activatecgi off
+
+ allowed arguments:
+ on	(cgi.${SITENAME}.verb.guru becomes a web-accessible folder)
+ off	(cgi.${SITENAME}.verb.guru returns to a redirect to ${SITENAME}.verb.ink)"
+exit 0
+fi
+
+if [ "$1" = "on" ]
+then
+    rm -rf /var/www/html/guru.cgi
+    ln -s /var/www/guru/cgi /var/www/html/guru.cgi
+    echo "cgi on."
+exit 0
+fi
+
+if [ "$1" = "off" ]
+then
+    rm -f /var/www/html/guru.cgi
+    cp -R /var/www/html/0ne /var/www/html/guru.cgi
+    echo "cgi off."
+exit 0
+fi

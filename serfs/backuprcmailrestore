@@ -1,0 +1,80 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This restores a RoundCube backup .zip file backed-up using backuprcmail
+## You may run installemail prior to this, however this will completely overwrite the old roundcube
+## and the old roundcube, settings, and database will be backed up in www/email
+
+# Prereq: Either rcmail must already be installed (and will be totally replaced)
+## or you must create the symlink from the html/email.roundcube folder to the email/roundcube folder
+
+# Instructions:
+## The file can have any name, even if you changed it from the original, as long as it ends in .zip
+## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+
+# NOTE:
+## This is relatively benign and arguably unnecessary because it only affects SOME user settings only within the RoundCube app itself, and only for identical email inboxes created or imported in PostfixAdmin
+## This is in addition to backupemail and backupemailrestore (which only affect Postfix) and neither overlaps nor conflicts
+## There is no backup or backuprestore for PostfixAdmin since PFA's database is a controller of and slave to Postfix.
+
+# How to use:
+## ./backuprcmailrestore [filename, NO .zip]
+
+# Eg:
+## ./backuprcmailrestore verb.roundcube.a52.vbak
+
+
+FILENAME=$1
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Backup whatever the original status is
+cd /var/local/verb/serfs
+/var/local/verb/serfs/mysqlex rcmail
+mv /var/local/verb/serfs/rcmail.sql /var/www/email/roundcube/verb.rcmail.restore-originalbackedup.vbak.sql
+cp /var/local/verb/configs/sitemail /var/www/email/roundcube/sitemail-restore-originalbackedup
+cd /var/www/email
+zip -r verb.rcmail.restore-originalbackedup.vbak.zip roundcube
+mv /var/www/email/verb.rcmail.restore-originalbackedup.vbak.zip /var/www/guru/
+rm -rf roundcube
+
+# Unzip the file
+cd /var/www/guru
+unzip ${FILENAME}.zip
+rm -f ${FILENAME}.zip
+mv roundcube /var/www/email/
+
+# Restore and include RC settings in the sitemail config
+. /var/email/roundcube/sitemailpass-oldrc
+. /var/email/roundcube/sitemailpath-oldrc
+sed -i "s/SITERCPASSAPG.*/SITERCPASSAPG=${SITERCPASSAPG}/g" /var/local/verb/configs/sitemailpass
+sed -i "s/SITERCPATH.*/SITERCPATH=${SITERCPATH}/g" /var/local/verb/configs/sitemailpath
+. /var/local/verb/configs/sitemailpass
+. /var/local/verb/configs/sitemailpath
+
+# Restore the database
+/var/local/verb/serfs/mysqlnewdb rcmail rcmailusr rcpass${SITERCPASSAPG}
+mv /var/www/email/roundcube/rcmail.sql /var/local/verb/serfs/
+cd /var/local/verb/serfs/
+/var/local/verb/serfs/mysqlin rcmail
+rm -f rcmail.sql
+
+# Own
+chown -R www-data:www-data /var/www/email/roundcube
+
+# Set the apache symlink
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.rc
+ln -s /var/www/email/roundcube /var/www/html/${SITEEMAILTLD}.rc/${SITERCPATH}
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
+
+# Finish
+echo "Roundcube has been restored and all its backup files removed from this server.
+
+It should be currently live at rc.${SITENAME}.verb.${SITEEMAILTLD}/${SITERCPATH}.
+
+A backup of the previous Roundcube on this server has been saved in the guru folder just in case.
+"
+
+

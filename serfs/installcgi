@@ -1,0 +1,30 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This turns on the www/cgi folder and links it to cgi....verb.guru
+
+# How to use:
+## ./installcgi
+
+
+# Include settings
+. /var/local/verb/configs/sitenameip
+
+# Prepare the directories
+mkdir /srv/guru/cgi
+rm -rf /var/www/html/guru.cgi
+ln -s /srv/cgi /var/www/html/guru.cgi
+chown -R www-data:www-data /var/www
+chown -R www-data:www-data /srv/guru/cgi
+
+# Write the first file
+cp /var/local/verb/site-files/helloworld.cgi /var/www/guru/cgi/helloworld.cgi
+chmod +x /var/www/guru/cgi/helloworld.cgi
+
+echo "
+All done. Access CGI files in the cgi folder via ftp.
+And check out your first script at:
+
+http://cgi.${SITENAME}.verb.guru/helloworld.cgi
+"

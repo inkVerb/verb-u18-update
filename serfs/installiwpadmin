@@ -1,0 +1,81 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This downloads and installs the InfiniteWP Server to a new directory to an existing domain in the .../html/ folder
+## For security, this does NOT install to a pre-defined inkVerb subdomain, ie iwp.name.verb.ink. The site has too much control and must be set differently.
+## This does not interfere at all with the contents of the domain.
+## This should be installed AFTER any installations to the domain, such as WordPress
+
+# All options after the domain are optional, but are sequential
+
+# How to use:
+## ./installiwpadmin [sub.domain.tld or domain.tld] [directory of domain.tld/directory] [dbase] [dbuser] [dbpassword]
+
+
+CVAPPNAME=iwpadmin
+
+DOMAIN=$1
+DIRECTORY=$2
+DBASE=$3
+DBUSER=$4
+DBPASSWORD=$5
+CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
+
+# Check that the directory doesn't already exist
+if [ -d /var/www/html/${DOMAIN}/${DIRECTORY} ]; then
+echo "That directory already exists for that domain. Choose a different directory."
+exit 22; fi
+
+# Options
+if [ -z $1 ]; then
+echo "You must designate a domain."
+exit 22; fi
+## Auto options
+if [ -z $2 ]; then
+DIRECTORY=iwp$(pwgen -s -1 1); fi
+if [ -z $5 ]; then
+DBPASSWORD=$(pwgen -s -1 10); fi
+if [ -z $3 ]; then
+DBASE=iwp$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 5); fi
+if [ -z $4 ]; then
+DBUSER=${DBASE}; fi
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+# Download and establish IWPAdmin in the server to pre-created domain
+cd /var/www/vapps
+/var/local/verb/serfs/inkget ${CVAPPNAME}.current
+unzip -o ${CVAPPNAME}.current.zip
+rm -f ${CVAPPNAME}.current.zip
+mv ${CVAPPNAME} ${DOMAIN}
+mv ${CVAPPNAME} ${CVAPPNAME}.${DOMAIN}
+ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}/${DIRECTORY}
+
+# Create the database and credentials
+mysql --login-path=local -e "
+CREATE DATABASE  ${DBASE};
+GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
+FLUSH PRIVILEGES;"
+
+# Write the config for backup
+echo "#!/bin/sh
+APPDBASE=${DBASE}
+APPDDBUSR=${DBUSER}
+APPDDBPAS=${DBPASSWORD}
+IWPADMIN_DIRECTORY=\"${DIRECTORY}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+
+# Reset all permissions
+chown -R www-data:www-data /var/www/html/${DOMAIN}/${DIRECTORY}
+
+echo "${DOMAIN} now has the InfiniteWP Admin Panel.
+These are setup:
+
+Database: ${DBASE}
+Database user: ${DBUSER}
+Database password: ${DBPASSWORD}
+Database port / prefix: DO NOT CHANGE
+
+Go to http://${DOMAIN}/${DIRECTORY} to install.
+"

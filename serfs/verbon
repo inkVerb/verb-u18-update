@@ -1,0 +1,111 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This turns on a tld of the verb sites, such as verb.red, but not the other verb.tld sites, all are on until turned off via verboff
+## This is done through a2ensite
+## For *.verb.one or custom *.verb.guru, this only turns on NAME.verb.one and one.NAME.verb.one
+## All other custom verb.one and custom verb.guru sites must be turned on again via newonesub
+
+# How to use:
+## ./verbon [tld]
+
+# Eg:
+## ./verbon kiwi
+
+
+# Include the config file
+. /var/local/verb/configs/sitenameip
+
+SITEON=$1
+
+sed -i "s/VERB${SITEON}=.*/VERB${SITEON}=true/g" /var/local/verb/configs/sitetldstatus
+
+if [ "${SITEON}" = "email" ]
+then
+    a2ensite ${SITENAME}.verb.email email.${SITENAME}.verb.email boxes.${SITENAME}.verb.email mail.${SITENAME}.verb.email rc.${SITENAME}.verb.email
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "one" ]
+then
+    a2ensite ${SITENAME}.verb.one one.${SITENAME}.verb.one
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "ink" ]
+then
+    a2ensite ${SITENAME}.verb.ink ink.${SITENAME}.verb.ink ask.${SITENAME}.verb.ink bb.${SITENAME}.verb.ink blog.${SITENAME}.verb.ink code.${SITENAME}.verb.ink home.${SITENAME}.verb.ink shop.${SITENAME}.verb.ink sn.${SITENAME}.verb.ink wiki.${SITENAME}.verb.ink
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "blue" ]
+then
+    a2ensite ${SITENAME}.verb.blue blue.${SITENAME}.verb.blue nextcloud.${SITENAME}.verb.blue owncloud.${SITENAME}.verb.blue pydio.${SITENAME}.verb.blue seafile.${SITENAME}.verb.blue
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "guru" ]
+then
+    a2ensite ${SITENAME}.verb.guru guru.${SITENAME}.verb.guru cgi.${SITENAME}.verb.guru ftp.${SITENAME}.verb.guru files.${SITENAME}.verb.guru fossil.${SITENAME}.verb.guru mysql.${SITENAME}.verb.guru net2ftp.${SITENAME}.verb.guru repo.${SITENAME}.verb.guru
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "kiwi" ]
+then
+    a2ensite ${SITENAME}.verb.kiwi kiwi.${SITENAME}.verb.kiwi ampache.${SITENAME}.verb.kiwi art.${SITENAME}.verb.kiwi gallery.${SITENAME}.verb.kiwi media.${SITENAME}.verb.kiwi podcast.${SITENAME}.verb.kiwi studio.${SITENAME}.verb.kiwi
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "pink" ]
+then
+    a2ensite ${SITENAME}.verb.pink pink.${SITENAME}.verb.pink
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "red" ]
+then
+    a2ensite ${SITENAME}.verb.red red.${SITENAME}.verb.red act.${SITENAME}.verb.red crm.${SITENAME}.verb.red erp.${SITENAME}.verb.red hrm.${SITENAME}.verb.red odoo.${SITENAME}.verb.red scm.${SITENAME}.verb.red
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "rocks" ]
+then
+    a2ensite ${SITENAME}.verb.rocks rocks.${SITENAME}.verb.rocks
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
+
+if [ "${SITEON}" = "uno" ]
+then
+    a2ensite ${SITENAME}.verb.uno uno.${SITENAME}.verb.uno
+    service apache2 reload
+    echo "Done."
+exit 0
+fi
+
