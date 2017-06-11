@@ -13,8 +13,8 @@ set -e
 # Download and unpack the latest checked version from the Inkver repo
 cd /var/local/verb/
 /var/local/verb/serfs/inkget verb-update
-unzip -q verber.update.current.zip
-rm -f verber.update.current.zip
+unzip -q verb-update.zip
+rm -f verb-update.zip
 
 # Run the update script
 /var/local/verb/verb-update/update
