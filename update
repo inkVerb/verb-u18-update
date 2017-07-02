@@ -13,7 +13,7 @@
 
 ## Sample version updater:
 #UPDATE_PATCH_VERNO=
-#if [ $(echo "$UPDATE_PATCH_VERNO>$VERNO"|bc) = 1 ]; then
+#if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 ## Run the update scripts for this patch
 #
 ###### SCRIPTS GO HERE #####
@@ -41,7 +41,7 @@ MIN_VERNO=0.805
 . /var/local/verb/configs/inklists/verberverno
 . /var/local/verb/configs/sitenameip
 ## Check minimal updateable version
-if [ $(echo "$MIN_VERNO>$VERNO"|bc) = 1 ]; then
+if [ $(echo ${MIN_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 echo "Current Verber™ version is ${VERNO}, minimum ${MIN_VERNO} to use this updater.
 Run updateverberlegacy for older versions."
 exit 0
@@ -55,7 +55,7 @@ echo "Serfs have been updated."
 # Run version-by-version updates
 
 UPDATE_PATCH_VERNO=0.806
-if [ $(echo "$UPDATE_PATCH_VERNO>$VERNO"|bc) = 1 ]; then
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 # Run the update scripts for this patch
 
 ##### SCRIPTS GO HERE #####
@@ -148,7 +148,8 @@ fi
 
 
 UPDATE_PATCH_VERNO=0.807
-if [ $(echo "$UPDATE_PATCH_VERNO>$VERNO"|bc) = 1 ]; then
+
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 # Run the update scripts for this patch
 
 ##### SCRIPTS GO HERE #####
@@ -201,7 +202,7 @@ fi
 
 
 UPDATE_PATCH_VERNO=0.808
-if [ $(echo "$UPDATE_PATCH_VERNO>$VERNO"|bc) = 1 ]; then
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 # Run the update scripts for this patch
 
 ##### SCRIPTS GO HERE #####
@@ -244,7 +245,7 @@ fi
 
 
 UPDATE_PATCH_VERNO=0.809
-if [ $(echo "$UPDATE_PATCH_VERNO>$VERNO"|bc) = 1 ]; then
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 # Run the update scripts for this patch
 
 ##### SCRIPTS GO HERE #####
@@ -313,7 +314,7 @@ fi
 ###############END#UPDATE#PATCH#
 
 UPDATE_PATCH_VERNO=0.810
-if [ $(echo "$UPDATE_PATCH_VERNO>$VERNO"|bc) = 1 ]; then
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 # Run the update scripts for this patch
 
 ##### SCRIPTS GO HERE #####
