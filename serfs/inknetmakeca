@@ -118,22 +118,23 @@ chown -R www-data:www-data /var/www/html/${NEWCAFULLHOST}
 
 # Make the CA directories
 if [ ! -d /var/local/verb/configs/inknet/clients ]; then
-mkdir /var/local/verb/configs/inknet/clients
+mkdir -p /var/local/verb/configs/inknet/clients
 fi
 if [ ! -d ~/.ssh/inknet ]; then
-mkdir ~/.ssh/inknet
+mkdir -p ~/.ssh/inknet
 fi
-mkdir ~/.ssh/inknet/ca
-mkdir /var/local/verb/configs/inknet/vrk
-mkdir /var/local/verb/configs/inknet/verber
+mkdir -p ~/.ssh/inknet/ca
+mkdir -p /var/local/verb/configs/inknet/vrk
+mkdir -p /var/local/verb/configs/inknet/verber
 
 # Set CA Verber host key cert that will be made with inknetnewcahostkey
 ## Prep addition comments to SSH config
 echo "### Below added by inkVerb's inkNet ###" >> /etc/ssh/sshd_config
 ## Change the location of user keys (to avoid locations such as www-data/.ssh)
-mkdir /etc/ssh/authorized_keys
-### For root, so as not to interfere with other system functions
-cp /root/.ssh/authorized_keys /etc/ssh/authorized_keys/root
+mkdir -p /etc/ssh/authorized_keys
+### For root and current user (if different), so as not to interfere with other system functions
+ln -sfn /root/.ssh/authorized_keys /etc/ssh/authorized_keys/root
+ln -sfn ~/.ssh/authorized_keys /etc/ssh/authorized_keys/${USER}
 ### In case the user is not root
 cp ~/.ssh/authorized_keys /etc/ssh/authorized_keys/${USER}
 ### Change the setting to recognize the new location

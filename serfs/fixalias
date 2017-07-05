@@ -11,21 +11,26 @@ set -e
 
 DOMAIN=$1
 
-# Check to see if "inkverbfixwww" has already been added
-if grep -Fxq "INKALIASFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf
-then
+# Conflict check to see if "fixhttps" has already been added
+if grep -q "INKHTTPSFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
+echo "Can't fix alias because www fix is already in."
+exit 0; fi
+
+# Check to see if "fixalias" has already been added
+if grep -q "INKALIASFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
 service apache2 reload
 	echo "${DOMAIN} already has the alias fix. The server was just reloaded so the site should work."
 else
 
-## Then add the config lins if it doesn't.
+## Then add the config lines if it doesn't.
 echo "
 
+##INKALIASFIX=fixed
 # Fixes alias
-## inkVerb needs this line INKALIASFIX=fixed
         <VirtualHost *:80>
         ServerAlias *.${DOMAIN}
-        </VirtualHost>" >> /etc/apache2/sites-available/${DOMAIN}.conf
+        </VirtualHost>
+##verbFIX" >> /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload
 	echo "${DOMAIN} now has alias fix for subdomains and is ready to go."
 fi

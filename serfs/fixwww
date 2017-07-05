@@ -14,22 +14,23 @@ set -e
 
 DOMAIN=$1
 
+
 # Check to see if "fixwww" has already been added
-if grep -Fxq "INKWWWFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf
-then
+if grep -q "##INKWWWFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
 service apache2 reload
 	echo "${DOMAIN} already has the www subdomain fix. The server was just reloaded so the site should work."
 else
 
-## Then add the config lins if it doesn't.
+## Then add the config lines if it doesn't.
 echo "
 
+##INKWWWFIX=fixed
 # Fixes www
-## inkVerb needs this line INKWWWFIX=fixed
         <VirtualHost *:80>
         ServerName www.${DOMAIN}
         Redirect permanent / http://${DOMAIN}/
-        </VirtualHost>" >> /etc/apache2/sites-available/${DOMAIN}.conf
+        </VirtualHost>
+##verbFIX" >> /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload
 	echo "${DOMAIN} now has the www subdomain fix and is ready to go."
 fi
