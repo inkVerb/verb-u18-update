@@ -420,7 +420,7 @@ fi
 
 
 
-# Verb Domain mod?
+# Verb Domain mod? NOT IN PRODUCTION, MAY BE REMOVED
 if [ -f /var/local/verb/configs/sitedomainverber ]; then
  if [ "${VTYPE}" = "VERB_DOMAIN" ]; then
 /var/local/verb/configs/conflab/mods/domainverber
