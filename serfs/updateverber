@@ -9,14 +9,17 @@ set -e
 ## ./updateverber
 
 
+# Include the config
+. /var/local/verb/configs/sitenameip
+
 # Download the latest checked version from GitHub
 cd /var/local/verb/
-git clone https://github.com/inkverb/verb-update
+git clone https://github.com/inkverb/${SITEUPDATEREPO}
 
 # Run the update script
-chmod +x /var/local/verb/verb-update/update
-/var/local/verb/verb-update/update
+chmod +x /var/local/verb/${SITEUPDATEREPO}/update
+/var/local/verb/${SITEUPDATEREPO}/update
 
 # Remove the entire updater
-rm -rf /var/local/verb/verb-update
+rm -rf /var/local/verb/${SITEUPDATEREPO}
 
