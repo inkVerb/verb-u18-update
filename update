@@ -468,5 +468,5 @@ fi
 
 
 # Finish
-echo "Verber at v${VERNO}"
+echo "Verber at v${VERNO} from ${SITEUPDATEREPO}."
 
