@@ -11,7 +11,7 @@ set -e
 
 # Include the config
 . /var/local/verb/configs/sitenameip
-NEWCAURI="${SITENAME}.verb.${SITETLD}"
+NEWCAURI="${nameURI}"
 NEWCAFULLHOST="${SITEHOST}.${NEWCAURI}"
 NEWCANAME="${SITEHOST}_${SITENAME}_verb_${SITETLD}"
 
@@ -76,7 +76,7 @@ else
   rm /etc/apache2/sites-available/${NEWCAFULLHOST}.conf; fi
   if [ -e /etc/apache2/sites-enabled/${NEWCAFULLHOST}.conf ]; then
   rm /etc/apache2/sites-enabled/${NEWCAFULLHOST}.conf; fi
- /var/local/verb/serfs/addsubdomain ${SITEHOST} ${SITENAME}.verb.${SITETLD}
+ /var/local/verb/serfs/addsubdomain ${SITEHOST} ${nameURI}
 ### Set up SSL certs based on situation
 #### If not done
   if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then

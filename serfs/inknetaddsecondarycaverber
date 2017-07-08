@@ -20,6 +20,12 @@ FULLCAVNAME=$3
 NEWCAVERBERNAME=$(echo $FULLCAVNAME | cut -c1-18)
 NEWCAVERBERIP=$4
 
+# inkNet login Sailor
+## Password generator
+ADDINIVSAILORNAME=sail$(pwgen -s -1 14)
+## Add the Sailor
+/var/local/verb/serfs/inkneivappaddsailor ${ADDINIVSAILORNAME} ${ADDINIVSAILPASSWORD}
+
 # Set configs
 ## For the secondary CA Verber
 echo "#!/bin/sh
@@ -30,6 +36,7 @@ CAVERBERHOST=\"${NEWCAVERBERHOST}\"
 CAVERBERURI=\"${NEWCAVERBERURI}\"
 CAVERBERNAME=\"${NEWCAVERBERNAME}\"
 CAVERBERIP=\"${NEWCAVERBERIP}\"
+CLIENTSAILOR=\"${ADDINIVSAILORNAME}\"
 " > /var/local/verb/configs/inknet/secondarycav.${NEWCAVERBERNAME}.cnf
 
 # Get the secondary CA Verber's pub key

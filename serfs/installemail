@@ -20,8 +20,9 @@ set -e
 
 
 
-# Include the config files
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpass
 . /var/local/verb/configs/sitemailpath
 
@@ -40,20 +41,19 @@ if [ ! -z "${BACKUPRESTORE}"]; then
 fi
 
 # inkCert
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.${SITEEMAILTLD}; then
-echo "Note: ${SITENAME}.verb.${SITEEMAILTLD} still doesn't have proper SSL certs. You can install, but will get SSL warnings due to \"self-signed\" or \"snakeoil\" certs.
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
+echo "Note: ${emailTLDURI} still doesn't have proper SSL certs. You can install, but will get SSL warnings due to \"self-signed\" or \"snakeoil\" certs.
 You may ignore these warnings if you choose. If you want proper SSL certs, you still need to run inkCert for them.
 "
 fi
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.${SITEEMAILTLD}; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.email r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.email
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
+/var/local/verb/serfs/inkcertreqle ${emailURI} r
+/var/local/verb/serfs/inkcertaddallle ${emailURI}
 fi
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.${SITEEMAILTLD}; then
-/var/local/verb/serfs/inkcertreq ${SITENAME}.verb.email r
-/var/local/verb/serfs/inkcertaddall ${SITENAME}.verb.email
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
+/var/local/verb/serfs/inkcertreq ${emailURI} r
+/var/local/verb/serfs/inkcertaddall ${emailURI}
 fi
-
 
 # Finished
 if [ "${EASYSECURE}" != "secure" ]; then
@@ -63,18 +63,18 @@ For setup, note:
 - Use the install password 'inkverb77'
 - Use any email you want admin, the admin password must include two numbers and two letters
 - Then, login:
-  - Add the domain: ${SITENAME}.verb.${SITETLD}
-  - Create a user, such as me@${SITENAME}.verb.${SITETLD} etc
+  - Add the domain: ${nameURI}
+  - Create a user, such as me@${nameURI} etc
   - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
 Set up all this at:
 
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${PFA}/setup.php
+ https://boxes.${emailTLDURI}/${PFA}/setup.php
 
 - Then run ./postinstallpfa
 
 Roundcube is ready to be installed at:
 
- https://rc.${SITENAME}.verb.${SITEEMAILTLD}/${RC}/installer
+ https://rc.${emailTLDURI}/${RC}/installer
 
 - Then run ./postinstallrc
 "
@@ -89,18 +89,19 @@ For PostfixAdmin setup, note:
   Then...
 - Use any email you want admin, the admin password must include two numbers and two letters
 - Then, login:
-  - Add the domain: ${SITENAME}.verb.${SITETLD}
-  - Create a user, such as me@${SITENAME}.verb.ink etc
+  - Add the domain: ${nameURI}
+  - Create a user, such as me@${inkURI} etc
   - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
 
 Set up all this for PostfixAdmin at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${PFA}/setup.php
+ https://boxes.${emailTLDURI}/${PFA}/setup.php
 
 - Then run ./postinstallpfa
 
 Roundcube is also ready to be installed at:
- https://rc.${SITENAME}.verb.${SITEEMAILTLD}/${RC}/installer
+ https://rc.${emailTLDURI}/${RC}/installer
 
 - Then run ./postinstallrc
 "
 fi
+

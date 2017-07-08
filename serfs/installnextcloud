@@ -12,6 +12,10 @@ set -e
 
 CVAPPNAME=nextcloud
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -34,9 +38,6 @@ if [ -z $1 ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
 if [ -z $2 ]; then
 DBUSER=${DBASE}; fi
-
-# Include the config file
-. /var/local/verb/configs/sitenameip
 
 # Do it
 cd /var/www/vapps
@@ -72,6 +73,6 @@ Host: localhost
 
 *Don't make any other changes during the install!
 
-Go to https://nextcloud.${SITENAME}.verb.blue to install.
+Go to https://nextcloud.${blueURI} to install.
 "
 

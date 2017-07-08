@@ -11,7 +11,7 @@ set -e
 
 # Include the config
 . /var/local/verb/configs/sitenameip
-CAURI="${SITENAME}.verb.${SITETLD}"
+CAURI="${nameURI}"
 CAFULLHOST="${SITEHOST}.${CAURI}"
 CANAME="${SITEHOST}_${SITENAME}_verb_${SITETLD}"
 

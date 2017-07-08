@@ -11,8 +11,10 @@ set -e
 ## ./activaterepo on
 ## ./activaterepo off
 
-# Include config
+
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 if [ "$1" = "-h" ]
 then
@@ -23,8 +25,8 @@ Examples:
  ./activaterepo off
 
  allowed arguments:
- on	(repo.${SITENAME}.verb.guru becomes a web-accessible folder)
- off	(repo.${SITENAME}.verb.guru returns to a redirect to ${SITENAME}.verb.ink)"
+ on	(repo.${guruURI} becomes a web-accessible folder)
+ off	(repo.${guruURI} returns to a redirect to ${inkURI})"
 exit 0
 fi
 

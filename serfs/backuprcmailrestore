@@ -29,6 +29,8 @@ FILENAME=$1
 
 # Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+. /var/local/verb/configs/sitemailpath
 
 # Backup whatever the original status is
 cd /var/local/verb/serfs
@@ -72,7 +74,7 @@ chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
 # Finish
 echo "Roundcube has been restored and all its backup files removed from this server.
 
-It should be currently live at rc.${SITENAME}.verb.${SITEEMAILTLD}/${SITERCPATH}.
+It should be currently live at rc.${emailTLDURI}/${SITERCPATH}.
 
 A backup of the previous Roundcube on this server has been saved in the guru folder just in case.
 "

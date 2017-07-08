@@ -13,6 +13,7 @@ set -e
 
 # Include the config files
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpath
 
 # Check to see if already installed
@@ -33,7 +34,7 @@ fi
 MAILPASSGEN=$(pwgen -s -1 5)
 
 # Choose Internet Site options in advance
-echo "postfix postfix/mailname string ${SITEHOST}.${SITENAME}.verb.${SITETLD}" | debconf-set-selections
+echo "postfix postfix/mailname string ${hostURI}" | debconf-set-selections
 echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 #echo "postfix postfix/relayhost string smtp.localdomain" | debconf-set-selections 
 apt install -y mail-server^
@@ -89,14 +90,10 @@ cp /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl.conf /etc/dovecot
 cp /var/local/verb/configs/conflab/email/dovecot/conf.d/15-lda.conf /etc/dovecot/conf.d/
 cp /var/local/verb/configs/conflab/email/dovecot/dovecot-sql.conf.ext /etc/dovecot/
 ## Replace configs
-sed  -i "s/name286/${SITENAME}/g" /etc/dovecot/conf.d/10-ssl.conf
-sed  -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-SNAKEOIL.conf
-sed  -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-INKCERT.conf
-sed  -i "s/email286/${SITEEMAILTLD}/g" /etc/dovecot/conf.d/10-ssl.conf
-sed  -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-SNAKEOIL.conf
-sed  -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-INKCERT.conf
-sed  -i "s/name286/${SITENAME}/g" /etc/dovecot/conf.d/15-lda.conf
-sed  -i "s/tld286/${SITETLD}/g" /etc/dovecot/conf.d/15-lda.conf
+sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /etc/dovecot/conf.d/10-ssl.conf
+sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-SNAKEOIL.conf
+sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/email/dovecot/conf.d/10-ssl-INKCERT.conf
+sed  -i "s/nameURI286/${nameURI}/g" /etc/dovecot/conf.d/15-lda.conf
 sed  -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/dovecot/dovecot-sql.conf.ext
 ## Own
 chown -R vmail:dovecot /etc/dovecot
@@ -137,16 +134,14 @@ sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_doma
 sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_mailbox_domainaliases_maps.cf
 sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_mailbox_maps.cf
 sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_sender_login_maps.cf
-sed -i "s/name286/${SITENAME}/g" /etc/postfix/main.cf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
-sed -i "s/host286/${SITEHOST}/g" /etc/postfix/main.cf
-sed -i "s/email286/${SITEEMAILTLD}/g" /etc/postfix/main.cf
-sed -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
-sed -i "s/email286/${SITEEMAILTLD}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
-sed -i "s/tld286/${SITETLD}/g" /etc/postfix/main.cf
-sed -i "s/tld286/${SITETLD}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
-sed -i "s/tld286/${SITETLD}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
+sed -i "s/hostURI286/${hostURI}/g" /etc/postfix/main.cf
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /etc/postfix/main.cf
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
+sed -i "s/nameURI286/${nameURI}/g" /etc/postfix/main.cf
+sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/configs/conflab/email/postfix/main-SNAKEOIL.cf
+sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/configs/conflab/email/postfix/main-INKCERT.cf
+
 # Grand Restart
 service postfix restart
 systemctl restart postfix
@@ -189,13 +184,13 @@ mkdir /etc/opendkim/keys
 echo "127.0.0.1
 localhost
 ${SITEIP}
-${SITEHOST}.${SITENAME}.verb.${SITETLD}" > /etc/opendkim/TrustedHosts
-echo "inkdkim._domainkey.${SITENAME}.verb.${SITETLD} ${SITENAME}.verb.${SITETLD}:inkdkim:/etc/opendkim/keys/${SITENAME}.verb.${SITETLD}/inkdkim.private" > /etc/opendkim/KeyTable
-echo "${SITENAME}.verb.${SITETLD} inkdkim._domainkey.${SITENAME}.verb.${SITETLD}" > /etc/opendkim/SigningTable
+${hostURI}" > /etc/opendkim/TrustedHosts
+echo "inkdkim._domainkey.${nameURI} ${nameURI}:inkdkim:/etc/opendkim/keys/${nameURI}/inkdkim.private" > /etc/opendkim/KeyTable
+echo "${nameURI} inkdkim._domainkey.${nameURI}" > /etc/opendkim/SigningTable
 ## OpenDKIM Key for initial site
-mkdir -p /etc/opendkim/keys/${SITENAME}.verb.${SITETLD}
-cd /etc/opendkim/keys/${SITENAME}.verb.${SITETLD}
-opendkim-genkey -r -S -s inkdkim -d ${SITENAME}.verb.${SITETLD}
+mkdir -p /etc/opendkim/keys/${nameURI}
+cd /etc/opendkim/keys/${nameURI}
+opendkim-genkey -r -S -s inkdkim -d ${nameURI}
 chmod 660 inkdkim.private
 chown root:opendkim inkdkim.private
 chown opendkim:opendkim inkdkim.private
@@ -208,12 +203,12 @@ cp /etc/postgrey/whitelist_recipients /etc/postfix/postgrey_whitelist_recipients
 # Set Apache subdomains
 cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.mail
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.mail
-#a2ensite mail.${SITENAME}.verb.${SITEEMAILTLD}
+#a2ensite mail.${emailTLDURI}
 service apache2 reload
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-#sed -i "/^domains =/ s/$/, mail.${SITENAME}.verb.${SITEEMAILTLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${SITEEMAILTLD}.ini
+#sed -i "/^domains =/ s/$/, mail.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Monit
 cp /var/local/verb/configs/conflab/email/monit/monitrc.d/amavis /etc/monit/monitrc.d/
@@ -229,4 +224,4 @@ sed -i "s/SITEMAILSTATUS=.*/SITEMAILSTATUS=EMAIL_SERVER/g" /var/local/verb/confi
 # Finish
 echo "Postfix and friends for inkVerb has been installed.
 
-The email server is https://${SITENAME}.verb.${SITEEMAILTLD}"
+The email server is https://${emailTLDURI}"

@@ -23,6 +23,11 @@ set -e
 SITEDOMAIN=$1
 CERTDOMAIN=$2
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+. /var/local/verb/configs/inkcert/inkcertstatus
+
 # Check variables
 if [ -z $1 ]; then
 echo "You need to specify a domain. Read the instructions."; exit 0
@@ -32,10 +37,6 @@ fi
 if [ -z $2 ]; then
 CERTDOMAIN=$1
 fi
-
-# Include and check the inkCert install config
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/inkcert/inkcertstatus
 
 # Certs should already be in place from inkcertreqle
 ## This is a test for the inkcert directories:
@@ -47,7 +48,7 @@ inkCert-Letsencrypt certs were not installed for ${SITEDOMAIN} because the ${CER
   - DNS for ${SITEDOMAIN} may need a \"wildcard\" * CNAME record that points to ${SITEDOMAIN} as the \"hostname\"
   - DNS records can take about 4 hours to have effect
   - You need to first run: inkcertreqle
-  - Do not run inkcertreqle for individual subdomains with a shared certificate, but only for: ${SITENAME}.verb.blue, ${SITENAME}.verb.rocks, inkisaverb.com, etc.
+  - Do not run inkcertreqle for individual subdomains with a shared certificate, but only for: ${blueURI}, ${rocksURI}, inkisaverb.com, etc.
   - The verb/configs/inkcert/cli-ini/ file for ${CERTDOMAIN} may not contain the subdomain you are using.
 "
 exit 22

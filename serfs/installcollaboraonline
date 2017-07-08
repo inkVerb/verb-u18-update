@@ -11,6 +11,10 @@ set -e
 
 CVAPPNAME=collaboraonline
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 ## Set the port
 if [ -z "$1" ]; then
 PORT=9980
@@ -22,9 +26,6 @@ fi
 if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
 echo "This is already installed. I quit."
 exit 0; fi
-
-# Include the config file
-. /var/local/verb/configs/sitenameip
 
 # Make sure Docker is installed
 /var/local/verb/serfs/installdocker
@@ -43,14 +44,14 @@ a2enmod proxy_wstunnel
 a2enmod proxy_http
 a2enmod ssl
 ## Config files
-cp /var/local/verb/configs/site-files/collabora.${SITENAME}.verb.blue.conf-collabora /etc/apache2/sites-available/collabora.${SITENAME}.verb.blue.conf
-sed -i "s/por286/${PORT}/g" /etc/apache2/sites-available/collabora.${SITENAME}.verb.blue.conf
+cp /var/local/verb/configs/site-files/conf/collabora.${blueURI}.conf-collabora /etc/apache2/sites-available/collabora.${blueURI}.conf
+sed -i "s/por286/${PORT}/g" /etc/apache2/sites-available/collabora.${blueURI}.conf
 ## inkCert is already installed (check first to avoid errors, apply inkCert-LE or inkCert Proper as needed)
 if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${SITEDOMAIN}.conf; then 
-/var/local/verb/serfs/inkcertaddle collabora.${SITENAME}.verb.blue ${SITENAME}.verb.blue
+/var/local/verb/serfs/inkcertaddle collabora.${blueURI} ${blueURI}
 fi
 if grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${SITEDOMAIN}.conf; then
-/var/local/verb/serfs/inkcertadd collabora.${SITENAME}.verb.blue
+/var/local/verb/serfs/inkcertadd collabora.${blueURI}
 fi
 ## Reload
 service apache2 reload
@@ -59,12 +60,12 @@ service apache2 reload
 echo "#!/bin/sh
 COVAPPSTATUS=\"INSTALLED\"
 COPORT=${PORT}
-COHOST=\"nextcloud.${SITENAME}.verb.blue\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+COHOST=\"nextcloud.${blueURI}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}
 
 echo "Collabora Online is now installed...
 
 Next:
-1. Login as an admin to https://nextcloud.${SITENAME}.verb.blue to enable the Collabora Online office app.
-2. Finish the settings: Admin > Collabora Online > Collabora Online server: https://collabora.${SITENAME}.verb.blue
+1. Login as an admin to https://nextcloud.${blueURI} to enable the Collabora Online office app.
+2. Finish the settings: Admin > Collabora Online > Collabora Online server: https://collabora.${blueURI}
 "
 

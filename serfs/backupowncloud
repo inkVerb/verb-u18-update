@@ -19,6 +19,7 @@ SECNAME=$1
 
 # Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/verbapp.owncloud
 
 # Export the database
@@ -48,7 +49,7 @@ ln -s /var/www/guru/verb.owncloud.${SECNAME}.vbak.zip /var/www/html/${SITETLD}/
 chown -R www-data:www-data /var/www/html/${SITETLD}/verb.owncloud.${SECNAME}.vbak.zip
 echo "owncloud has been backed up to the 'guru' folder and can also be downloaded at:
 
-http://${SITENAME}.verb.${SITETLD}/verb.owncloud.${SECNAME}.vbak.zip
+http://${nameURI}/verb.owncloud.${SECNAME}.vbak.zip
 
 Note that the app remains live.
 "

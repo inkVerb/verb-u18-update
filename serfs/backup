@@ -22,6 +22,7 @@ SECNAME=$2
 
 # Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/verbapp.${APPNAME}
 
 # Export the database
@@ -51,7 +52,7 @@ ln -s /var/www/guru/verb.${APPNAME}.${SECNAME}.vbak.zip /var/www/html/${SITETLD}
 chown -R www-data:www-data /var/www/html/${SITETLD}/verb.${APPNAME}.${SECNAME}.vbak.zip
 echo "${APPNAME} has been backed up to the 'guru' folder and can also be downloaded at:
 
-http://${SITENAME}.verb.${SITETLD}/verb.${APPNAME}.${SECNAME}.vbak.zip
+http://${nameURI}/verb.${APPNAME}.${SECNAME}.vbak.zip
 
 Note that the app remains live.
 "

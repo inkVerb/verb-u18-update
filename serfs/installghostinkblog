@@ -16,6 +16,10 @@ set -e
 
 CVAPPNAME=ghost.inkblog
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 EMAILUSER=$1
 EMAILPASS=$2
 
@@ -29,12 +33,9 @@ fi
 . /var/local/verb/configs/siteinstallstatus
 if [ "${INKblog}" != "NOT_YET" ]; then
 echo "Awkward...
-Your blog at blog.${SITENAME}.verb.ink already has ${INKblog} installed. This just isn't going to work."
+Your blog at blog.${inkURI} already has ${INKblog} installed. This just isn't going to work."
 exit 0
 fi
-
-# Include settings
-. /var/local/verb/configs/sitenameip
 
 # Install Node.js (LTS req by Ghost) and npm
 curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
@@ -53,7 +54,7 @@ npm install --production
 # Set up the Ghost config
 cd /var/local/ghost/ghostblog
 cp config.example.js config.js
-sed -i "s/url: 'http:\/\/my-ghost-blog.com'/url: 'http:\/\/blog.${SITENAME}.verb.ink'/g" config.js
+sed -i "s/url: 'http:\/\/my-ghost-blog.com'/url: 'http:\/\/blog.${inkURI}'/g" config.js
 sed -i "s/host: '127.0.0.1'/host: '${SITEIP}'/g" config.js
 sed -i "s/mail: {}/mail: {transport: 'SMTP', options: {host: 'localhost', port: 25, service: 'dovecot', auth: {user: '${EMAILUSER}', pass: '${EMAILPASS}'}}}/g" config.js
 
@@ -65,27 +66,27 @@ ufw allow 2368
 rm -rf /var/www/html/ink.blog
 echo "Ghost" > /var/www/html/ink.blog
 ## Set the IP address in the Apache config file
-cp /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-ghost /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
-sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
+cp /var/local/verb/configs/site-files/conf/blog.${inkURI}.conf-ghost /etc/apache2/sites-available/blog.${inkURI}.conf
+sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/blog.${inkURI}.conf
 service apache2 reload
 ## inkCert SSL certs
 ### Not setup
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
-echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.ink."
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+echo "FYI: inkCert is not yet setup for ${inkURI}."
 fi
 ### inkCert-LE DONE
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
-echo "inkCert-LE is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+echo "inkCert-LE is already setup for ${inkURI}. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddallle ${inkURI}
 fi
 ### inkCert-IC DONE
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
-echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertadd blog.${SITENAME}.verb.ink
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd blog.${inkURI}
 fi
 
 # Make it a service at startup
-cp /var/local/verb/configs/site-files/ghost.conf /etc/init/ghost.conf
+cp /var/local/verb/configs/site-files/conf/ghost.conf /etc/init/ghost.conf
 
 # Set the site-wide inkblog config
 sed -i "s/INKblog=.*/INKblog=\"Ghost\"/g" /var/local/verb/configs/siteinstallstatus
@@ -113,7 +114,7 @@ cd /var/local/ghost/ghostblog && NODE_ENV=production forever start index.js
 
 # Finish
 echo "Ghost is setup.
-Go to http://blog.${SITENAME}.verb.ink/ghost to install."
+Go to http://blog.${inkURI}/ghost to install."
 
 # Optional server restart
 #echo "But first, wait two minutes for the server to restart."

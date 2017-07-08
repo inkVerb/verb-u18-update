@@ -8,8 +8,9 @@ set -e
 ## ./installcgi
 
 
-# Include settings
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 # Prepare the directories
 mkdir /srv/guru/cgi
@@ -19,12 +20,12 @@ chown -R www-data:www-data /var/www
 chown -R www-data:www-data /srv/guru/cgi
 
 # Write the first file
-cp /var/local/verb/site-files/helloworld.cgi /var/www/guru/cgi/helloworld.cgi
+cp -f /var/local/verb/site-files/cgi-fossil/helloworld.cgi /var/www/guru/cgi/
 chmod +x /var/www/guru/cgi/helloworld.cgi
 
 echo "
 All done. Access CGI files in the cgi folder via ftp.
 And check out your first script at:
 
-http://cgi.${SITENAME}.verb.guru/helloworld.cgi
+http://cgi.${guruURI}/helloworld.cgi
 "

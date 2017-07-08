@@ -33,14 +33,15 @@
 #
 
 
-MIN_VERNO=0.805
+MIN_VERNO=0.811
 VUPDATE_REPO="verb-update"
 
 ## Version Check ##
 ### The minimum version that can use this updater
 ## Include the configs
-. /var/local/verb/configs/inklists/verberverno
 . /var/local/verb/configs/sitenameip
+#. /var/local/verb/configs/siteurilist # Include this after MIN_VERNO=0.812
+. /var/local/verb/configs/inklists/verberverno
 ## Check minimal updateable version
 if [ $(echo ${MIN_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 echo "Current Verber™ version is ${VERNO}, minimum ${MIN_VERNO} to use this updater.
@@ -55,372 +56,8 @@ echo "Serfs have been updated."
 
 # Run version-by-version updates
 
-UPDATE_PATCH_VERNO=0.806
-if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
-# Run the update scripts for this patch
 
-##### SCRIPTS GO HERE #####
-cp /var/local/verb/${VUPDATE_REPO}/0.806/inklists/ghostsiteports /var/local/verb/configs/inklists/
-cp /var/local/verb/${VUPDATE_REPO}/0.806/site-files/* /var/local/verb/configs/site-files/
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/newonesub.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/newgurusub.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/newonesubcgi.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/newgurusubcgi.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/newghostsite.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/newodoosite.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/sub286.name286.verb.tld286.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/odoo.name286.verb.red.conf-odoo
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-ghost
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/bb.name286.verb.ink.conf-wpbb
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-wpblg
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-drupal
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-october
-mv /var/local/verb/configs/site-files/sub286.name286.verb.tld286.conf /var/local/verb/configs/site-files/sub286.${SITENAME}.verb.tld286.conf
-mv /var/local/verb/configs/site-files/odoo.name286.verb.red.conf-odoo /var/local/verb/configs/site-files/odoo.${SITENAME}.verb.red.conf-odoo
-mv /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-ghost /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-ghost
-mv /var/local/verb/configs/site-files/bb.name286.verb.ink.conf-wpbb /var/local/verb/configs/site-files/bb.${SITENAME}.verb.ink.conf-wpbb
-mv /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-wpblg /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-wpblg
-mv /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-drupal /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-drupal
-mv /var/local/verb/configs/site-files/blog.name286.verb.ink.conf-october /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-october
-cp /var/local/verb/${VUPDATE_REPO}/0.806/inst/setupverb /var/local/verb/inst/
-cp -rf /var/local/verb/${VUPDATE_REPO}/0.806/postfixadmin /var/local/verb/configs/conflab/email/
-# Update Postfix Admin to use local configs, remove incl-once, and clean up some of the comments
-cp /var/www/email/postfixadmin/config.inc.php /var/www/email/postfixadmin/config.local.php
-sed -i "/if (file_exists(dirname/,+2d" /var/www/email/postfixadmin/config.local.php
-sed -i "/\/\/.*/d" /var/www/email/postfixadmin/config.local.php
-
-# siteinstallstatus
-echo "REDODOO=NOT_YET
-" >> /var/local/verb/configs/siteinstallstatus
-
-# WP Updater
-cp /var/local/verb/${VUPDATE_REPO}/0.806/mu-plugins/auto-update.php /var/local/verb/configs/conflab/mu-plugins/
-if [ -d "/var/local/ink" ]; then
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/news280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/shop280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/tyler280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/podcast280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/eplugins280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/ethemes280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/bb280.inkisaverb.com/wp-content/mu-plugins/
-cp /var/local/verb/configs/conflab/mu-plugins/auto-update.php /var/www/html/ink280.inkisaverb.com/wp-content/mu-plugins/
-fi
-
-# Ghost blog
-if [ -d "/var/local/ghost/ghostblog" ]; then
-. /var/local/verb/configs/siteinstallstatus
- if [ "${INKBLOG}" = "Ghost" ]; then
-rm -rf /var/www/html/ink.blog
-echo "Ghost" > /var/www/html/ink.blog
- fi
-fi
-
-# Roundcube
-cp /var/local/verb/${VUPDATE_REPO}/0.806/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/favicon.ico /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/
-cp /var/local/verb/${VUPDATE_REPO}/0.806/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/favicon.ico /var/local/verb/configs/conflab/email/roundcube/
-
-# Pink
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/${VUPDATE_REPO}/0.806/etc-apache2-available/pink.name286.verb.pink.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/${VUPDATE_REPO}/0.806/etc-apache2-available/name286.verb.pink.conf
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/${VUPDATE_REPO}/0.806/configs/cli-ini/cli.name286.verb.pink.ini
-cp /var/local/verb/${VUPDATE_REPO}/0.806/configs/cli-ini/cli.name286.verb.pink.ini /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.pink.ini
-cp /var/local/verb/${VUPDATE_REPO}/0.806/configs/cli-ini/siteinkcert.name286.verb.pink /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.pink
-cp /var/local/verb/${VUPDATE_REPO}/0.806/etc-apache2-available/pink.name286.verb.pink.conf /etc/apache2/sites-available/pink.${SITENAME}.verb.pink.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.806/etc-apache2-available/name286.verb.pink.conf /etc/apache2/sites-available/${SITENAME}.verb.pink.conf
-echo "VERBPINK=true" >> /var/local/verb/configs/sitetldstatus
-/var/local/verb/serfs/updatehtmlverbs
-a2ensite ${SITENAME}.verb.pink pink.${SITENAME}.verb.pink
-service apache2 reload
-
-# inkCert job name
-mv /var/local/verb/configs/inkcert/inkcert-renew-all.sh /var/local/verb/configs/inkcert/inkcertle-renew-all.sh
-echo "3 3 * * * root /var/local/verb/configs/inkcert/inkcertle-renew-all.sh" >> /var/local/verb/configs/verbcrontab
-crontab /var/local/verb/configs/verbcrontab
-
-###########################
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
-. /var/local/verb/configs/inklists/verberverno
-echo "Verber updated to v${VERNO}"
-else
-echo "${UPDATE_PATCH_VERNO} patch not necessary..."
-fi
-###############END#UPDATE#PATCH#
-
-
-UPDATE_PATCH_VERNO=0.807
-
-if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-
-# Add the N/A declaration to redundant verb subdomains
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/email.${SITENAME}.verb.email.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/one.${SITENAME}.verb.one.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/ink.${SITENAME}.verb.ink.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/blue.${SITENAME}.verb.blue.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/guru.${SITENAME}.verb.guru.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/kiwi.${SITENAME}.verb.kiwi.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/pink.${SITENAME}.verb.pink.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/red.${SITENAME}.verb.red.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/rocks.${SITENAME}.verb.rocks.conf
-echo "
-#INKVERB-INKCERT=NA" >> /etc/apache2/sites-available/uno.${SITENAME}.verb.uno.conf
-
-# inkCert tweaks and fixes
-sed -i "s/FIRSTINKCERTADDLE=NOT_YET/FIRSTINKCERTADDLE=DONE/g" /var/local/verb/configs/inkcert/inkcertstatus
-cp /var/local/verb/${VUPDATE_REPO}/0.807/inkcert/* /var/local/verb/configs/inkcert/
-cp /var/local/verb/${VUPDATE_REPO}/0.807/donjon/nextcloudprep.sh /var/local/verb/donjon/
-# Nextcloud
-sed -i "/^domains =/ s/$/, nextcloud.${SITENAME}.verb.blue/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.blue.ini
-cp /var/local/verb/${VUPDATE_REPO}/0.807/sites-available/nextcloud.name286.verb.blue.conf /etc/apache2/sites-available/nextcloud.${SITENAME}.verb.blue.conf
-sed -i "s/name286/${SITENAME}/g" /etc/apache2/sites-available/nextcloud.${SITENAME}.verb.blue.conf
-/var/local/verb/serfs/updatehtmlverbs
-a2ensite nextcloud.${SITENAME}.verb.blue
-service apache2 reload
-## Install dependencies
-apt install -y php-bz2 php-curl php-gd php-imagick php-intl php-mbstring php-xml php-zip
-
-###########################
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
-. /var/local/verb/configs/inklists/verberverno
-echo "Verber updated to v${VERNO}"
-else
-echo "${UPDATE_PATCH_VERNO} patch not necessary..."
-fi
-###############END#UPDATE#PATCH#
-
-
-UPDATE_PATCH_VERNO=0.808
-if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-
-# Update sitetldstatus variables
-sed -i "s/VERBEMAIL/VERBemail/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBONE/VERBone/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBINK/VERBink/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBBLUE/VERBblue/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBGURU/VERBguru/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBKIWI/VERBkiwi/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBPINK/VERBpink/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBRED/VERBred/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBROCKS/VERBrocks/g" /var/local/verb/configs/sitetldstatus
-sed -i "s/VERBUNO/VERBuno/g" /var/local/verb/configs/sitetldstatus
-
-# php.ini
-sed -i "s/memory_limit = .*/memory_limit = 512M/g" /var/local/verb/configs/php-${SITENAME}.ini
-sed -i "s/;memory_limit = .*/;memory_limit = 128M/g" /var/local/verb/configs/php-${SITENAME}.ini
-
-# Cron
-mv /var/local/verb/configs/verbcrontab /var/local/verb/configs/verbcron
-cp /var/local/verb/configs/verbcron /etc/cron.d/verber
-touch boo
-crontab boo
-rm boo
-
-# inkget repo
-/var/local/verb/serfs/setinkgetrepo ink.ink.verb.ink
-
-############################
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
-. /var/local/verb/configs/inklists/verberverno
-echo "Verber updated to v${VERNO}"
-else
-echo "${UPDATE_PATCH_VERNO} patch not necessary..."
-fi
-###############END#UPDATE#PATCH#
-
-
-UPDATE_PATCH_VERNO=0.809
-if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-
-# Remove default domains
-sed -i "s/, email.${SITENAME}.verb.email//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.email.ini
-sed -i "s/, one.${SITENAME}.verb.one//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.one.ini
-sed -i "s/, ink.${SITENAME}.verb.ink//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.ink.ini
-sed -i "s/, blue.${SITENAME}.verb.blue//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.blue.ini
-sed -i "s/, guru.${SITENAME}.verb.guru//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.guru.ini
-sed -i "s/, kiwi.${SITENAME}.verb.kiwi//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.kiwi.ini
-sed -i "s/, pink.${SITENAME}.verb.pink//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.pink.ini
-sed -i "s/, red.${SITENAME}.verb.red//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.red.ini
-sed -i "s/, rocks.${SITENAME}.verb.rocks//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.rocks.ini
-sed -i "s/, uno.${SITENAME}.verb.uno//g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.uno.ini
-. /var/local/verb/configs/sitetldstatus
-if [ $VERBemail=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.email r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.email
-fi
-if [ $VERBone=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.one r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.one
-fi
-if [ $VERBink=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.ink r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
-fi
-if [ $VERBblue=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.blue r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.blue
-fi
-if [ $VERBguru=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.guru r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.guru
-fi
-if [ $VERBkiwi=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.kiwi r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.kiwi
-fi
-if [ $VERBpink=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.pink r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.pink
-fi
-if [ $VERBred=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.red r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.red
-fi
-if [ $VERBrocks=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.rocks r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.rocks
-fi
-if [ $VERBuno=true ]; then
-/var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.uno r
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.uno
-fi
-
-############################
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
-. /var/local/verb/configs/inklists/verberverno
-echo "Verber updated to v${VERNO}"
-else
-echo "${UPDATE_PATCH_VERNO} patch not necessary..."
-fi
-###############END#UPDATE#PATCH#
-
-UPDATE_PATCH_VERNO=0.810
-if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-
-# Apache config files
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/${VUPDATE_REPO}/0.810/site-files/*
-sed -i "s/name286/${SITENAME}/g" /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/*
-cp /var/local/verb/${VUPDATE_REPO}/0.810/site-files/collabora.name286.verb.blue.conf-collabora /var/local/verb/configs/site-files/collabora.${SITENAME}.verb.blue.conf-collabora
-cp /var/local/verb/${VUPDATE_REPO}/0.810/site-files/collabora.name286.verb.blue.conf-orig /var/local/verb/configs/site-files/collabora.${SITENAME}.verb.blue.conf-orig
-cp /var/local/verb/${VUPDATE_REPO}/0.810/site-files/bb.name286.verb.ink.conf-orig /var/local/verb/configs/site-files/bb.${VNAME}.verb.ink.conf-orig
-cp /var/local/verb/${VUPDATE_REPO}/0.810/site-files/blog.name286.verb.ink.conf-orig /var/local/verb/configs/site-files/blog.${VNAME}.verb.ink.conf-orig
-cp /var/local/verb/${VUPDATE_REPO}/0.810/site-files/odoo.name286.verb.red.conf-orig /var/local/verb/configs/site-files/odoo.${SITENAME}.verb.red.conf-orig
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/collabora.name286.verb.blue.conf /etc/apache2/sites-available/collabora.${SITENAME}.verb.blue.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/chat.name286.verb.blue.conf /etc/apache2/sites-available/chat.${SITENAME}.verb.blue.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/xmpp.name286.verb.blue.conf /etc/apache2/sites-available/xmpp.${SITENAME}.verb.blue.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/ejabberd.name286.verb.kiwi.conf /etc/apache2/sites-available/ejabberd.${SITENAME}.verb.kiwi.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/prosody.name286.verb.kiwi.conf /etc/apache2/sites-available/prosody.${SITENAME}.verb.kiwi.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/voip.name286.verb.kiwi.conf /etc/apache2/sites-available/voip.${SITENAME}.verb.kiwi.conf
-cp /var/local/verb/${VUPDATE_REPO}/0.810/sites-available/webrtc.name286.verb.kiwi.conf /etc/apache2/sites-available/webrtc.${SITENAME}.verb.kiwi.conf
-/var/local/verb/serfs/updatehtmlverbs
-
-# Blue inkCert
-sed -i "/^domains =/ s/$/, collabora.${SITENAME}.verb.blue/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.blue.ini
-sed -i "/^domains =/ s/$/, chat.${SITENAME}.verb.blue/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.blue.ini
-sed -i "/^domains =/ s/$/, xmpp.${SITENAME}.verb.blue/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.blue.ini
-sed -i "/^domains =/ s/$/, ejabberd.${SITENAME}.verb.kiwi/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.kiwi.ini
-sed -i "/^domains =/ s/$/, prosody.${SITENAME}.verb.kiwi/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.kiwi.ini
-sed -i "/^domains =/ s/$/, voip.${SITENAME}.verb.kiwi/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.kiwi.ini
-sed -i "/^domains =/ s/$/, webrtc.${SITENAME}.verb.kiwi/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.kiwi.ini
-
-# SQL guru
-rm -f /etc/apache2/sites-enabled/mysql.${SITENAME}.verb.guru.conf
-mv /var/www/html/guru.mysql /var/www/html/guru.sql
-sed -i "s/mysql/sql/g" /var/www/html/guru.mysql/index.php
-sed -i "s/mysql/sql/g" /etc/apache2/sites-available/mysql.${SITENAME}.verb.guru.conf
-sed -i "s/mysql\.${SITENAME}\.verb\.guru/sql\.${SITENAME}\.verb\.guru/g" /etc/letsencrypt/renewal/${SITENAME}.verb.guru.conf
-mv /etc/apache2/sites-available/mysql.${SITENAME}.verb.guru.conf /etc/apache2/sites-available/sql.${SITENAME}.verb.guru.conf
-sed -i "s/mysql/sql/g" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.guru.ini
-
-# Apache stuff
-/var/local/verb/serfs/updatehtmlverbs
-a2ensite collabora.${SITENAME}.verb.blue
-a2ensite sql.${SITENAME}.verb.guru
-a2ensite chat.${SITENAME}.verb.blue
-a2ensite xmpp.${SITENAME}.verb.blue
-a2ensite ejabberd.${SITENAME}.verb.kiwi
-a2ensite prosody.${SITENAME}.verb.kiwi
-a2ensite voip.${SITENAME}.verb.kiwi
-a2ensite webrtc.${SITENAME}.verb.kiwi
-service apache2 reload
-
-# inkCert
-## Renewals
-cd /etc/inkcert/le/renewal
-mv ${SITENAME}.verb.red.conf ${SITENAME}.verb.red.conf--
-mv ${SITENAME}.verb.kiwi.conf ${SITENAME}.verb.kiwi.conf--
-mv ${SITENAME}.verb.guru.conf ${SITENAME}.verb.guru.conf--
-mv ${SITENAME}.verb.blue.conf ${SITENAME}.verb.blue.conf--
-mv ${SITENAME}.verb.one.conf ${SITENAME}.verb.one.conf--
-mv ${SITENAME}.verb.ink.conf ${SITENAME}.verb.ink.conf--
-mv ${SITENAME}.verb.email.conf ${SITENAME}.verb.email.conf--
-
-## Archives
-cd /etc/inkcert/le/archive
-mv ${SITENAME}.verb.red ${SITENAME}.verb.red--
-mv ${SITENAME}.verb.kiwi ${SITENAME}.verb.kiwi--
-mv ${SITENAME}.verb.guru ${SITENAME}.verb.guru--
-mv ${SITENAME}.verb.blue ${SITENAME}.verb.blue--
-mv ${SITENAME}.verb.one ${SITENAME}.verb.one--
-mv ${SITENAME}.verb.ink ${SITENAME}.verb.ink--
-mv ${SITENAME}.verb.email ${SITENAME}.verb.email--
-
-## Live
-cd /etc/inkcert/le/live
-mv ${SITENAME}.verb.red ${SITENAME}.verb.red--
-mv ${SITENAME}.verb.kiwi ${SITENAME}.verb.kiwi--
-mv ${SITENAME}.verb.guru ${SITENAME}.verb.guru--
-mv ${SITENAME}.verb.blue ${SITENAME}.verb.blue--
-mv ${SITENAME}.verb.one ${SITENAME}.verb.one--
-mv ${SITENAME}.verb.ink ${SITENAME}.verb.ink--
-mv ${SITENAME}.verb.email ${SITENAME}.verb.email--
-
-## Request
-service apache2 stop
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.red.ini
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.kiwi.ini
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.guru.ini
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.blue.ini
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.one.ini
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.ink.ini
-letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.email.ini
-service apache2 start
-
-###########################
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
-. /var/local/verb/configs/inklists/verberverno
-echo "Verber updated to v${VERNO}"
-else
-echo "${UPDATE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPDATE#PATCH#
-
-
-UPDATE_PATCH_VERNO=0.811
+UPDATE_PATCH_VERNO=0.812
 if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
 # Run the update scripts for this patch
 
@@ -428,24 +65,58 @@ if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(ec
 
 # eg: echo "I would update the serfs here, but that happens automatically."
 
-# New siteinstallstatus
+# Create the siteurllist config
 echo "#!/bin/sh
 ## This is a config file for other verb scripts
 
-# Determine which site tlds are active on the server, all are on by default
+# Determine the site urls, whether they are active or not
 
-VERBemail=true
-VERBone=true
-VERBink=true
-VERBblue=true
-VERBguru=true
-VERBkiwi=true
-VERBpink=true
-VERBred=true
-VERBrocks=true
-VERBuno=true
-" > /var/local/verb/configs/sitetldstatus
+nameURI=${SITENAME}.verb.${SITETLD}
+hostURI=${SITEHOST}.${SITENAME}.verb.${SITETLD}
+emailTLDURI=${SITENAME}.verb.${SITETLD}
+emailURI=${SITENAME}.verb.email
+oneURI=${SITENAME}.verb.one
+inkURI=${SITENAME}.verb.ink
+blueURI=${SITENAME}.verb.blue
+guruURI=${SITENAME}.verb.guru
+kiwiURI=${SITENAME}.verb.kiwi
+pinkURI=${SITENAME}.verb.pink
+redURI=${SITENAME}.verb.red
+rocksURI=${SITENAME}.verb.rocks
+unoURI=${SITENAME}.verb.uno
+" > /var/local/verb/configs/siteurilist
+. /var/local/verb/configs/siteurilist
 
+# site-files
+## Copy new files
+rm -f /var/local/verb/configs/site-files/*.conf*
+cp -rf /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/site-files/conf /var/local/verb/configs/site-files/
+## Replace
+sed -i "s/emailURI286/${emailURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/oneURI286/${oneURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/inkURI286/${inkURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/blueURI286/${blueURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/guruURI286/${guruURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/kiwiURI286/${kiwiURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/pinkURI286/${pinkURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/redURI286/${redURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/rocksURI286/${rocksURI}/g" /var/local/verb/configs/site-files/conf/*
+sed -i "s/unoURI286/${unoURI}/g" /var/local/verb/configs/site-files/conf/*
+## Rename
+rename "s/emailURI286/${emailURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/oneURI286/${oneURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/inkURI286/${inkURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/blueURI286/${blueURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/guruURI286/${guruURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/kiwiURI286/${kiwiURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/pinkURI286/${pinkURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/redURI286/${redURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/rocksURI286/${rocksURI}/" /var/local/verb/configs/site-files/conf/*
+rename "s/unoURI286/${unoURI}/" /var/local/verb/configs/site-files/conf/*
+
+# inkNet
+echo "INKNET_REPO=\"NOT_SET\"" >> /var/local/verb/configs/siteinkget
+cp -f /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/donjon/* /var/local/verb/donjon/
 
 ###########################
 # Set and refresh the current version into inklists
@@ -455,16 +126,13 @@ echo "Verber updated to v${VERNO}"
 else
 echo "${UPDATE_PATCH_VERNO} patch not necessary..."
 fi
+
+## INCLUDE AFTER 0.812, even if already at 0.812 !!
+. /var/local/verb/configs/siteurilist
 ##############END#UPDATE#PATCH#
 
 
 
-# Verb Domain mod? NOT IN PRODUCTION, MAY BE REMOVED
-if [ -f /var/local/verb/configs/sitedomainverber ]; then
- if [ "${VTYPE}" = "VERB_DOMAIN" ]; then
-/var/local/verb/configs/conflab/mods/domainverber
- fi
-fi
 
 
 # Finish

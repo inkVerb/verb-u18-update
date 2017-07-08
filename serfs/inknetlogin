@@ -24,8 +24,11 @@ LOGINCAV=$(echo $FULLCAVNAME | cut -c1-18)
 . /var/local/verb/configs/inknet/secondarycav.${LOGINCAV}.cnf
 else
 . /var/local/verb/configs/inknet/client.${CAVERBERNAME}.inker.login.cnf
+LOGINSAILOR="inivclisailor"
 fi
 
 # Login
+## Done by the user ${CLIENTSAILOR} with password ${CLIENTSAILPASS}
+## Follow these instructions https://stackoverflow.com/questions/40668512/how-to-switch-to-different-user-inside-a-shell-script-and-execute-some-command-w
 ssh -o HostName=${CAVERBERHOST}.${CAVERBERURI} -p ${CLIENTPORT} ${CLIENTUSERNAME}@${CAVERBERIP}
 

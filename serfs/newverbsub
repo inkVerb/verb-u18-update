@@ -13,18 +13,27 @@ set -e
 TLD=$1
 SUBDOMAIN=$2
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
+## Domain Mod?
+if grep -Fq "SITENAME=DOMAIN_MOD-" /var/local/verb/configs/sitenameip; then
+tldURI="${TLD}.${baseDOM}"
+else
+tldURI="${SITENAME}.verb.${TLD}"
+fi
 
 # Copy the file
-cp /var/local/verb/configs/site-files/sub286.${SITENAME}.verb.tld286.conf /etc/apache2/sites-available/${SUBDOMAIN}.${SITENAME}.verb.${TLD}.conf
+cp /var/local/verb/configs/site-files/conf/sub286.tldURI286.conf /etc/apache2/sites-available/${SUBDOMAIN}.${tldURI}.conf
 
 # Replace
-sed -i "s/sub286/${SUBDOMAIN}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${SITENAME}.verb.${TLD}.conf
-sed -i "s/tld286/${TLD}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${SITENAME}.verb.${TLD}.conf
+sed -i "s/sub286/${SUBDOMAIN}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${tldURI}.conf
+sed -i "s/tldURI286/${tldURI}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${tldURI}.conf
+sed -i "s/tld286/${TLD}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${tldURI}.conf
 
 # inkCert, at end of the "domains =" line
-sed -i "/^domains =/ s/$/, ${SUBDOMAIN}.${SITENAME}.verb.${TLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${TLD}.ini
+sed -i "/^domains =/ s/$/, ${SUBDOMAIN}.${tldURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${tldURI}.ini
 
 # Create the http dir
 cd /var/www/html
@@ -35,25 +44,25 @@ chown -R www-data:www-data /var/www/html/${TLD}.${SUBDOMAIN}
 ## If setupverb has already run
 if [ ! -f "/var/local/verb/inst/setupverb" ]; then
 echo "...reloading Apache..."
-a2ensite ${SUBDOMAIN}.${SITENAME}.verb.${TLD}
+a2ensite ${SUBDOMAIN}.${tldURI}
 service apache2 reload
 
 # inkCert
 ## If inkCert has already run
- if [ -f  "/var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.${TLD}" ]; then
- echo "Updating inkCert SSL certs to include ${SUBDOMAIN}.${SITENAME}.verb.${TLD}..."
- /var/local/verb/serfs/inkcertreqle ${SITENAME}.verb.${TLD} r
- /var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.${TLD}
+ if [ -f  "/var/local/verb/configs/inkcert/cli-ini/siteinkcert.${tldURI}" ]; then
+ echo "Updating inkCert SSL certs to include ${SUBDOMAIN}.${tldURI}..."
+ /var/local/verb/serfs/inkcertreqle ${tldURI} r
+ /var/local/verb/serfs/inkcertaddallle ${tldURI}
  else
- echo "${SUBDOMAIN}.${SITENAME}.verb.${TLD} will get its SSL certs when you run inkCert for ${SITENAME}.verb.${TLD}."
+ echo "${SUBDOMAIN}.${tldURI} will get its SSL certs when you run inkCert for ${tldURI}."
  fi
 else
-echo "${SUBDOMAIN}.${SITENAME}.verb.${TLD} will be activated with the crew when you run setupverb."
+echo "${SUBDOMAIN}.${tldURI} will be activated with the crew when you run setupverb."
 fi
 
 # Finish
 echo "
-${SUBDOMAIN}.${SITENAME}.verb.${TLD} is all set to go.
+${SUBDOMAIN}.${tldURI} is all set to go.
 But, remember it is not part of the native Verber package. This is an aftermarket mod that inkVerb will not maintain.
 "
 

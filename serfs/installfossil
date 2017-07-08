@@ -11,8 +11,9 @@ set -e
 ## ./installfossil adam adam@verb.ink Adamp4$$w0RD
 
 
-# Include settings
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 NEWUSER=$1
 NEWEMAIL=$2
@@ -55,10 +56,10 @@ fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository dinosaur.fossil
 # Ending message
 echo "
 Fossil installed. The first, default fossil will be available at:
-fossil.${SITENAME}.verb.guru
+fossil.${guruURI}
 
 The another demo fossil, dinosaur.fossil, is available at:
-fossil.${SITENAME}.verb.guru/dinosaur.cgi
+fossil.${guruURI}/dinosaur.cgi
 
 All relevant files appear via ftp in the \"guru/fossil\" folder.
 "

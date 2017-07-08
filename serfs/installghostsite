@@ -63,7 +63,7 @@ rm -f /etc/apache2/sites-available/${DOMAIN}.conf
 rm -f /var/www/html/${DOMAIN}
 echo "Ghost Site" > /var/www/html/${DOMAIN}
 ## Add the Apache config
-cp /var/local/verb/configs/site-files/newghostsite.conf /etc/apache2/sites-available/${DOMAIN}.conf
+cp /var/local/verb/configs/site-files/conf/newghostsite.conf /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/ghostsite286/${DOMAIN}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/2368/${NEWPORT}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/${DOMAIN}.conf
@@ -85,7 +85,7 @@ echo "inkCert-IC is already setup for ${DOMAIN}. Updating the Apache configs..."
 fi
 
 # Make it a service at startup
-cp /var/local/verb/configs/site-files/ghostsite.conf /etc/init/ghostsite-${DOMAIN}.conf
+cp /var/local/verb/configs/site-files/conf/ghostsite.conf /etc/init/ghostsite-${DOMAIN}.conf
 sed -i "s/ghostsite/ghostsite-${DOMAIN}/g" /etc/init/ghostsite-${DOMAIN}.conf
 sed -i "s/ghostdomain286/${DOMAIN}/g" /etc/init/ghostsite-${DOMAIN}.conf
 

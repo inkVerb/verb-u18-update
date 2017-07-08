@@ -13,6 +13,7 @@ PFAPASS=$1
 
 # Include the config file
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpath
 
 # Download and unzip
@@ -46,7 +47,7 @@ echo "
 Postfix Admin update complete.
 
 IF... you don't have an administrator, run Setup at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/setup.php
+ https://boxes.${emailTLDURI}/${SITEPFAPATH}/setup.php
 - You must create your own password on the Setup page, then add it via: setpfapass
 - Go back to the Setup page and finish the process.
 - Then run ./postinstallpfa
@@ -55,10 +56,10 @@ IF... you don't have an administrator, run Setup at:
 
 IMPORTANT:
 Now, you NEED to run the database upgrade at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/upgrade.php
+ https://boxes.${emailTLDURI}/${SITEPFAPATH}/upgrade.php
 - Then run ./postinstallpfa
 - Then login at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}
+ https://boxes.${emailTLDURI}/${SITEPFAPATH}
 
 ...That's it.
 If all works well, you may delete the backup wtih updatepfarmvbak before updating again.
@@ -70,7 +71,7 @@ echo "
 Postfix Admin update complete.
 
 IF... you don't have an administrator, run Setup at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/setup.php
+ https://boxes.${emailTLDURI}/${SITEPFAPATH}/setup.php
 - Use the install password 'inkverb77'
 - Then run ./postinstallpfa
 
@@ -78,10 +79,10 @@ IF... you don't have an administrator, run Setup at:
 
 IMPORTANT:
 Now, you NEED to run the database upgrade at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}/upgrade.php
+ https://boxes.${emailTLDURI}/${SITEPFAPATH}/upgrade.php
 - Then run ./postinstallpfa
 - Then login at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${SITEPFAPATH}
+ https://boxes.${emailTLDURI}/${SITEPFAPATH}
 
 ...That's it.
 If all works well, you may delete the backup wtih updatepfarmvbak before updating again.

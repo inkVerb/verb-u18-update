@@ -10,36 +10,39 @@ set -e
 ## ./inkcertdo-all-verbs
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+. /var/local/verb/configs/sitetldstatus
+
 if [ $VERBemail=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.email
+/var/local/verb/serfs/inkcertdo ${emailURI}
 fi
 if [ $VERBone=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.one
+/var/local/verb/serfs/inkcertdo ${oneURI}
 fi
 if [ $VERBink=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.ink
+/var/local/verb/serfs/inkcertdo ${inkURI}
 fi
 if [ $VERBblue=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.blue
+/var/local/verb/serfs/inkcertdo ${blueURI}
 fi
 if [ $VERBguru=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.guru
+/var/local/verb/serfs/inkcertdo ${guruURI}
 fi
 if [ $VERBkiwi=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.kiwi
+/var/local/verb/serfs/inkcertdo ${kiwiURI}
 fi
 if [ $VERBpink=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.pink
+/var/local/verb/serfs/inkcertdo ${pinkURI}
 fi
 if [ $VERBred=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.red
+/var/local/verb/serfs/inkcertdo ${redURI}
 fi
 if [ $VERBrocks=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.rocks
+/var/local/verb/serfs/inkcertdo ${rocksURI}
 fi
 if [ $VERBuno=true ]; then
-/var/local/verb/serfs/inkcertdo ${SITENAME}.verb.uno
+/var/local/verb/serfs/inkcertdo ${unoURI}
 fi
 

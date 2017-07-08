@@ -14,15 +14,16 @@ set -e
 # Type ./pointink -h for help
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 if [ "$1" = "-h" ]; then
     echo "Usage: ./pointink [subdomin only]
 
 Examples:
- ./pointink crm.red (points ${SITENAME}.verb.red to crm.your-name.verb.red)
- ./pointink red (resets ${SITENAME}.verb.red to point to itself)
+ ./pointink crm.red (points ${redURI} to crm.your-name.verb.red)
+ ./pointink red (resets ${redURI} to point to itself)
 
  allowed arguments:
  blue

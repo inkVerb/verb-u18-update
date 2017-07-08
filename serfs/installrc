@@ -20,6 +20,7 @@ set -e
 
 # Include the config files
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpass
 . /var/local/verb/configs/sitemailpath
 
@@ -68,12 +69,12 @@ cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.rc
 ln -s /var/www/email/roundcube /var/www/html/${SITEEMAILTLD}.rc/${RCFOLDER}
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
 chown -R www-data:www-data /var/www/email/roundcube
-a2ensite rc.${SITENAME}.verb.${SITEEMAILTLD}
+a2ensite rc.${emailTLDURI}
 service apache2 reload
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, rc.${SITENAME}.verb.${SITEEMAILTLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${SITEEMAILTLD}.ini
+sed -i "/^domains =/ s/$/, rc.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Roundcube system apps
 apt install -y \
@@ -94,12 +95,10 @@ service apache2 restart
 # Settings
 cp /var/local/verb/configs/conflab/email/roundcube/config/roundcube286-config.inc.php /var/www/email/roundcube/config/config.inc.php
 cp /var/local/verb/configs/conflab/email/roundcube/config/roundcube286-defaults.inc.php /var/www/email/roundcube/config/defaults.inc.php
-sed -i "s/name286/${SITENAME}/g" /var/www/email/roundcube/config/config.inc.php
-sed -i "s/name286/${SITENAME}/g" /var/www/email/roundcube/config/defaults.inc.php
-sed -i "s/tld286/${SITETLD}/g" /var/www/email/roundcube/config/config.inc.php
-sed -i "s/tld286/${SITETLD}/g" /var/www/email/roundcube/config/defaults.inc.php
-sed -i "s/email286/${SITEEMAILTLD}/g" /var/www/email/roundcube/config/config.inc.php
-sed -i "s/email286/${SITEEMAILTLD}/g" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/nameURI286/${nameURI}/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/nameURI286/${nameURI}/g" /var/www/email/roundcube/config/defaults.inc.php
 sed -i "s/rcpass286/rcpass${RCPASSGEN}/g" /var/www/email/roundcube/config/config.inc.php
 sed -i "s/rcpass286/rcpass${RCPASSGEN}/g" /var/www/email/roundcube/config/defaults.inc.php
 sed -i "s/rcemailconfdeskeysalt286/${DESSALTGEN}/g" /var/www/email/roundcube/config/config.inc.php
@@ -158,7 +157,7 @@ sed -i "s/$config\['password_force_new_user'\].*/$config\['password_force_new_us
 echo "
 Roundcube is ready to be installed at:
 
- https://rc.${SITENAME}.verb.${SITEEMAILTLD}/${RCFOLDER}/installer
+ https://rc.${emailTLDURI}/${RCFOLDER}/installer
 
 - Then run ./postinstallrc
 "

@@ -12,6 +12,9 @@ set -e
 
 CVAPPNAME=suitecrm
 
+# Include the config
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -74,6 +77,6 @@ Database password: ${DBPASSWORD}
 
 *Choose \"Provide Existing User\" BEFORE entering above information.
 
-Go to the http://crm.${SITENAME}.verb.red site to install.
+Go to the http://crm.${redURI} site to install.
 "
 

@@ -12,6 +12,10 @@ set -e
 
 CVAPPNAME=orangehrm
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -34,9 +38,6 @@ if [ -z $1 ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
 if [ -z $2 ]; then
 DBUSER=${DBASE}; fi
-
-# Include the config file
-. /var/local/verb/configs/sitenameip
 
 # Download and unpack the latest checked version from inkisaverb.com/repo
 cd /var/www/vapps
@@ -83,6 +84,6 @@ Database user password: ${DBPASSWORD}
 *Select \"Existing database\" in setup to make life easier, if you want.
 *Enable Data Encryption? - Probably NOT!
 
-Go to http://hrm.${SITENAME}.verb.red to install.
+Go to http://hrm.${redURI} to install.
 "
 

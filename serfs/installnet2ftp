@@ -9,8 +9,9 @@ set -e
 ## ./installvsftpd
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 # Download and unzip
 cd /var/www/vapps
@@ -27,7 +28,7 @@ cd net2ftp
 cp settings.inc.php settings.inc.php.dist
 cp settings_authorizations.inc.php settings_authorizations.inc.php.dist
 cp settings_screens.inc.php settings_screens.inc.php.dist
-sed -i "s/\$net2ftp_settings\[\"email_feedback\"\] = \"webmaster@enter-your-domain-here.com\";/\$net2ftp_settings\[\"email_feedback\"\] = \"postmaster@${SITENAME}.verb.ink\";/g" settings.inc.php
+sed -i "s/\$net2ftp_settings\[\"email_feedback\"\] = \"webmaster@enter-your-domain-here.com\";/\$net2ftp_settings\[\"email_feedback\"\] = \"postmaster@${inkURI}\";/g" settings.inc.php
 sed -i "s/462E16CB7C3F369BD9F4DBEE0A926F8F14FFB3/462E16CB7C3F369HD9F4DAEE0A926FLF14F9B3/g" settings.inc.php
 sed -i "s/\$net2ftp_settings\[\"max_filesize\"\]  = \"10000000\";/\$net2ftp_settings\[\"max_filesize\"\]  = \"1000000000\";/g" settings.inc.php
 sed -i "s/\$net2ftp_settings\[\"allowed_ftpservers\"\]\[1\] = \"ALL\";/\/\/\$net2ftp_settings\[\"allowed_ftpservers\"\]\[1\] = \"ALL\";/g" settings_authorizations.inc.php
@@ -40,5 +41,5 @@ echo "net2ftp is enabled and clipping along!
 
 After creating an FTP Guru (or FTP Filer for private file access also)
 
-Login at http://net2ftp.${SITENAME}.verb.guru
+Login at http://net2ftp.${guruURI}
 "

@@ -12,6 +12,10 @@ set -e
 
 CVAPPNAME=ampache
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -23,9 +27,6 @@ if [ -z $1 ]; then
 DBASE=${CVAPPNAME}$(pwgen -s -1 6); fi
 if [ -z $2 ]; then
 DBUSER=${DBASE}; fi
-
-# Include config
-. /var/local/verb/configs/sitenameip
 
 # Install
 cd /var/www/vapps
@@ -87,6 +88,6 @@ Next page: All info should be correct already
 
 *Make sure you look through Admin areas for some important options after you complete the installation and login.
 
-Go to http://ampache.${SITENAME}.verb.kiwi to install.
+Go to http://ampache.${kiwiURI} to install.
 "
 

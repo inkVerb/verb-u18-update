@@ -12,6 +12,10 @@ set -e
 
 CVAPPNAME=owncloud
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -29,9 +33,6 @@ if [ -z $1 ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
 if [ -z $2 ]; then
 DBUSER=${DBASE}; fi
-
-# Include the config file
-. /var/local/verb/configs/sitenameip
 
 # Do it
 cd /var/www/vapps
@@ -73,6 +74,6 @@ Database password: ${DBPASSWORD}
 Database name: ${DBASE}
 
 *Don't make any other changes during the install!
-Go to http://owncloud.${SITENAME}.verb.blue to install.
+Go to http://owncloud.${blueURI} to install.
 "
 

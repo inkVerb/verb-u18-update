@@ -12,6 +12,9 @@ set -e
 
 CVAPPNAME=pydio
 
+# Include the config
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -73,6 +76,6 @@ Password: ${DBPASSWORD}
 *Check \"MySQLi\" if the installer asks.
 Don't make any other changes in set-up!
 
-Go to http://pydio.${SITENAME}.verb.blue to install.
+Go to http://pydio.${blueURI} to install.
 "
 

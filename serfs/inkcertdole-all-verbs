@@ -2,44 +2,56 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This script runs doinkcert for all native Verber domains... verb.ink, verb.blue, etc.
+# This script runs inkcertdole for all native Verber domains... verb.ink, verb.blue, etc.
 
 # How to use:
 ## ./inkcertdole-all-verbs
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitetldstatus
 
+# Verify that it's not a domain Dod Verber
+if grep -Fq "SITENAME=DOMAIN_MOD-" /var/local/verb/configs/sitenameip; then
+echo "Domain.MOD Verber NOTICE:
+This is a Domain Mod Verber. Letsencrypt won't run for so many domains in too short of a time.
+
+You must run inkcertdole one at a time for each uri, once you reach quota, wait a few days to continue.
+
+Eg: ./inkcertdole ${inkURI}
+"
+exit 0; fi
+
 if [ $VERBemail=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.email
+/var/local/verb/serfs/inkcertdole ${emailURI}
 fi
 if [ $VERBone=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.one
+/var/local/verb/serfs/inkcertdole ${oneURI}
 fi
 if [ $VERBink=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.ink
+/var/local/verb/serfs/inkcertdole ${inkURI}
 fi
 if [ $VERBblue=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.blue
+/var/local/verb/serfs/inkcertdole ${blueURI}
 fi
 if [ $VERBguru=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.guru
+/var/local/verb/serfs/inkcertdole ${guruURI}
 fi
 if [ $VERBkiwi=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.kiwi
+/var/local/verb/serfs/inkcertdole ${kiwiURI}
 fi
 if [ $VERBpink=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.pink
+/var/local/verb/serfs/inkcertdole ${pinkURI}
 fi
 if [ $VERBred=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.red
+/var/local/verb/serfs/inkcertdole ${redURI}
 fi
 if [ $VERBrocks=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.rocks
+/var/local/verb/serfs/inkcertdole ${rocksURI}
 fi
 if [ $VERBuno=true ]; then
-/var/local/verb/serfs/inkcertdole ${SITENAME}.verb.uno
+/var/local/verb/serfs/inkcertdole ${unoURI}
 fi
 

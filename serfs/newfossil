@@ -12,8 +12,9 @@ set -e
 ## ./newfossil dinosaur adam adam@verb.ink Adamp4$$w0RD
 
 
-# Include settings
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 NEWFOSSIL=$1
 NEWUSER=$2
@@ -36,5 +37,5 @@ chmod +x ${NEWFOSSIL}.cgi
 chown -R www-data:www-data /var/www/guru/fossil
 
 echo "${NEWFOSSIL}.fossil created.
-Available on web at fossil.${SITENAME}.verb.guru/${NEWFOSSIL}.cgi"
+Available on web at fossil.${guruURI}/${NEWFOSSIL}.cgi"
 

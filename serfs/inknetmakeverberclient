@@ -19,30 +19,31 @@ set -e
 ## ./inknetmakeverberclient I_AM_INKER
 
 
-# Include the config & set variables
+# Include the configs
 . /var/local/verb/configs/sitenameip
-NEWCLIENTURI="${SITENAME}.verb.${SITETLD}"
-FULLCLIENTNAME="${SITEHOST}_${SITENAME}_verb_${SITETLD}"
-NEWCLIENTNAME=$(echo $FULLCLIENTNAME | cut -c1-18)
+. /var/local/verb/configs/siteurilist
+
+# Set variables
+NEWCLIENTURI="${nameURI}"
+NEWCLIENTNAME="$(echo ${hostURI} | sed 's/\./_/g')"
 ## Check that URI matches host
-if [ "${SITEHOST}.${SITENAME}.verb.${SITETLD}" = "$(hostname -f)" ];
+if [ "${hostURI}" = "$(hostname -f)" ];
 then
 NEWCLIENTHOST="$(hostname -s)"
 else
-echo "The full hostname doesn't the inkVerb namespace URI and host settings. Fix that before proceeding.
+echo "The full hostname doesn't match the inkVerb namespace URI and host settings. Fix that before proceeding.
 The info is in: /etc/hosts
 ...which is sometimes over-written at startup by:
 /etc/cloud/templates/hosts.debian.tmpl ...so try changing that.
 It should say this:
 
-127.0.1.1 ${SITEHOST}.${SITENAME}.verb.${SITETLD} ${SITEHOST}
-${SITEIP} ${SITEHOST}.${SITENAME}.verb.${SITETLD} ${SITEHOST}
+127.0.1.1 ${hostURI} ${SITEHOST}
+${SITEIP} ${hostURI} ${SITEHOST}
 127.0.0.1 localhost.localdomain localhost
 
 Check with your hosting provider if you still have trouble.
 I quit."
-exit 22
-fi
+exit 22; fi
 ## To make this an CA Verber on an Inker (This server must already be an Inker)
 if [ "${1}" = "I_AM_INKER" ]; then
 ### Make sure it really is an Inker
@@ -61,17 +62,21 @@ NEWCAVERBERIP="I_AM_INKER"
 sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /var/local/verb/configs/siteinkget
 else
 ## To make this a standard CA Verber
+### Variables
 NEWCAVERBERHOST=$1
 NEWCAVERBERURI=$2
 NEWCAVERBERNAME=$3
 NEWCAVERBERIP=$4
+### Settings
 /var/local/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-/var/local/verb/serfs/setinkgetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
+/var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
+### inkNet Sailor (to login to the CA Verber)
+/var/local/verb/serfs/inkneivappaddsailor inivclisailor
 fi
 
 # Set configs
-## For the Client and primary CAVerber
+## For the Client and primary CA Verber
 echo "#!/bin/sh
 # inkNet config, verb.ink
 ## This contains information about this Client Verber's credentials used in signing SSH keys for inkNet on another CA Verber
@@ -83,6 +88,7 @@ CAVERBERIP=\"${NEWCAVERBERIP}\"
 CLIENTHOST=\"${NEWCLIENTHOST}\"
 CLIENTURI=\"${NEWCLIENTURI}\"
 CLIENTNAME=\"${NEWCLIENTNAME}\"
+CLIENTSAILPASS=\"${ADDINIVSAILPASSWORD}\"
 " > /var/local/verb/configs/inknet/inker.client.cnf
 
 # Verify proper configuration
@@ -97,7 +103,7 @@ echo "
 
 ## Added by inkNet ##
 Host *
- IdentityFile /etc/ssh/inknet/inknet_client_${NEWCLIENTNAME}_key" >> /etc/ssh/ssh_config
+ IdentityFile /etc/ssh/inknet/in_cli_${NEWCLIENTNAME}_key" >> /etc/ssh/ssh_config
 
 # Reload SSH services
 service ssh restart
@@ -112,7 +118,7 @@ Now, run inknetinstallca
 exit 0; fi
 
 # Get the CA Client key
-if [ ! -f /etc/ssh/inknet/inknet_ca_${NEWCAVERBERNAME}_key.pub ]; then
+if [ ! -f /etc/ssh/inknet/in_ca_${NEWCAVERBERNAME}_key.pub ]; then
 /var/local/verb/serfs/inknetaddcaverberpubkey; fi
 
 # Finish

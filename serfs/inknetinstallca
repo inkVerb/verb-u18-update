@@ -8,8 +8,8 @@ set -e
 
 # DEV NOTE:
 ## There are two CA keys
-### inknet_ca_${CAVERBERNAME}_key to sign the host key on the same CA Verber itself, which authenticates this server to Clients
-### inknet_ca_client_${CAVERBERNAME}_key to sign the Client keys seeking authentication, which authenticates Clients to this server
+### in_ca_${CAVERBERNAME}_key to sign the host key on the same CA Verber itself, which authenticates this server to Clients
+### in_ca_client_${CAVERBERNAME}_key to sign the Client keys seeking authentication, which authenticates Clients to this server
 
 # How to use:
 ## ./inknetinstallca
@@ -51,8 +51,8 @@ fi
 # Create the first host key on this CA Verber, for the settings added in inknetmakeca
 /var/local/verb/serfs/inknetnewcahostkey
 
-# JailKit (so users can login)
-/var/local/verb/serfs/inknetinstalljailkit
+# Install IVapp (so users can login)
+/var/local/verb/serfs/inknetinstallivapp
 
 # Set the inkNet config
 sed -i "s/INKNETSTATUS=\"MADE_INSTALL_READY\"/INKNETSTATUS=\"INSTALLED\"/g" /var/local/verb/configs/inknet/ca.verber.cnf

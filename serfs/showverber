@@ -11,6 +11,7 @@ set -e
 
 # Include the config
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpath
 . /var/local/verb/configs/inklists/verberverno
 
@@ -19,14 +20,14 @@ echo "Here you go. This Verber's info...
 IP: ${SITEIP}
 Namespace: ${SITENAME}
 Primary TLD: ${SITETLD}
-Primary URI: ${SITENAME}.verb.${SITETLD}
+Primary URI: ${nameURI}
 Host: ${SITEHOST}
 Timezone: ${SITETIMECITY}, ${SITETIMEREGION}
 Version: ${VERNO}
 Type: ${VERNO}
 
 Email
-Email URI: ${SITENAME}.verb.${SITEEMAILTLD}
+Email URI: ${emailTLDURI}
 Status: ${SITEMAILSTATUS}
 Snail: ${SITESNAIL}
 RC path: ${SITERCPATH}

@@ -12,6 +12,10 @@ set -e
 
 CVAPPNAME=mediawiki
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
@@ -29,9 +33,6 @@ if [ -z $1 ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
 if [ -z $2 ]; then
 DBUSER=${DBASE}; fi
-
-# Include the config file
-. /var/local/verb/configs/sitenameip
 
 # Download and establish mediawiki from the inkVerb repo
 cd /var/www/vapps
@@ -63,9 +64,9 @@ Database username: ${DBUSER} (NOT root)
 Database password: ${DBPASSWORD}
 Storage engine: InnoDB
 Character Set: UTF-8
-Return email address: use anything real, maybe yourname@${SITENAME}.verb.ink, NOT something@wiki.${SITENAME}.verb.ink
+Return email address: use anything real, maybe yourname@${inkURI}, NOT something@wiki.${inkURI}
 
-Go to http://wiki.${SITENAME}.verb.ink to install.
+Go to http://wiki.${inkURI} to install.
 
 After installing, download the LocalSettings.php file, then upload it to the "guru" web folder, then run postinstallmediawiki to complete in installation.
 "

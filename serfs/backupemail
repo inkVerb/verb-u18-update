@@ -45,6 +45,6 @@ fi
 ln -s /var/www/guru/verb.vmail.${SECNAME}.vbak.zip /var/www/html/${SITETLD}/
 chown -R www-data:www-data /var/www/html/${SITETLD}/verb.vmail.${SECNAME}.vbak.zip
 echo "The email server data has been backed up to the 'guru' folder and can also be downloaded at
-http://${SITENAME}.verb.${SITETLD}/verb.vmail.${SECNAME}.vbak.zip
+http://${nameURI}/verb.vmail.${SECNAME}.vbak.zip
 Note that the email server remains live."
 

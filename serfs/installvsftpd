@@ -11,8 +11,9 @@ set -e
 ## ./installvsftpd
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 apt install vsftpd
 
@@ -41,10 +42,10 @@ sed -i "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/#rsa_cert_file
 sed -i "s/rsa_private_key_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.key/#rsa_private_key_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.key/g" /etc/vsftpd.conf
 ## Allow the inkCert certs
 echo "ssl_enable=Yes" >> /etc/vsftpd.conf
-echo "rsa_cert_file=/etc/inkcert/live/${SITENAME}.verb.${SITETLD}/cert.pem" >> /etc/vsftpd.conf
-echo "rsa_private_key_file=/etc/inkcert/live/${SITENAME}.verb.${SITETLD}/privkey.pem" >> /etc/vsftpd.conf
+echo "rsa_cert_file=/etc/inkcert/live/${nameURI}/cert.pem" >> /etc/vsftpd.conf
+echo "rsa_private_key_file=/etc/inkcert/live/${nameURI}/privkey.pem" >> /etc/vsftpd.conf
 ## The line below is expirimental based on info from http://vsftpd.beasts.org/vsftpd_conf.html
-echo "ca_certs_file=/etc/inkcert/live/${SITENAME}.verb.${SITETLD}/chain.pem" >> /etc/vsftpd.conf
+echo "ca_certs_file=/etc/inkcert/live/${nameURI}/chain.pem" >> /etc/vsftpd.conf
 
 # Put the default ftp user to another directory
 mkdir /srv/vsftpd

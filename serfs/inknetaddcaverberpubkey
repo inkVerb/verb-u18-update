@@ -25,7 +25,7 @@ else
 fi
 
 # Check to acknowledge if already added
-if [ -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub ]; then
+if [ -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub ]; then
 echo "This Inker CA key is already installed. Updating it..."
 fi
 
@@ -37,20 +37,20 @@ exit 22; fi
 ## Get to the directory
 cd /etc/ssh/inknet
 ## Backup any existing key
-if [ -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub ]; then
+if [ -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub ]; then
 echo "A key from this inkNet CA is already installed. Fine, getting the new one..."
- if [ -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub ]; then
- rm /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub
+ if [ -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub ]; then
+ rm /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub
  fi
-mv /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub
+mv /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub
 fi
 ## Get the new key
-wget -q https://${CAVERBERHOST}.${CAVERBERURI}/inknet/inknet_ca_${CAVERBERNAME}_key.pub --no-check-certificate
+wget -q https://${CAVERBERHOST}.${CAVERBERURI}/inknet/in_ca_${CAVERBERNAME}_key.pub --no-check-certificate
 ## Check if done correctly 
-if [ -f inknet_ca_${CAVERBERNAME}_key.pub ]; then
-rm -f /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub
+if [ -f in_ca_${CAVERBERNAME}_key.pub ]; then
+rm -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub
 else
-mv /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key-vbak.pub /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub
+mv /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub
 echo "Can't download CA key. You're using the old one. I quit."
 exit 44
 fi
@@ -62,12 +62,12 @@ touch ~/.ssh/known_hosts; fi
 ## Remove any previous keys for this CA (sed delete the line with the pattern)
 sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" ~/.ssh/known_hosts
 ## Include this new CA key
-echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub).${CAVERBERURI}"  >> ~/.ssh/known_hosts
+echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub).${CAVERBERURI}"  >> ~/.ssh/known_hosts
 #######OR THIS: (add URI to the end, but as of 2017 makes no difference)
 ### Remove any previous keys for this CA (sed delete the line with the pattern)
 #sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" ~/.ssh/known_hosts
 ### Include this new CA key
-#echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/inknet_ca_${CAVERBERNAME}_key.pub)"  >> ~/.ssh/known_hosts
+#echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub)"  >> ~/.ssh/known_hosts
 
 # Finish
 echo "Inker CA key from ${CAVERBERURI} has been added and is up to date."

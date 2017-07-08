@@ -1,0 +1,61 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This creates an IVapp spoof user, mainly to login to other machines with no password, based on settings, but does not add any credentials of the module
+## Prerequisite: installivapp (a dragon in the donjon)
+
+# How to use:
+## ./ivappaddsailor [user name] [/path/to/ivapp/user/group-profile.conf]
+
+## DEV:
+## Add a section with this:
+### Follow these instructions https://stackoverflow.com/questions/40668512/how-to-switch-to-different-user-inside-a-shell-script-and-execute-some-command-w
+
+
+# Check variables
+## Entered
+if [ -z $3 ]; then
+echo "You must enter a username, password, and config profile like this:
+./inknetaddivappuser [user name] [password] [/path/to/ivapp/user/group-profile.conf]"
+exit 55; fi
+## Exists
+if [ ! -f "$3" ]; then
+echo "That settings file does not exist."
+exit 55; fi
+
+CONF=$3
+
+# Include configs
+. ${CONF}
+. ${IVAPPCONFLOC}
+
+# Check status
+if [ -f "${STATUSFILE}" ]; then
+. ${STATUSFILE}
+ if [ "${IVAPPSTATUS}" != "INSTALLED" ]; then
+echo "${MODULENAME} is not installed. Do that first."; exit 22
+ fi
+else
+echo "${MODULENAME} is not installed. Do that first."; exit 22
+fi
+
+INPUTUSERNAME=$1
+INPUTUSERPASS=$2
+ADDIVAPPUSERNAME=$(echo $INPUTUSERNAME | cut -c1-18)
+
+# Check and include the config
+adduser ${ADDIVAPPUSERNAME} --gecos ",,," --disabled-password
+## Add him to the IVapp group
+usermod -a -G ${IVAPPUSERGROUP} ${ADDIVAPPUSERNAME}
+## Move his home
+usermod -m -d ${IVAPPBASE}/${IVAPPDIR}/${IVAPPGROUPDIR}/${ADDIVAPPUSERNAME} ${ADDIVAPPUSERNAME}
+## Give him necessary permissions limits
+setfacl -R -m user:${ADDIVAPPUSERNAME}:--- /home
+setfacl -R -m user:${ADDIVAPPUSERNAME}:--- /var
+setfacl -R -m user:${ADDIVAPPUSERNAME}:--- ${IVAPPBASE}
+setfacl -R -m user:${ADDIVAPPUSERNAME}:rwx ${IVAPPBASE}/${IVAPPDIR}/${IVAPPGROUPDIR}/${ADDIVAPPUSERNAME}
+
+# Finish
+echo "The ${MODULENAME} user ${ADDIVAPPUSERNAME} has been added."
+

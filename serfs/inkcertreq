@@ -27,10 +27,12 @@ set -e
 
 DOMAIN=$1
 
-# Include and check the inkCert install config
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/inkcert/inkcertstatus
 
+# Check inkCert installed
 if [ "${INKCERTINSTALLED}" = "NOT_YET" ]; then
 echo "inkCert not yet installed.
 
@@ -96,52 +98,52 @@ Problem: ${DOMAIN} is not active on this server...
 }
 ### Do the checks per each verb tld
 . /var/local/verb/configs/sitetldstatus
-if [ "${DOMAIN}" = "${SITENAME}.verb.email" ]; then
+if [ "${DOMAIN}" = "${emailURI}" ]; then
  if [[ "${VERBemail}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.one" ]; then
+if [ "${DOMAIN}" = "${oneURI}" ]; then
  if [[ "${VERBone}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.ink" ]; then
+if [ "${DOMAIN}" = "${inkURI}" ]; then
  if [[ "${VERBink}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.blue" ]; then
+if [ "${DOMAIN}" = "${blueURI}" ]; then
  if [[ "${VERBblue}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.guru" ]; then
+if [ "${DOMAIN}" = "${guruURI}" ]; then
  if [[ "${VERBguru}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.kiwi" ]; then
+if [ "${DOMAIN}" = "${kiwiURI}" ]; then
  if [[ "${VERBkiwi}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.pink" ]; then
+if [ "${DOMAIN}" = "${pinkURI}" ]; then
  if [[ "${VERBpink}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.red" ]; then
+if [ "${DOMAIN}" = "${redURI}" ]; then
  if [[ "${VERBred}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.rocks" ]; then
+if [ "${DOMAIN}" = "${rocksURI}" ]; then
  if [[ "${VERBrocks}" != true ]]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${SITENAME}.verb.uno" ]; then
+if [ "${DOMAIN}" = "${unoURI}" ]; then
  if [[ "${VERBuno}" != true ]]; then
   verbtld_is_off
  fi

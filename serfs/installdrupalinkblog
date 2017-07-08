@@ -17,6 +17,9 @@ set -e
 
 CVAPPNAME=drupal.inkblog
 
+# Include the config
+. /var/local/verb/configs/siteurilist
+
 DD=$1
 DBASE=$2
 DBUSER=$3
@@ -27,7 +30,7 @@ CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
 . /var/local/verb/configs/siteinstallstatus
 if [ "${INKblog}" != "NOT_YET" ]; then
 echo "Um... How do I say this...
-Your blog at blog.${SITENAME}.verb.ink already has ${INKblog} installed. This just isn't going to work.
+Your blog at blog.${inkURI} already has ${INKblog} installed. This just isn't going to work.
 "
 exit 0
 fi
@@ -184,22 +187,22 @@ APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
 
 # Set up the Apache config
-cp /var/local/verb/configs/site-files/blog.${SITENAME}.verb.ink.conf-drupal /etc/apache2/sites-available/blog.${SITENAME}.verb.ink.conf
+cp /var/local/verb/configs/site-files/conf/blog.${inkURI}.conf-drupal /etc/apache2/sites-available/blog.${inkURI}.conf
 service apache2 reload
 ## inkCert SSL certs
 ### Not setup
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
-echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.ink."
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+echo "FYI: inkCert is not yet setup for ${inkURI}."
 fi
 ### inkCert-LE DONE
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
-echo "inkCert-LE is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertaddallle ${SITENAME}.verb.ink
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+echo "inkCert-LE is already setup for ${inkURI}. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddallle ${inkURI}
 fi
 ### inkCert-IC DONE
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.ink; then
-echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertadd blog.${SITENAME}.verb.ink
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd blog.${inkURI}
 fi
 
 # Set the site-wide inkblog config
@@ -215,6 +218,6 @@ Database password: ${DBPASSWORD}
 
 You also have ftp access to the folder in: guru/_domains/ink.blog
 
-Go to http://blog.${SITENAME}.verb.ink to install.
+Go to http://blog.${inkURI} to install.
 "
 

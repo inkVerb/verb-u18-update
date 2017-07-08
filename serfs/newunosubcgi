@@ -5,24 +5,26 @@ set -e
 # This adds a new subdomain to become newsub.your-name.verb.uno, and enables CGI.
 
 # How to use:
-## ./newunosub [newsub only]
+## ./newunosubcgi [newsub only]
 
 
-# Include the config file
-. /verb/local/verb/configs/sitenameip
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 NEWUNOSUB=$1
 
 # Copy and prepare Apache server config files
-cp /var/local/verb/configs/site-files/newunosubcgi.conf /etc/apache2/sites-available/${NEWUNOSUB}.${SITENAME}.verb.uno.conf 
-sed -i "s/newunosub/${NEWUNOSUB}/g" /etc/apache2/sites-available/${NEWUNOSUB}.${SITENAME}.verb.uno.conf
+cp /var/local/verb/configs/site-files/conf/newunosubcgi.conf /etc/apache2/sites-available/${NEWUNOSUB}.${unoURI}.conf 
+sed -i "s/newunosub/${NEWUNOSUB}/g" /etc/apache2/sites-available/${NEWUNOSUB}.${unoURI}.conf
+sed -i "s/unoURI286/${unoURI}/g" /etc/apache2/sites-available/${NEWUNOSUB}.${unoURI}.conf
 cp -R /var/local/verb/configs/site-files/newunosubdir /var/www/uno/${NEWUNOSUB}
 chown -R www-data:www-data /var/www/uno/${NEWUNOSUB}
-a2ensite ${NEWUNOSUB}.${SITENAME}.verb.uno
+a2ensite ${NEWUNOSUB}.${unoURI}
 service apache2 reload
 cp /var/www/html/uno/index-newunosub.php /var/www/html/uno/index-${NEWUNOSUB}.php
 chown -R www-data:www-data /var/www/html/uno
 
 # inkCert, at end of the "domains =" line
-sed -i "/^domains =/ s/$/, ${NEWONESUB}.${SITENAME}.verb.uno/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.uno.ini
+sed -i "/^domains =/ s/$/, ${NEWONESUB}.${unoURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${unoURI}.ini
 

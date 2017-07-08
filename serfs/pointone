@@ -13,16 +13,19 @@ set -e
 # Type ./pointone -h for help
 
 
+# Include the config
+. /var/local/verb/configs/siteurilist
+
 if [ "$1" = "-h" ]; then
     echo "Usage: ./pointone [subdomain only]
 Examples:
- ./pointone lucky (points ${SITENAME}.verb.one to lucky.${SITENAME}.verb.one
- ./pointone verb.one (resets ${SITENAME}.verb.one to point to itself)
+ ./pointone lucky (points ${oneURI} to lucky.${oneURI}
+ ./pointone verb.one (resets ${oneURI} to point to itself)
 
- Make sure the .${SITENAME}.verb.one subdomain exists
+ Make sure the .${oneURI} subdomain exists
  Then, you may use any subdomain you want except
  verb.one
- which will reset ${SITENAME}.verb.one"
+ which will reset ${oneURI}"
 exit 0
 fi
 
@@ -36,6 +39,6 @@ NEWONESUB=$1
 
     cp /var/www/html/one/index-newonesub.php /var/www/html/one/index.php
     sed -i "s/newonesub/${NEWONESUB}/g" /var/www/html/one/index.php
-    echo "Pointing to http://${NEWONESUB}.${SITENAME}.verb.one, done."
+    echo "Pointing to http://${NEWONESUB}.${oneURI}, done."
 exit 0
 

@@ -11,8 +11,9 @@ set -e
 ## ./newfossilpass dinosaur adam AdamNuup4$$w0RD
 
 
-# Include settings
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 OLDFOSSIL=$1
 OLDUSER=$2
@@ -24,4 +25,4 @@ cd /var/www/guru/fossil
 fossil user password ${OLDUSER} ${NEWPASS} --repository ${OLDFOSSIL}.fossil
 
 echo "New ${OLDFOSSIL}.fossil password set for ${OLDUSER}.
-Available on web at fossil.${SITENAME}.verb.guru/${OLDFOSSIL}.cgi"
+Available on web at fossil.${guruURI}/${OLDFOSSIL}.cgi"

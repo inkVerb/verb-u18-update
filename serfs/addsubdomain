@@ -30,9 +30,9 @@ if [ -f /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf ]; then
 fi
 
 # Copy and prepare Apache server config files
-cp /var/local/verb/configs/site-files/newdomain.tld.conf /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
+cp /var/local/verb/configs/site-files/conf/newdomain.tld.conf /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
 sed -i "s/newdomain.tld/${SUBDOMAIN}.${OLDDOMAIN}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
-cp -R /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
+cp -rf /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
 ln -s /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN} /var/www/html/
 chown -R www-data:www-data /var/www/html/${SUBDOMAIN}.${OLDDOMAIN}
 chown -R www-data:www-data /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}

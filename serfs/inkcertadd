@@ -21,6 +21,11 @@ set -e
 SITEDOMAIN=$1
 CERTDOMAIN=$2
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+. /var/local/verb/configs/inkcert/inkcertstatus
+
 # Check variables
 if [ -z $1 ]; then
 echo "You need to specify a domain. Read the instructions."; exit 0
@@ -30,10 +35,6 @@ fi
 if [ -z $2 ]; then
 CERTDOMAIN=$1
 fi
-
-# Include and check the inkCert install config
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/inkcert/inkcertstatus
 
 # Certs should already be in place from inkcertreq
 ## This is a test for the inkcert directories:
@@ -45,7 +46,7 @@ inkCert certs are not installed. Common problems can include:
   - DNS for ${SITEDOMAIN} may need a \"wildcard\" * CNAME record that points to ${SITEDOMAIN} as the \"hostname\"
   - DNS records can take about 4 hours to have effect
   - You need to first run: inkcertreq
-  - Do not run for individual subdomains with a shared certificate, but only for: ${SITENAME}.verb.blue, ${SITENAME}.verb.rocks, inkisaverb.com, etc.
+  - Do not run for individual subdomains with a shared certificate, but only for: ${blueURI}, ${rocksURI}, inkisaverb.com, etc.
 "
 exit 22
 fi

@@ -30,7 +30,7 @@
 ### Serf?: inkcertinstall
 #### Serf: inknetnewcaselfauthpubkey
 #### Serf: inknetnewcahostkey
-#### Serf?: inknetinstalljailkit
+#### Serf?: inknetinstallivapp
 
 # Client Verber #
 ##### Serf: inknetmakeverberclient
@@ -60,7 +60,7 @@
 
 # CA Verber #
 ##### Serf: inknetaddvrkclient/inknetaddverberclient
-#### Serf: inknetaddjailkituser
+#### Serf: inkneivappadduser
 ##### Serf: inknetaddclientkey
 ##### Serf: inknetzipclientpkg
 

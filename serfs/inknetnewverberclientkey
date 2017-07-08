@@ -21,7 +21,7 @@ fi
 . /var/local/verb/configs/inknet/inker.client.cnf
 
 # Generate signing keys
-ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/inknet_client_${CLIENTNAME}_key
+ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/in_cli_${CLIENTNAME}_key
 
 # Finish
 echo "Ready for the next step...

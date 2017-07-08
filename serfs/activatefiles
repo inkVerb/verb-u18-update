@@ -13,6 +13,9 @@ set -e
 ## ./activatefiles off
 
 
+# Include the config
+. /var/local/verb/configs/siteurilist
+
 if [ "$1" = "-h" ]
 then
     echo "Usage: ./activatefiles [on/off]
@@ -22,8 +25,8 @@ Examples:
  ./activatefiles off
 
  allowed arguments:
- on	(files.${SITENAME}.verb.guru becomes a web-accessible folder)
- off	(files.${SITENAME}.verb.guru returns to a redirect to ${SITENAME}.verb.ink)"
+ on	(files.${guruURI} becomes a web-accessible folder)
+ off	(files.${guruURI} returns to a redirect to ${inkURI})"
 exit 0
 fi
 

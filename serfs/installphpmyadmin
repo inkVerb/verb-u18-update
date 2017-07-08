@@ -8,8 +8,9 @@ set -e
 ## ./installphpmyadmin [directory]
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 DIRECTRY=$1
 MYSQL_ROOT_PASS=$(cat /var/local/verb/configs/mysqlboss.cnf)
@@ -45,6 +46,6 @@ service apache2 reload
 echo "
 PHP My Admin now active.
 
-After creating a database \"boss\" user, log in at http://mysql.${SITENAME}.verb.guru/${DIRECTRY}
+After creating a database \"boss\" user, log in at http://mysql.${guruURI}/${DIRECTRY}
 "
 

@@ -81,11 +81,11 @@ CLIENTPASSWORD=\"${ADDPASSWORD}\"
 CLIENTPORT=\"${ADDLOGINPORT}\"
 " > /var/local/verb/configs/inknet/verber/${ADDNAME}/client.verber.${ADDCLIENTNAME}.cnf
 
-# Create the jailed user
-/var/local/verb/serfs/inknetaddjailkituser ${ADDUSERNAME} ${ADDPASSWORD}
+# Create the IVapp user
+/var/local/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrb
 
 # Create the inkNet Client tool links
-ln -sfn /var/local/verb/tools /srv/jail/home/${ADDUSERNAME}/
+ln -sfn /var/local/verb/tools/verber /var/local/ivapp/inknet/verber/${ADDUSERNAME}/tools
 
 # Finish
 echo " \"${ADDCLIENTURI}\" has been added as a Verber Client."

@@ -16,6 +16,6 @@ set -e
 DOMAIN=$1
 
 rm -f /etc/apache2/sites-available/${DOMAIN}.conf
-cp /var/local/verb/configs/site-files/newdomaincgi.tld.conf /etc/apache2/sites-available/${DOMAIN}.conf
+cp /var/local/verb/configs/site-files/conf/newdomaincgi.tld.conf /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/newdomain.tld/${DOMAIN}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload

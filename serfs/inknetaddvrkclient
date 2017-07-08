@@ -71,11 +71,11 @@ CLIENTPASSWORD=\"${ADDPASSWORD}\"
 CLIENTPORT=\"${ADDLOGINPORT}\"
 " > /var/local/verb/configs/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf
 
-# Create the jailed user
-/var/local/verb/serfs/inknetaddjailkituser ${ADDUSERNAME} ${ADDPASSWORD}
+# Create the IVapp user
+/var/local/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrk
 
 # Create the inkNet Client tool links
-ln -sfn /var/local/verb/tools /srv/jail/home/${ADDUSERNAME}/
+ln -sfn /var/local/verb/tools/vrker /var/local/ivapp/inknet/vrker/${ADDUSERNAME}/tools
 
 # FInish
 echo "All set. Your Vrk Station has been added as a Client to this Verber.

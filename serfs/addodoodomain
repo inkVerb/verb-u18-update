@@ -7,11 +7,18 @@ set -e
 ## The domain will automatically be added with DKIM credentials if it has not been already
 ## This will NOT run inkCert for the domain, but inkCert will be prepped at least and used if inkCert certs already exist.
 
+#DEV: This still needs a tld status check to see if red is on
+
 # How to use:
 ## ./addodoodomain [domain]
 
 
 CVAPPNAME=odoo
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+. /var/local/verb/configs/sitetldstatus
 
 DOMAIN=$1
 
@@ -29,7 +36,7 @@ exit 0; fi
 . /var/local/verb/configs/siteinstallstatus
 ## red.odoo
 if [ "${REDodoo}" = "NOT_YET" ]; then
-echo "Odoo 10 must first be installed at odoo.${SITENAME}.verb.red.
+echo "Odoo 10 must first be installed at odoo.${redURI}.
 Run installodoo10 or a later version if it exists.
 "
 fi
@@ -39,16 +46,13 @@ if [ ! -d "/var/www/domains/${DOMAIN}" ]; then
 /var/local/verb/serfs/adddomain ${DOMAIN}
 fi
 
-# Include settings
-. /var/local/verb/configs/sitenameip
-
 # Apache
 ## Remove static-Apache newdomain config & html folder
 rm -f /etc/apache2/sites-available/${DOMAIN}.conf
 rm -f /var/www/html/${DOMAIN}
 echo "Odoo Site" > /var/www/html/${DOMAIN}
 ## Add the Apache config
-cp /var/local/verb/configs/site-files/newodoosite.conf /etc/apache2/sites-available/${DOMAIN}.conf
+cp /var/local/verb/configs/site-files/conf/newodoosite.conf /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/odoosite286/${DOMAIN}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload

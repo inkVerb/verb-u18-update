@@ -17,6 +17,7 @@ set -e
 
 # Include the config files
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpass
 . /var/local/verb/configs/sitemailpath
 
@@ -60,9 +61,8 @@ fi
 sed -i "s/SITEPFAPATH.*/SITEPFAPATH=${PFAFOLDER}/g" /var/local/verb/configs/sitemailpath
 
 # Settings
-sed -i "s/name286/${SITENAME}/g" /var/www/email/postfixadmin/config.inc.php
-sed -i "s/tld286/${SITETLD}/g" /var/www/email/postfixadmin/config.inc.php
-sed -i "s/email286/${SITEEMAILTLD}/g" /var/www/email/postfixadmin/config.inc.php
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/postfixadmin/config.inc.php
+sed -i "s/nameURI286/${nameURI}/g" /var/www/email/postfixadmin/config.inc.php
 sed  -i "s/mailpassword/mailpass${SITEMAILPASSAPG}/g" /var/www/email/postfixadmin/config.inc.php
 sed  -i "s/rcfolder286/${SITERCPATH}/g" /var/www/email/postfixadmin/config.inc.php
 sed  -i "s/pfafolder286/${PFAFOLDER}/g" /var/www/email/postfixadmin/config.inc.php
@@ -79,12 +79,12 @@ cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.boxes
 ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.boxes/${PFAFOLDER}
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.boxes
 chown -R www-data:www-data /var/www/email/postfixadmin
-a2ensite boxes.${SITENAME}.verb.${SITEEMAILTLD}
+a2ensite boxes.${emailTLDURI}
 service apache2 reload
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, boxes.${SITENAME}.verb.${SITEEMAILTLD}/" /var/local/verb/configs/inkcert/cli-ini/cli.${SITENAME}.verb.${SITEEMAILTLD}.ini
+sed -i "/^domains =/ s/$/, boxes.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Finished
 if [ "${PFAPASS}" = "secure" ]
@@ -97,12 +97,12 @@ For setup, note:
   Then...
 - Use any email you want admin, the admin password must include two numbers and two letters
 - Then, login:
-  - Add the domain: ${SITENAME}.verb.${SITETLD}
-  - Create a user, such as me@${SITENAME}.verb.ink etc
+  - Add the domain: ${nameURI}
+  - Create a user, such as me@${inkURI} etc
   - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
 
 Set up all this at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${PFAFOLDER}/setup.php
+ https://boxes.${emailTLDURI}/${PFAFOLDER}/setup.php
 
 - Then run ./postinstallpfa
 "
@@ -115,11 +115,11 @@ For setup, note:
 - Use the install password 'inkverb77'
 - Use any email you want admin, the admin password must include two numbers and two letters
 - Then, login:
-  - Add the domain: ${SITENAME}.verb.${SITETLD}
-  - Create a user, such as me@${SITENAME}.verb.${SITETLD} etc
+  - Add the domain: ${nameURI}
+  - Create a user, such as me@${nameURI} etc
   - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
 Set up all this at:
- https://boxes.${SITENAME}.verb.${SITEEMAILTLD}/${PFAFOLDER}/setup.php
+ https://boxes.${emailTLDURI}/${PFAFOLDER}/setup.php
 - Then run ./postinstallpfa
 "
 

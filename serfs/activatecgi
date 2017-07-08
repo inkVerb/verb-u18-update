@@ -12,6 +12,9 @@ set -e
 ## ./activatecgi off
 
 
+# Include the config
+. /var/local/verb/configs/siteurilist
+
 if [ "$1" = "-h" ]
 then
     echo "Usage: ./activatecgi [on/off]
@@ -21,8 +24,8 @@ Examples:
  ./activatecgi off
 
  allowed arguments:
- on	(cgi.${SITENAME}.verb.guru becomes a web-accessible folder)
- off	(cgi.${SITENAME}.verb.guru returns to a redirect to ${SITENAME}.verb.ink)"
+ on	(cgi.${guruURI} becomes a web-accessible folder)
+ off	(cgi.${guruURI} returns to a redirect to ${inkURI})"
 exit 0
 fi
 

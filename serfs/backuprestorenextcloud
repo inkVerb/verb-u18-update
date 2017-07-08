@@ -1,0 +1,72 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This restores a backup .zip file from Nextcloud backed-up using backupnextcloud
+
+# Prereq: Nextcloud must be installed via the installnextcloud serf on the new server first
+
+# Instructions:
+## The file can have any name, even if you changed it from the original, as long as it ends in .zip
+## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+
+# How to use:
+## ./backuprestorenextcloud [filename, NO .zip]
+
+# Eg:
+## ./backuprestorenextcloud verb.nextcloud.sF52.vbak  # (This is for the backup file verb.nextcloud.sF52.vbak.zip)
+
+
+FILENAME=$1
+
+# Include the site config
+. /var/local/verb/configs/sitenameip
+
+# Backup whatever the original status is
+. /var/local/verb/configs/verbapp.nextcloud
+cd /var/local/verb/serfs
+/var/local/verb/serfs/backupappdb ${APPDBASE} restore-originalbackedup -nl
+mv verb.${APPDBASE}.restore-originalbackedup.vbak.sql /var/www/vapps/nextcloud/data/
+mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+DROP DATABASE ${APPDBASE};"
+mv /var/local/verb/configs/verbapp.nextcloud /var/www/vapps/nextcloud/data/
+cd /var/www/vapps/nextcloud
+zip -r verb.nextcloud.restore-originalbackedup.vbak.zip data
+mv verb.nextcloud.restore-originalbackedup.vbak.zip /var/www/guru/
+
+# Unzip the file
+cd /var/www/guru
+unzip ${FILENAME}.zip
+rm -f ${FILENAME}.zip
+cd data
+rm -f index.html
+rm -f nextcloud.log
+rm -rf updater-data
+cd ..
+cp /var/www/vapps/nextcloud/data/index.html data
+cp /var/www/vapps/nextcloud/data/nextcloud.log data
+rm -rf /var/www/vapps/nextcloud/data
+mv data /var/www/vapps/nextcloud/
+
+# Restore and include the app config
+mv /var/www/vapps/nextcloud/data/verbapp.nextcloud /var/local/verb/configs/
+. /var/local/verb/configs/verbapp.nextcloud
+
+# Restore the database
+/var/local/verb/serfs/mysqlnewdb ${APPDBASE} ${APPDDBUSR} ${APPDDBPAS}
+mv /var/www/vapps/nextcloud/data/${APPDBASE}.sql /var/local/verb/serfs/
+cd /var/local/verb/serfs/
+/var/local/verb/serfs/mysqlin ${APPDBASE}
+rm -f ${APPDBASE}.sql
+
+# Own
+chown -R www-data:www-data /var/www/vapps/nextcloud
+
+# Finish
+echo "Owncloud's user data has been restored and all its backup files removed from this server.
+
+A backup of the previous Nextcloud data on this server has been saved in the guru folder just in case.
+
+You will probably need to log into Nextcloud as an admin to disable and re-enable apps that show \"enabled\" but are not working.
+"
+

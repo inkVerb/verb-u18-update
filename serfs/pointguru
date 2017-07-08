@@ -13,16 +13,17 @@ set -e
 # Type ./pointguru -h for help
 
 
-# Include the config file
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 if [ "$1" = "-h" ]; then
     echo "Usage: ./pointguru [subdomain only]
 Examples:
- ./pointguru lucky (points ${SITENAME}.verb.guru to lucky.your-name.verb.one
- ./pointguru verb.guru (resets ${SITENAME}.verb.guru to point to itself)
+ ./pointguru lucky (points ${guruURI} to lucky.your-name.verb.one
+ ./pointguru verb.guru (resets ${guruURI} to point to itself)
  you may use any subdomain you want except
- verb.guru, which will reset ${SITENAME}.verb.guru
+ verb.guru, which will reset ${guruURI}
  and
  cgi, fpt, files, fossil, mysql, net2ftp, repo which are already taken."
 exit 0
@@ -73,5 +74,5 @@ NEWONESUB=$1
 
     cp /var/www/html/guru/index-newgurusub.php /var/www/html/guru/index.php
     sed -i "s/newgurusub/${NEWONESUB}/g" /var/www/html/guru/index.php
-    echo "Pointing to http://${NEWONESUB}.${SITENAME}.verb.guru, done."
+    echo "Pointing to http://${NEWONESUB}.${guruURI}, done."
 exit 0

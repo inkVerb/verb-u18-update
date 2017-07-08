@@ -12,8 +12,9 @@ set -e
 ## ./newfossiluser dinosaur adam adam@verb.ink Adamp4$$w0RD
 
 
-# Include settings
+# Include the configs
 . /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
 
 OLDFOSSIL=$1
 NEWUSER=$2
@@ -26,4 +27,4 @@ cd /var/www/guru/fossil
 fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository ${OLDFOSSIL}.fossil
 
 echo "New user ${NEWUSER} added to ${OLDFOSSIL}.fossil.
-Available on web at fossil.${SITENAME}.verb.guru/${OLDFOSSIL}.cgi"
+Available on web at fossil.${guruURI}/${OLDFOSSIL}.cgi"

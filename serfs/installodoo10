@@ -10,15 +10,16 @@ set -e
 
 CVAPPNAME=odoo.red
 
+# Include the configs
+. /var/local/verb/configs/sitenameip
+. /var/local/verb/configs/siteurilist
+
 # Check for existing Odoo
 . /var/local/verb/configs/siteinstallstatus
 if [ "${REDodoo}" != "NOT_YET" ]; then
-echo "${REDodoo} is already installed at odoo.${SITENAME}.verb.red.
+echo "${REDodoo} is already installed at odoo.${redURI}.
 It's all been done."
 exit 0; fi
-
-# Include settings
-. /var/local/verb/configs/sitenameip
 
 # Debian Install
 ## Based on http://www.odoo.com/documentation/10.0/setup/install.html#setup-install-packaged
@@ -37,23 +38,23 @@ ufw allow 8072
 rm -rf /var/www/html/red.odoo
 echo "Odoo 10" > /var/www/html/red.odoo
 ## Set the IP address in the Apache config file
-cp /var/local/verb/configs/site-files/odoo.${SITENAME}.verb.red.conf-odoo /etc/apache2/sites-available/odoo.${SITENAME}.verb.red.conf
-sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/odoo.${SITENAME}.verb.red.conf
+cp -f /var/local/verb/configs/site-files/conf/odoo.${redURI}.conf-odoo /etc/apache2/sites-available/odoo.${redURI}.conf
+sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/odoo.${redURI}.conf
 service apache2 reload
 ## inkCert SSL certs
 ### Not setup
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.red; then
-echo "FYI: inkCert is not yet setup for ${SITENAME}.verb.red."
+if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${redURI}; then
+echo "FYI: inkCert is not yet setup for ${redURI}."
 fi
 ### inkCert-LE DONE
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.red; then
-echo "inkCert-LE is already setup for ${SITENAME}.verb.red. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertaddle odoo.${SITENAME}.verb.red
+if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${redURI}; then
+echo "inkCert-LE is already setup for ${redURI}. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertaddle odoo.${redURI}
 fi
 ### inkCert-IC DONE
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITENAME}.verb.red; then
-echo "inkCert-IC is already setup for ${SITENAME}.verb.ink. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertadd odoo.${SITENAME}.verb.red
+if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${redURI}; then
+echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
+/var/local/verb/serfs/inkcertadd odoo.${redURI}
 fi
 
 # Set the site-wide app-install config
@@ -65,9 +66,9 @@ Odoo was installed as red.
 " > /var/local/verb/configs/verbapp.${CVAPPNAME}
 
 # Record the port in the Odoo port inklist
-echo "odoo.${SITENAME}.verb.red 8069" >> /var/local/verb/configs/inklists/odoositeports
+echo "odoo.${redURI} 8069" >> /var/local/verb/configs/inklists/odoositeports
 
 # Finish
 echo "Odoo is setup.
-Go to http://odoo.${SITENAME}.verb.red to install."
+Go to http://odoo.${redURI} to install."
 

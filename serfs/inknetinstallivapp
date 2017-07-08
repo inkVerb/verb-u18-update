@@ -1,0 +1,12 @@
+#!/bin/sh
+#IVapp installer! verb.ink
+
+# This installs the IVapp submodule with settings to be used by inkNet
+
+# How to use:
+## ./inknetinstallivapp
+
+
+# Run the installer
+/var/local/verb/donjon/installivapp /var/local/verb/inst/configs/inknet/ivapp.conf
+

@@ -43,7 +43,7 @@ ln -s /var/www/html/${SITETLD}/verb.${APPDBASE}.${SECNAME}.vbak.sql /var/www/htm
 chown -R www-data:www-data /var/www/html/${SITETLD}/verb.${APPDBASE}.${SECNAME}.vbak.sql
 echo "The database for ${APPNAME} has been backed up and can be downloaded at:
 
-http://${SITENAME}.verb.${SITETLD}/${APPDBASE}-${SECNAME}.sql
+http://${nameURI}/${APPDBASE}-${SECNAME}.sql
 
 Note that the app remains live.
 "

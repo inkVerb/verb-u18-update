@@ -29,7 +29,7 @@ fi
 ## Create the inkNet host keys for Verber
 ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/inknet_CAverber_${IAMCANAME}_key
 ## CA signs the Verber host key
-ssh-keygen -s ~/.ssh/inknet/ca/inknet_ca_${IAMCANAME}_key -N "" -I verber_${IAMCANAME} -h -n ${IAMCAHOST}.${IAMCAURI} -V +170w /etc/ssh/inknet/inknet_CAverber_${IAMCANAME}_key.pub
+ssh-keygen -s ~/.ssh/inknet/ca/in_ca_${IAMCANAME}_key -N "" -I verber_${IAMCANAME} -h -n ${IAMCAHOST}.${IAMCAURI} -V +170w /etc/ssh/inknet/inknet_CAverber_${IAMCANAME}_key.pub
 ### Now exists: /etc/ssh/inknet/inknet_CAverber_${CAVERBERNAME}_key-cert.pub
 
 # Restart

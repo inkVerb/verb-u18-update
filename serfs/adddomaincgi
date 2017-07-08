@@ -33,10 +33,10 @@ if [ -f /etc/apache2/sites-available/${NEWDOMAIN}.conf ]; then
 fi
 
 # Copy and prepare Apache server config files
-cp /var/local/verb/configs/site-files/newdomaincgi.tld.conf /etc/apache2/sites-available/${NEWDOMAIN}.conf 
+cp /var/local/verb/configs/site-files/conf/newdomaincgi.tld.conf /etc/apache2/sites-available/${NEWDOMAIN}.conf 
 sed -i "s/newdomain.tld/${NEWDOMAIN}/g" /etc/apache2/sites-available/${NEWDOMAIN}.conf
 if [ ! -d /var/www/domains/${NEWDOMAIN} ]; then
-cp -R /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${NEWDOMAIN}
+cp -rf /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${NEWDOMAIN}
 fi
 ln -sfn /var/www/domains/${NEWDOMAIN} /var/www/html/
 chown -R www-data:www-data /var/www/html/${NEWDOMAIN}
