@@ -34,7 +34,7 @@
 
 
 MIN_VERNO=0.811
-VUPDATE_REPO="verb-update"
+VUPDATE_REPO="verb-update-dev"
 
 ## Version Check ##
 ### The minimum version that can use this updater
@@ -115,8 +115,15 @@ rename "s/rocksURI286/${rocksURI}/" /var/local/verb/configs/site-files/conf/*
 rename "s/unoURI286/${unoURI}/" /var/local/verb/configs/site-files/conf/*
 
 # inkNet
-echo "INKNET_REPO=\"NOT_SET\"" >> /var/local/verb/configs/siteinkget
 cp -f /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/donjon/* /var/local/verb/donjon/
+echo "#!/bin/sh
+## This is a config file for inkNet information
+
+
+INKNET_REPO=NOT_SET
+INKNETSSLCA=NOT_SET
+INKNETSSHCA=NOT_SET" > /var/local/verb/configs/inknet/inknetinfo
+
 
 ###########################
 # Set and refresh the current version into inklists

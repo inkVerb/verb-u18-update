@@ -70,6 +70,8 @@ NEWCAVERBERIP=$4
 ### Settings
 /var/local/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
+/var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
+/var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 ### inkNet Sailor (to login to the CA Verber)
 /var/local/verb/serfs/inkneivappaddsailor inivclisailor
