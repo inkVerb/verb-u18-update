@@ -8,14 +8,13 @@
 ## ./inknetnewverberclientkey
 
 
-# Check and include the config
+# Check the config
 if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
 echo "Out of order. This is not a Client yet.
 
 First run inknetmakeverberclient
 "
-exit 22
-fi
+exit 22; fi
 
 # Include the config
 . /var/local/verb/configs/inknet/inker.client.cnf

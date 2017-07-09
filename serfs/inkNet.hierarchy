@@ -24,12 +24,19 @@
 
 # CA Verber #
 ##### Serf: inknetmakeverberclient I_AM_INKER
+#### Serf: setinkcertsslca
+#### Serf: setinkcertsshca
+#### Serf: setinkgetrepo
+#### Serf: setinknetsslca
+#### Serf: setinknetsshca
+#### Serf: setinknetrepo
 
 ##### Serf: inknetinstallca
 #### Serf?: inknetmakeca
 ### Serf?: inkcertinstall
 #### Serf: inknetnewcaselfauthpubkey
 #### Serf: inknetnewcahostkey
+#### Serf: inknetsecuredldircron
 #### Serf?: inknetinstallivapp
 
 # Client Verber #
@@ -37,6 +44,10 @@
 #### Serf: setinkcertsslca
 #### Serf: setinkcertsshca
 #### Serf: setinkgetrepo
+#### Serf: setinknetsslca
+#### Serf: setinknetsshca
+#### Serf: setinknetrepo
+#### Serf: inknetivappaddsailor
 #### Serf?: inknetaddcaverberpubkey
 
 # Client Vrk Station #
@@ -60,7 +71,7 @@
 
 # CA Verber #
 ##### Serf: inknetaddvrkclient/inknetaddverberclient
-#### Serf: inkneivappadduser
+#### Serf: inknetivappadduser
 ##### Serf: inknetaddclientkey
 ##### Serf: inknetzipclientpkg
 

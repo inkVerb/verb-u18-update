@@ -9,11 +9,12 @@ set -e
 ## ./showinknetverberclientkey
 
 
-# Check & include the config
+# Check the config
 if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
 echo "This is not yet connected to an Inker via inkNet."
-exit 22
-fi
+exit 22; fi
+
+# Include the config
 . /var/local/verb/configs/inknet/inker.client.cnf
 
 # Display info

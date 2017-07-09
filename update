@@ -18,11 +18,19 @@ VUPDATE_REPO="verb-update-dev"
 ## Sample version updater:
 #UPDATE_PATCH_VERNO=
 #if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
+#
+## Move to working directory of the patch
+#if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/" ]; then
+#cd /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/; fi
+#
 ## Run the update scripts for this patch
 #
 ###### SCRIPTS GO HERE #####
+## NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/
 #
 ## eg: echo "I would update the serfs here, but that happens automatically."
+#
+#
 #
 ############################
 ## Set and refresh the current version into inklists
@@ -135,6 +143,34 @@ fi
 
 ## INCLUDE AFTER 0.812, even if already at 0.812 !!
 . /var/local/verb/configs/siteurilist
+##############END#UPDATE#PATCH#
+
+
+UPDATE_PATCH_VERNO=0.813
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
+
+# Move to working directory of the patch
+if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/" ]; then
+cd /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/; fi
+
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# inkNet
+rm -rf /var/local/verb/configs/inknet/*
+cp inknet/* /var/local/verb/configs/inknet/
+cp -f donjon/* /var/local/verb/donjon/
+chmod +x /var/local/verb/donjon/ivappsetpermissions.sh
+cp -rf tools /var/local/verb/
+
+###########################
+# Set and refresh the current version into inklists
+sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
+. /var/local/verb/configs/inklists/verberverno
+echo "Verber updated to v${VERNO}"
+else
+echo "${UPDATE_PATCH_VERNO} patch not necessary..."
+fi
 ##############END#UPDATE#PATCH#
 
 

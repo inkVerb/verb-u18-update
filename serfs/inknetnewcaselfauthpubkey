@@ -29,8 +29,8 @@ cd ~/.ssh/inknet/ca/
 rm -f in_ca_${IAMCANAME}_key
 ssh-keygen -N "" -f in_ca_${IAMCANAME}_key
 ## Link to the download web folder
-cp in_ca_${IAMCANAME}_key.pub /var/www/html/${IAMCAHOST}.${IAMCAURI}/inknet/
-chown -R www-data:www-data /var/www/html/${IAMCAHOST}.${IAMCAURI}/inknet/
+cp -f in_ca_${IAMCANAME}_key.pub /var/www/html/${IAMCAHOST}/inknet/
+chown -R www-data:www-data /var/www/html/${IAMCAHOST}/inknet/
 
 # Finish
 echo "Go change the world! New master keys have been created for this CA Verber."

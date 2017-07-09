@@ -6,14 +6,13 @@ set -e
 ## This should generally not be necessary unless new repos have been added and the current repo is distant or has high traffic.
 
 # How to use:
-## ./setinknetrepo [inkget repo]
+## ./setinknetrepo [inkNet repo]
 
 # Eg:
-## ./setinknetrepo asia.verb.ink
 ## ./setinknetrepo toronto.verb.ink
 
 
 NEWINKCERTREPO=$1
 
-sed -i "s/INKNET_REPO=.*/INKNET_REPO=\"${NEWINKCERTREPO}\"/g" /var/local/verb/configs/siteinkget
+sed -i "s/INKNET_REPO=.*/INKNET_REPO=\"${NEWINKCERTREPO}\"/g" /var/local/verb/configs/inknet/inknetinfo
 

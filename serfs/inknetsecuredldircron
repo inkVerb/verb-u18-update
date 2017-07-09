@@ -9,20 +9,29 @@ set -e
 ## ./inknetsecuredldircron
 
 
+# Check if CA
+if [ ! -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
+echo "Out of order. This is not a CA Verber yet.
+
+First run inknetinstallca
+"
+exit 22; fi
+
+# Check if already installed
+if [ -f "/var/local/verb/configs/inknet/inknetrmcertdldirs.sh" ]; then
+echo "The securedldircron is already setup."; exit 0; fi
+
 # Include the config
-. /var/local/verb/configs/sitenameip
-CAURI="${nameURI}"
-CAFULLHOST="${SITEHOST}.${CAURI}"
-CANAME="${SITEHOST}_${SITENAME}_verb_${SITETLD}"
+. /var/local/verb/configs/inknet/ca.verber.cnf
 
 # Create cron to delete inkNet download directories
 echo "#!/bin/sh
 # inkNet cron, verb.ink
-find /var/www/html/${CAFULLHOST}/inknet/* -type d -mmin +30 -exec rm -rf {} \;
+find /var/www/html/${IAMCAHOST}/inknet/* -type d -mmin +30 -exec rm -rf {} \;
 " > /var/local/verb/configs/inknet/inknetrmcertdldirs.sh
 chmod +x /var/local/verb/configs/inknet/inknetrmcertdldirs.sh
 echo "14,44 * * * * root /var/local/verb/configs/inknet/inknetrmcertdldirs.sh" >> /var/local/verb/configs/verbcron
-cp /var/local/verb/configs/verbcron /etc/cron.d/verber
+cp -f /var/local/verb/configs/verbcron /etc/cron.d/verber
 
 # Finish
 echo "This server is now keeping the web inknet/ folder cleaned at 14 and 44 minutes past each hour."

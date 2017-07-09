@@ -14,5 +14,5 @@ set -e
 
 INKSSHCA=$1
 
-sed -i "s/INKNETSSHCA=.*/INKNETSSHCA=${INKSSHCA}/g" /var/local/verb/configs/inknet/inknetinfo
+sed -i "s/INKNETSSHCA=.*/INKNETSSHCA=\"${INKSSHCA}\"/g" /var/local/verb/configs/inknet/inknetinfo
 

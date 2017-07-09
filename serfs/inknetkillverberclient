@@ -5,33 +5,30 @@ set -e
 # This deletes a Verber Client's profile and kills the inkNet JailKit user
 
 # How to use:
-## ./inknetkillverberclient [verb host - usually same as namespace] [verb namespace] [verber tld]
+## ./inknetkillverberclient [verb host]
 
 
 KILLHOST=$1
-KILLNAME=$2
-KILLTLD=$3
-FULLKILLNAME="${KILLHOST}_${KILLNAME}_verb_${KILLTLD}"
-KILLVERBCLIENT=$(echo $FULLKILLNAME | cut -c1-18)
-
+KILLVERBCLIENT="$(echo ${KILLHOST} | sed 's/\./_/g')"
 
 # Chek if it exists
-if [ ! -e "/var/local/verb/configs/inknet/verber/${KILLNAME}/client.verber.${KILLVERBCLIENT}.cnf" ]; then
+if [ ! -e "/var/local/verb/configs/inknet/verber/client.verber.${KILLVERBCLIENT}.cnf" ]; then
 echo "That Verber Client doesn't exist here."
 exit 22; fi
 
 # Include the Client's config
-. /var/local/verb/configs/inknet/verber/${KILLNAME}/client.verber.${KILLVERBCLIENT}.cnf
+. /var/local/verb/configs/inknet/verber/client.verber.${KILLVERBCLIENT}.cnf
 
-# Kill the inkNet JailKit user
-/var/local/verb/serfs/inknetkilljailkituser ${CLIENTUSERNAME}
+# Kill the inkNet ivApp user
+userdel -r ${CLIENTUSERNAME}
+rm -rf /var/local/ivapp/inknet/verber/${CLIENTUSERNAME}
 
 # Remove directories
-rm -f /var/local/verb/configs/inknet/verber/${KILLNAME}/client.verber.${KILLVERBCLIENT}.cnf
+rm -f /var/local/verb/configs/inknet/verber/client.verber.${KILLVERBCLIENT}.cnf
 
 # Remove the SSH authorized_key file
 rm -f /etc/ssh/authorized_keys/${CLIENTUSERNAME}
 
 # Finish
-echo "Done. ${KILLVERBCLIENT} pushed overboard and fed to the sharks."
+echo "Done. ${KILLHOST} pushed overboard and fed to the sharks."
 

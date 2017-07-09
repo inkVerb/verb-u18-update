@@ -10,7 +10,7 @@ set -e
 
 
 # Check the config
-if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf }; then
+if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
 echo "This is not yet connected to an Inker via inkNet."
 exit 0
 fi

@@ -1,5 +1,6 @@
 #!/bin/sh
 #IVapp installer! verb.ink
+set -e
 
 # This adds an IVapp user with settings for inkNet
 
@@ -13,10 +14,17 @@ ADDINIVUSER=$1
 ADDINIVPASS=$2
 ADDINIVCONF=$3
 
+# Check if installed
+if [ ! -d "/var/local/ivapp/inknet" ]; then
+echo "ivApp is not instlled yet. I quit."; exit 22; fi
+
 # Add the user
-/var/local/verb/donjon/ivappadduser ${ADDINIVUSER} ${ADDINIVPASS} /var/local/verb/inst/configs/inknet/ivinknet-${ADDINIVCONF}.conf
+/var/local/verb/donjon/ivappadduser ${ADDINIVUSER} ${ADDINIVPASS} /var/local/verb/configs/inknet/ivinknet-${ADDINIVCONF}.conf
+
+# Include the user type config
+. /var/local/verb/configs/inknet/ivinknet-${ADDINIVCONF}.conf
 
 # Create the inkNet Client tool links
-rm -rf /var/local/ivapp/inknet/sailor/${ADDINIVUSER}/tools
-ln -sfn /var/local/verb/tools/sailor /var/local/ivapp/inknet/sailor/${ADDINIVUSER}/tools
+rm -rf /var/local/ivapp/inknet/${IVAPPGROUPDIR}/${ADDINIVUSER}/tools
+ln -sfn /var/local/verb/tools/${IVAPPGROUPDIR} /var/local/ivapp/inknet/${IVAPPGROUPDIR}/${ADDINIVUSER}/tools
 

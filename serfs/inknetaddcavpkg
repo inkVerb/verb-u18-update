@@ -22,9 +22,15 @@ if [ -z "$1" ]; then
 echo "Please copy-paste the code the CA Verber gave you, then press Enter."
 read SECPATH
 fi
+if [ -z "$SECPATH" ]; then
+echo "Please copy-paste the code the CA Verber gave you, then press Enter."
+read SECPATH
+fi
+if [ -z "$SECPATH" ]; then
+echo "You aren't entering the path. I quit."; exit 55; fi
 
 # Download the package
-wget -q https://${CAVERBERHOST}.${CAVERBERURI}/inknet/${SECPATH}/${CLIENTNAME}.ink --no-check-certificate
+wget -q https://${CAVERBERHOST}/inknet/${SECPATH}/${CLIENTNAME}.ink --no-check-certificate
 
 # Unpack
 mv ${CLIENTNAME}.ink ${CLIENTNAME}.zip

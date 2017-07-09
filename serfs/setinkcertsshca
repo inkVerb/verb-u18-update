@@ -14,5 +14,5 @@ set -e
 
 INKSSHCA=$1
 
-sed -i "s/INKCERTSSHCA=.*/INKCERTSSHCA=${INKSSHCA}/g" /var/local/verb/configs/inkcert/inkcertstatus
+sed -i "s/INKCERTSSHCA=.*/INKCERTSSHCA=\"${INKSSHCA}\"/g" /var/local/verb/configs/inkcert/inkcertstatus
 

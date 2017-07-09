@@ -7,15 +7,23 @@ set -e
 # Client Config - to have the CA public cert on the Client, so the Client can recognize the known remote host via CA cert
 ## With this, theoretically, the CA Verber can change its own host certificate and Clients will still recognize it
 
+# Note: you can use underscores or dots
+
 # How to use:
 ## ./inknetaddcaverberpubkey [secondary CA Verber name - optional]
 
-# Eg:
-## ./inknetaddcaverberpubkey (for primary CA Verber / Inker)
-## ./inknetaddcaverberpubkey two_two_verb_ink (for secondary "two" CA Verber)
+# Eg: (for primary CA Verber / Inker)
+## ./inknetaddcaverberpubkey
+
+# Eg: (for secondary CA Verber)
+## ./inknetaddcaverberpubkey two1.two.verb.ink
+## ./inknetaddcaverberpubkey two1_two_verb_ink
+## ./inknetaddcaverberpubkey two1.ink.inkisaverb.com
+## ./inknetaddcaverberpubkey two1_ink_inkisaverb_com
 
 
-SECONDARYCAVNAME=$1
+CA2URI=$1
+SECONDARYCAVNAME="$(echo ${CA2URI} | sed 's/\./_/g')"
 
 # Include the config
 if [ -z "$1" ]; then
@@ -45,7 +53,7 @@ echo "A key from this inkNet CA is already installed. Fine, getting the new one.
 mv /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub
 fi
 ## Get the new key
-wget -q https://${CAVERBERHOST}.${CAVERBERURI}/inknet/in_ca_${CAVERBERNAME}_key.pub --no-check-certificate
+wget -q https://${CAVERBERHOST}/inknet/in_ca_${CAVERBERNAME}_key.pub --no-check-certificate
 ## Check if done correctly 
 if [ -f in_ca_${CAVERBERNAME}_key.pub ]; then
 rm -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key-vbak.pub

@@ -13,24 +13,23 @@ set -e
 ## ./inknetnewcahostkey
 
 
-# Check and include the config
+# Check if CA
 if [ ! -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
 echo "Out of order. This is not a CA Verber yet.
 
 First run inknetinstallca
 "
-exit 22
-fi
+exit 22; fi
 
 # Include the config
 . /var/local/verb/configs/inknet/ca.verber.cnf
 
 # Verber Keys (on the same CA server)
 ## Create the inkNet host keys for Verber
-ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/inknet_CAverber_${IAMCANAME}_key
+ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/in_cav_${IAMCANAME}_key
 ## CA signs the Verber host key
-ssh-keygen -s ~/.ssh/inknet/ca/in_ca_${IAMCANAME}_key -N "" -I verber_${IAMCANAME} -h -n ${IAMCAHOST}.${IAMCAURI} -V +170w /etc/ssh/inknet/inknet_CAverber_${IAMCANAME}_key.pub
-### Now exists: /etc/ssh/inknet/inknet_CAverber_${CAVERBERNAME}_key-cert.pub
+ssh-keygen -s ~/.ssh/inknet/ca/in_ca_${IAMCANAME}_key -N "" -I in_cav_${IAMCANAME} -h -n ${IAMCAHOST} -V +170w /etc/ssh/inknet/in_cav_${IAMCANAME}_key.pub
+### Now exists: /etc/ssh/inknet/in_cav_${CAVERBERNAME}_key-cert.pub
 
 # Restart
 service ssh restart

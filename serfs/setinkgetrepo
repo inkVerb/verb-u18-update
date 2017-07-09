@@ -9,7 +9,6 @@ set -e
 ## ./setinkgetrepo [inkget repo]
 
 # Eg:
-## ./setinkgetrepo asia.verb.ink
 ## ./setinkgetrepo toronto.verb.ink
 
 

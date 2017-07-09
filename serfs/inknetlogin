@@ -3,32 +3,41 @@
 set -e
 
 # This logs into a CA Verber
-## Don't use any options if logging into the primary CA Verbe, such as the Inker
+## You can use the name or the URI, host.namespace.verb.ink or host_namespace_verb_ink
 
 # How to use:
-## ./inknetlogin [secondary CA Verber - optional]
+## ./inknetlogin [secondary CA Verber - optional || otherwise enter CA1 ] ["Command to execute in quotes"]
+
+# Eg:
+## ./inknetlogin CA1 "senddns txt newtxtrecord"
+## ./inknetlogin mail3.jesse.verb.email "getverbmail"
 
 
 # Check & include the config
 if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
 echo "This is not yet connected to a CA Verber via inkNet."
-exit 22
-fi
+exit 22; fi
 
-# Include the correct config
+# Include the correct configs
 . /var/local/verb/configs/inknet/inker.client.cnf
 ## Add secondary CA Verber credentials if present
-if [ -n "$1" ]; then
-FULLCAVNAME=$1
-LOGINCAV=$(echo $FULLCAVNAME | cut -c1-18)
-. /var/local/verb/configs/inknet/secondarycav.${LOGINCAV}.cnf
-else
+if [ "$1" = "CA1" ]; then
 . /var/local/verb/configs/inknet/client.${CAVERBERNAME}.inker.login.cnf
-LOGINSAILOR="inivclisailor"
+else
+CAV2HOST=$1
+CAV2NAME="$(echo ${CAV2HOST} | sed 's/\./_/g')"
+. /var/local/verb/configs/inknet/2cav.${CAV2NAME}.cnf
 fi
 
+# Set variable
+SAILCOMMAND=$2
+
 # Login
-## Done by the user ${CLIENTSAILOR} with password ${CLIENTSAILPASS}
-## Follow these instructions https://stackoverflow.com/questions/40668512/how-to-switch-to-different-user-inside-a-shell-script-and-execute-some-command-w
-ssh -o HostName=${CAVERBERHOST}.${CAVERBERURI} -p ${CLIENTPORT} ${CLIENTUSERNAME}@${CAVERBERIP}
+##DEV: Done by the user ${CLIENTSAILOR} with no password. This may not be executed correctly. Delete this DEV note if this script works.
+## Follow these instructions https://www.cyberciti.biz/open-source/command-line-hacks/linux-run-command-as-different-user/
+runuser -l ${CLIENTSAILOR} -c 'ssh -o HostName=${CAVERBERHOST} -p ${CLIENTPORT} ${CLIENTUSERNAME}@${CAVERBERIP}'
+runuser -l ${CLIENTSAILOR} -c 'echo "${SAILCOMMAND}"'
+sleep 10
+runuser -l ${CLIENTSAILOR} -c 'exit'
+echo "Done."
 

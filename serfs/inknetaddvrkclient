@@ -7,10 +7,15 @@ set -e
 ## Prerequisite: inknetinstallca
 
 # How to use:
-## ./inknetaddvrkclient [username on machine] [machine name - AKA 'computer name'] [vrk ip - if known]
+## ./inknetaddvrkclient [username on machine] [machine name - AKA 'computer name' - or URI if has one] [vrk ip - if known]
 
 # Eg:
 ## ./inknetaddvrkclient jimmy uWorkStudioJimmy
+## ./inknetaddvrkclient jimmy uWorkStudioJimmy 999.99.99.999
+## ./inknetaddvrkclient root work.jimmy.verb.ink 999.99.99.999
+## ./inknetaddvrkclient root work_jimmy_verb_ink 999.99.99.999
+## ./inknetaddvrkclient root work.ink.inkisaverb.com 999.99.99.999
+## ./inknetaddvrkclient root work_ink_inkisaverb_com 999.99.99.999
 
 
 # Prerequesites
@@ -25,20 +30,22 @@ echo "inkNet not installed. First, run inknetinstallca"
 exit 0
 fi
 
-ADDUSER=$1
-ADDMACHINE=$2
-ADDIP=$3
-FULLCLIENTNAME="${ADDUSER}_${ADDMACHINE}"
-ADDCLIENTNAME=$(echo $FULLCLIENTNAME | cut -c1-18)
+ADDUSER="$1"
+ICMACHINE="$2"
+ADDMACHINE="$(echo ${ICMACHINE} | sed 's/_/\./g')"
+SCRMACHINE="$(echo ${ICMACHINE} | sed 's/\./_/g')"
+ADDCLIENTNAME="${ADDUSER}_${SCRMACHINE}"
 if [ -z "$3" ]; then
 ADDIP="NOT_SET"
+else
+ADDIP="$3"
 fi
 ADDAPG=$(pwgen -1 -0 -A 4)
-ADDPASSWORD=$(pwgen -1 -s 15)
 # New username based on user, random appendage, and computer name
-FULLUSERNAME=${ADDUSER}${ADDAPG}${ADDMACHINE}
+FULLUSERNAME=${ADDUSER}${ADDAPG}${SCRMACHINE}
 ## Truncate the new username to the 32 character limit
 ADDUSERNAME=$(echo $FULLUSERNAME | cut -c1-32)
+ADDPASSWORD=$(pwgen -1 -s 15)
 
 # Just in case user already exists
 if [ -f /var/local/verb/configs/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf ]; then
@@ -84,7 +91,7 @@ That machine's user account will be known here as: ${ADDCLIENTNAME}"
 
 ## Serf message
 echo "
-Now, as a Serf, you need to add the client ssh-rsa key via: inknetaddclientkey
+Now, you need to add the client ssh-rsa key via: inknetaddclientkey
 
 Then follow instructions.
 "

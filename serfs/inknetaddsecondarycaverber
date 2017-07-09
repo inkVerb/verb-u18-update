@@ -6,25 +6,32 @@ set -e
 ## This can be run to update an existing config
 
 # How to use:
-## ./inknetaddsecondarycaverber [CA Verber host] [CA Verber URI] [CA Verber name] [CA Verber IP]
+## ./inknetaddsecondarycaverber [CA Verber host] [CA Verber IP]
 
 # Eg: (almost certainly exactly this, but verify from inkVerb instructions at registration and available Inkers, probably region-specific)
-## ./inknetaddsecondarycaverber ink ink.verb.ink ink_ink_verb_ink 999.999.99.999 (for ink namespace - the master Inker site)
-## ./inknetaddsecondarycaverber john john.verb.ink john_john_verb_ink 999.999.99.999 (for john namespace - if you want your own Verber to act as your keys)
-## ./inknetaddsecondarycaverber ink2 ink.inkisaverb.com ink2_ink_inkisaverb_com 999.999.99.999 (for Domain Verber mod)
+## ./inknetaddsecondarycaverber ink.ink.verb.ink 999.999.99.999 (for ink namespace - the master Inker site)
+## ./inknetaddsecondarycaverber john.john.verb.ink 999.999.99.999 (for john namespace - if you want your own Verber to act as your keys)
+## ./inknetaddsecondarycaverber ink2.ink.inkisaverb.com 999.999.99.999 (for Domain Verber mod)
 
+
+# Verify that this Verber candidate is already a Client Verber
+if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+echo "Not bad, Bucko. But, this must be a Verber Client, even to itself if need be, before it can become a CA to anything else.
+
+First run, according to instructions: inknetmakeverberclient
+"
+exit 0; fi
 
 NEWCAVERBERHOST=$1
-NEWCAVERBERURI=$2
-FULLCAVNAME=$3
-NEWCAVERBERNAME=$(echo $FULLCAVNAME | cut -c1-18)
-NEWCAVERBERIP=$4
+NEWCAVERBERURI="$(echo ${NEWCAVERBERHOST} | rev | cut -d'.' -f-3 | rev)"
+NEWCAVERBERNAME="$(echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
+NEWCAVERBERIP=$2
 
 # inkNet login Sailor
 ## Password generator
 ADDINIVSAILORNAME=sail$(pwgen -s -1 14)
 ## Add the Sailor
-/var/local/verb/serfs/inkneivappaddsailor ${ADDINIVSAILORNAME} ${ADDINIVSAILPASSWORD}
+/var/local/verb/serfs/inknetivappaddsailor ${ADDINIVSAILORNAME}
 
 # Set configs
 ## For the secondary CA Verber
@@ -37,7 +44,7 @@ CAVERBERURI=\"${NEWCAVERBERURI}\"
 CAVERBERNAME=\"${NEWCAVERBERNAME}\"
 CAVERBERIP=\"${NEWCAVERBERIP}\"
 CLIENTSAILOR=\"${ADDINIVSAILORNAME}\"
-" > /var/local/verb/configs/inknet/secondarycav.${NEWCAVERBERNAME}.cnf
+" > /var/local/verb/configs/inknet/2cav.${NEWCAVERBERNAME}.cnf
 
 # Get the secondary CA Verber's pub key
 /var/local/verb/serfs/inknetaddcaverberpubkey ${NEWCAVERBERNAME}

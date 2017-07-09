@@ -9,7 +9,7 @@ set -e
 # DEV NOTE:
 ## There are two CA keys
 ### in_ca_${CAVERBERNAME}_key to sign the host key on the same CA Verber itself, which authenticates this server to Clients
-### in_ca_client_${CAVERBERNAME}_key to sign the Client keys seeking authentication, which authenticates Clients to this server
+### in_cav_${CAVERBERNAME}_key gets signed
 
 # How to use:
 ## ./inknetinstallca
@@ -21,8 +21,7 @@ echo "Not bad, Bucko. But, this must be a Verber Client, even to itself if need 
 
 First run, according to instructions: inknetmakeverberclient
 "
-exit 0
-fi
+exit 0; fi
 
 # inkNet/inkCert prerequisites
 if [ ! -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
@@ -36,14 +35,12 @@ fi
 # Check if already installed or correctly ready
 if [ "${INKNETSTATUS}" = "INSTALLED" ]; then
 echo "inkNet is already installed, dude. Don't mess."
-exit 0
-fi
+exit 0; fi
 if [ "${INKNETSTATUS}" != "MADE_INSTALL_READY" ]; then
 echo "Catostrophic failure. inkNetStatus should be MADE_INSTALL_READY or INSTALLED, but isn't either one.
 Look at ca.verber.cnf to see what's up.
 "
-exit 0
-fi
+exit 0; fi
 
 # Create the first CA Verber/Inker self-signing master keys for the settings added in inknetmakeca
 /var/local/verb/serfs/inknetnewcaselfauthpubkey
@@ -51,7 +48,7 @@ fi
 # Create the first host key on this CA Verber, for the settings added in inknetmakeca
 /var/local/verb/serfs/inknetnewcahostkey
 
-# Install IVapp (so users can login)
+# Install ivApp
 /var/local/verb/serfs/inknetinstallivapp
 
 # Set the inkNet config
