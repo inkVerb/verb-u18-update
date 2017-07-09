@@ -11,6 +11,10 @@
 
 # DEV NOTE: Serfs are automatically copied & updated from ${VUPDATE_REPO}/serfs to the Verber before any patches run, after the verno check.
 
+
+MIN_VERNO=0.811
+VUPDATE_REPO="verb-update-dev"
+
 ## Sample version updater:
 #UPDATE_PATCH_VERNO=
 #if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
@@ -29,12 +33,7 @@
 #echo "${UPDATE_PATCH_VERNO} patch not necessary..."
 #fi
 ###############END#UPDATE#PATCH#
-#
-#
 
-
-MIN_VERNO=0.811
-VUPDATE_REPO="verb-update-dev"
 
 ## Version Check ##
 ### The minimum version that can use this updater
