@@ -78,13 +78,6 @@ NEWCAVERBERIP=$2
 /var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-### Install ivApp
-/var/local/verb/serfs/inknetinstallivapp
-### inkNet ivApp Sailor (to login to the CA Verber)
-#### Password generator
-NEWINIVSAILORNAME=sail$(pwgen -s -1 -A 14)
-#### Add the Sailor
-/var/local/verb/serfs/inknetivappaddsailor ${NEWINIVSAILORNAME}
 fi
 
 # Set configs
@@ -100,13 +93,8 @@ CAVERBERIP=\"${NEWCAVERBERIP}\"
 CLIENTHOST=\"${NEWCLIENTHOST}\"
 CLIENTURI=\"${NEWCLIENTURI}\"
 CLIENTNAME=\"${NEWCLIENTNAME}\"
-CLIENTSAILOR=\"${NEWINIVSAILORNAME}\"
+CLIENTSAILOR=\"NOT_SET\"
 " > /var/local/verb/configs/inknet/inker.client.cnf
-
-# Verify proper configuration
-## For the user
-if [ ! -d ~/.ssh ]; then
-mkdir .ssh; fi
 ## For the system
 ### Prepare /etc/ssh/ssh_config
 if [ ! -d /etc/ssh/inknet ]; then
@@ -117,6 +105,11 @@ Host *
  IdentityFile /etc/ssh/inknet/in_cli_${NEWCLIENTNAME}_key
 ##
 " >> /etc/ssh/ssh_config
+
+# Install ivApp
+/var/local/verb/serfs/inknetinstallivapp
+## inkNet ivApp Sailor (to login to the CA Verber)
+/var/local/verb/serfs/inknetivappnewclientsailor
 
 # Reload SSH services
 service ssh restart
@@ -129,10 +122,6 @@ I am Inker!
 Now, run inknetinstallca
 "
 exit 0; fi
-
-# Get the CA Client key
-if [ ! -f /etc/ssh/inknet/in_ca_${NEWCAVERBERNAME}_key.pub ]; then
-/var/local/verb/serfs/inknetaddcaverberpubkey; fi
 
 # Finish
 echo "Done. This Verber is now ready to connect as a Client to a CA Inker.
