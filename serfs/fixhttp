@@ -1,0 +1,31 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This removes the httpsfix and restores the Apache file to it's original http and https state
+
+# How to use:
+## ./fixhttp [domain.tld or subdomain.domain.tld]
+
+
+DOMAIN=$1
+
+# Verify that it has been fixed
+if grep -q "##INKALIASFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
+
+# Replace it with the original file
+## From the original file
+sed -i '/##inkHTTPremoved/r /etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed' /etc/apache2/sites-available/${DOMAIN}.conf
+## Remove the old marker
+sed -i '/##inkHTTPremoved/d' /etc/apache2/sites-available/${DOMAIN}.conf
+## Remove the old settings
+sed -i '/^##INKHTTPSFIX=fixed/,/^##verbFIXhttps/{/^##INKHTTPSFIX=fixed/!{/^##verbFIXhttps/!d}}' /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i '/##INKHTTPSFIX=fixed/d' /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i '/##verbFIXhttps/d' /etc/apache2/sites-available/${DOMAIN}.conf
+
+# If it's not already there, just exit
+else
+echo "${DOMAIN} doesn't have the https fix. Doing nothing."
+exit 0
+fi
+

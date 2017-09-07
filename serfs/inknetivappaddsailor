@@ -17,6 +17,3 @@ ADDINIVSAILOR=$1
 rm -rf /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
 ln -sfn /var/local/verb/tools/sailor /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
 
-# Add the CA Public key here:
-/var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/.ssh/known_hosts
-

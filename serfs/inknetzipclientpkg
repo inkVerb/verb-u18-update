@@ -27,7 +27,7 @@ set -e
 
 VTYPE=$1
 ICNAME=$2
-VCNAME="$(echo ${ICNAME} | sed 's/\./_/g' | sed 's/@/_/g' )"
+VCNAME="$(echo ${ICNAME} | sed 's/\./_/g' | | sed 's/@/_/g' )"
 
 # Check variables
 if [ -z "$2" ]; then

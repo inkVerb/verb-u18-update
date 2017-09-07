@@ -40,7 +40,7 @@ chown -R www-data:www-data /var/www/email/postfixadmin
 # Setup password
 if [ "${PFAPASS}" != "secure" ]
 then
-sed -i "s/$CONF\['setup_password'\] = .*/$CONF\['setup_password'\] = '6eb7d8657903da15ba69349209a1c4f9:4b0f638a1fc2788682cee2f1c7416c883cfa33e9';/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/\$CONF\['setup_password'\] = .*/\$CONF\['setup_password'\] = '6eb7d8657903da15ba69349209a1c4f9:4b0f638a1fc2788682cee2f1c7416c883cfa33e9';/g" /var/www/email/postfixadmin/config.local.php
 fi
 
 # Finish

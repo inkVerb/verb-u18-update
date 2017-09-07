@@ -9,7 +9,7 @@ set -e
 ## Note: underscores are allowed in the host
 
 # How to use:
-## ./inknetaddverberclient [Verber host/name] [Verber IP]
+## ./inknetaddverberclient [Verber host ] [Verber IP]
 
 # Eg:
 ## ./inknetaddverberclient joey.joey.verb.ink 999.999.999.999 (most common)

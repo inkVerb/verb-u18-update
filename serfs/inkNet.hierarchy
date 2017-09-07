@@ -47,14 +47,8 @@
 #### Serf: setinknetsslca
 #### Serf: setinknetsshca
 #### Serf: setinknetrepo
-#### Serf: inknetivappnewclientsailor
-### Serf: inknetivappaddsailor
-### Serf: inknetaddcaverberpubkey
-
-# Client Verber Secondary #
-#### Serf: inknetivappnewclientsailor
-### Serf: inknetivappaddsailor
-### Serf: inknetaddcaverberpubkey
+#### Serf: inknetivappaddsailor
+#### Serf?: inknetaddcaverberpubkey
 
 # Client Vrk Station #
 ##### Surfer: inknetinstall
@@ -67,7 +61,7 @@
 ## Connect
 
 # Client Verber #
-##### Serf: inknetnewverberclientkey (run first time only)
+##### Serf?: inknetnewverberclientkey (run first time only)
 #### Serf: showinknetverberclientkey
 
 ##### Serf: showinknetverberclientkey (use to see the key to connect to additional CA Verbers)

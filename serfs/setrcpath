@@ -24,4 +24,4 @@ cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.rc
 ln -s /var/www/email/roundcube /var/www/html/${SITEEMAILTLD}.rc/${RCFOLDER}
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
 sed -i "s/SITERCPATH=.*/SITERCPATH=${RCFOLDER}/g" /var/local/verb/configs/sitemail
-sed -i "s/$CONF\['footer_link'\] = 'https:\/\/.*/$CONF\['footer_link'\] = 'https:\/\/rc\.${SITENAME}\.verb\.${SITEEMAILTLD}\/${RCFOLDER}';/g" /var/www/email/postfixadmin/config.inc.php
+sed -i "s/\$CONF\['footer_link'\] = 'https:\/\/.*/\$CONF\['footer_link'\] = 'https:\/\/rc\.${SITENAME}\.verb\.${SITEEMAILTLD}\/${RCFOLDER}';/g" /var/www/email/postfixadmin/config.inc.php

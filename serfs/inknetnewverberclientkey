@@ -19,13 +19,11 @@ exit 22; fi
 # Include the config
 . /var/local/verb/configs/inknet/inker.client.cnf
 
-# Generate the keys
+# Generate signing keys
 ssh-keygen -t rsa -N "" -f /etc/ssh/inknet/in_cli_${CLIENTNAME}_key
 
 # Finish
 echo "Ready for the next step...
 "
-. /var/local/verb/configs/sitenameip
-echo "Client IP: ${SITEIP}"
 /var/local/verb/serfs/showinknetverberclientkey
 

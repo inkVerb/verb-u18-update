@@ -12,7 +12,7 @@ set -e
 PFAPASSHASH=$1
 
 # Replace whatever current hash settings with the hash
-sed -i "s/$CONF\['configured'\] = .*/$CONF\['configured'\] = true;/g" /var/www/email/postfixadmin/config.local.php
-sed -i "s/$CONF\['setup_password'\] = .*/$CONF\['setup_password'\] = '${PFAPASSHASH}';/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/\CONF\['configured'\] = .*/\$CONF\['configured'\] = true;/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/\$CONF\['setup_password'\] = .*/\$CONF\['setup_password'\] = '${PFAPASSHASH}';/g" /var/www/email/postfixadmin/config.local.php
 echo "Hash set. Return to PostfixAdmin setup to use the same password you entered."
 

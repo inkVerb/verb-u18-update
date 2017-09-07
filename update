@@ -174,32 +174,6 @@ fi
 ##############END#UPDATE#PATCH#
 
 
-UPDATE_PATCH_VERNO=0.814
-if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
-
-# Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/; fi
-
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/
-
-# eg: echo "I would update the serfs here, but that happens automatically."
-cp -f roundcubepics/* /var/local/verb/configs/conflab/email/roundcube/roundcubepics/
-
-
-###########################
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
-. /var/local/verb/configs/inklists/verberverno
-echo "Verber updated to v${VERNO}"
-else
-echo "${UPDATE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPDATE#PATCH#
-
 
 
 # Finish

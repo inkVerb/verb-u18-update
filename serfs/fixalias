@@ -30,7 +30,7 @@ echo "
         <VirtualHost *:80>
         ServerAlias *.${DOMAIN}
         </VirtualHost>
-##verbFIX" >> /etc/apache2/sites-available/${DOMAIN}.conf
+##verbFIXalias" >> /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload
 	echo "${DOMAIN} now has alias fix for subdomains and is ready to go."
 fi

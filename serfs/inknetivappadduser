@@ -7,7 +7,7 @@ set -e
 # Usertype options are: sail vrb vrk
 
 # How to use:
-## ./inknetivappadduser [user] [password] [usertype]
+## ./inkneivappadduser [user] [password] [usertype]
 
 
 ADDINIVUSER=$1

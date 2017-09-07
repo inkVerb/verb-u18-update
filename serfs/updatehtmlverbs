@@ -18,10 +18,12 @@ set -e
 # Initial sites
 cd /var/www/html
 if [ ! -e 0sitedefaultInProgress ]; then
-cp -r /var/local/verb/configs/conflab/html/0sitedefaultInProgress .; fi
+cp -r /var/local/verb/configs/conflab/html/0sitedefaultInProgress .
+chmod -R 755 0sitedefaultInProgress; fi
 if [ ! -e 0ne ]; then
 mkdir 0ne
-echo "<?php header(\"Location: http://${inkURI}\"); die(); ?>" > /var/www/html/0ne/index.php; fi
+echo "<?php header(\"Location: http://${inkURI}\"); die(); ?>" > /var/www/html/0ne/index.php
+chmod -R 755 0ne; fi
 
 # Block web folder listing
 echo "Options -Indexes" >> /var/www/html/.htaccess

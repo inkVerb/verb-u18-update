@@ -143,7 +143,7 @@ php composer.phar install -n
 
 # Set up PFA forwarding plugin
 cp /var/www/email/roundcube/plugins/forward/config.inc.php.dist /var/www/email/roundcube/plugins/forward/config.inc.php
-sed -i "s/$rcmail_config\['forward_sql_dsn'\].*/$rcmail_config\['forward_sql_dsn'\] = 'mysql:\/\/mail:mailpass${SITEMAILPASSAPG}@localhost\/mail';/g" /var/www/email/roundcube/plugins/forward/config.inc.php
+sed -i "s/\$rcmail_config\['forward_sql_dsn'\].*/\$rcmail_config\['forward_sql_dsn'\] = 'mysql:\/\/mail:mailpass${SITEMAILPASSAPG}@localhost\/mail';/g" /var/www/email/roundcube/plugins/forward/config.inc.php
 ## Commented legacy pfadmin_forwarding
 #sed -i "s/mailpassword/mailpass${SITEMAILPASSAPG}/g" /var/www/email/roundcube/plugins/pfadmin_forwarding/config/config.inc.php
 
@@ -151,7 +151,7 @@ sed -i "s/$rcmail_config\['forward_sql_dsn'\].*/$rcmail_config\['forward_sql_dsn
 ## Copy config commented because installing via Compser
 #cp /var/local/www/email/roundcube/plugins/password/config.inc.php.dist /var/local/www/email/roundcube/plugins/password/config.inc.php
 cp /var/www/email/roundcube/plugins/password/config.inc.php.dist /var/www/email/roundcube/plugins/password/config.inc.php
-sed -i "s/$config\['password_force_new_user'\].*/$config\['password_force_new_user'\] = true;/g" /var/www/email/roundcube/plugins/password/config.inc.php
+sed -i "s/\$config\['password_force_new_user'\].*/\$config\['password_force_new_user'\] = true;/g" /var/www/email/roundcube/plugins/password/config.inc.php
 
 # Finished
 echo "

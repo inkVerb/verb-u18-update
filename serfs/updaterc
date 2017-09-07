@@ -23,7 +23,7 @@ cp -R /var/www/email/roundcube /var/www/email/roundcube.vbak
 cd roundcube
 ./bin/installto.sh /var/www/email/roundcube
 ## Disable the installer
-sed -i "s/$config\['enable_installer'\].*/$config\['enable_installer'\] = false;/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/\$config\['enable_installer'\].*/\$config\['enable_installer'\] = false;/g" /var/www/email/roundcube/config/config.inc.php
 ## Remove the updater
 cd /var/www
 rm -rf /var/www/roundcube

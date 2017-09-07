@@ -22,11 +22,16 @@ First run, according to instructions: inknetmakeverberclient
 "
 exit 0; fi
 
-INPCAVERBERHOST=$1
+NEWCAVERBERHOST=$1
 NEWCAVERBERURI="$(echo ${NEWCAVERBERHOST} | rev | cut -d'.' -f-3 | rev)"
-NEWCAVERBERNAME="$(echo ${INPCAVERBERHOST} | sed 's/\./_/g')"
-NEWCAVERBERHOST="$(echo ${NEWCAVERBERNAME} | sed 's/_/\./g')"
+NEWCAVERBERNAME="$(echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
 NEWCAVERBERIP=$2
+
+# inkNet login Sailor
+## Password generator
+ADDINIVSAILORNAME=sail$(pwgen -s -1 14)
+## Add the Sailor
+/var/local/verb/serfs/inknetivappaddsailor ${ADDINIVSAILORNAME}
 
 # Set configs
 ## For the secondary CA Verber
@@ -38,11 +43,11 @@ CAVERBERHOST=\"${NEWCAVERBERHOST}\"
 CAVERBERURI=\"${NEWCAVERBERURI}\"
 CAVERBERNAME=\"${NEWCAVERBERNAME}\"
 CAVERBERIP=\"${NEWCAVERBERIP}\"
-CLIENTSAILOR=\"NOT_SET\"
+CLIENTSAILOR=\"${ADDINIVSAILORNAME}\"
 " > /var/local/verb/configs/inknet/2cav.${NEWCAVERBERNAME}.cnf
 
-# inkNet ivApp Sailor (to login to the CA Verber)
-/var/local/verb/serfs/inknetivappnewclientsailor ${NEWCAVERBERHOST}
+# Get the secondary CA Verber's pub key
+/var/local/verb/serfs/inknetaddcaverberpubkey ${NEWCAVERBERNAME}
 
 # Finish
 echo "The secondary CA Verber credentials have been added for ${NEWCAVERBERNAME} at ${NEWCAVERBERHOST}.${NEWCAVERBERURI} with IP ${NEWCAVERBERIP}"

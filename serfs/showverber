@@ -26,8 +26,8 @@ Timezone: ${SITETIMECITY}, ${SITETIMEREGION}
 Version: ${VERNO}
 Type: ${VERNO}
 
-Email main domain URI: ${emailURI}
-Email server URI: ${emailTLDURI}
+Email
+Email URI: ${emailTLDURI}
 Status: ${SITEMAILSTATUS}
 Snail: ${SITESNAIL}
 RC path: ${SITERCPATH}

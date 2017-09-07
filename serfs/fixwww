@@ -30,7 +30,8 @@ echo "
         ServerName www.${DOMAIN}
         Redirect permanent / http://${DOMAIN}/
         </VirtualHost>
-##verbFIX" >> /etc/apache2/sites-available/${DOMAIN}.conf
+##verbFIXwww" >> /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload
 	echo "${DOMAIN} now has the www subdomain fix and is ready to go."
 fi
+

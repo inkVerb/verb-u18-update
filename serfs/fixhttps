@@ -19,10 +19,20 @@ exit 0; fi
 # Check to see if "fixhttps" has already been added
 if grep -q "##INKHTTPSFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
 service apache2 reload
-	echo "${DOMAIN} already has the alias fix. The server was just reloaded so the site should work."
+	echo "${DOMAIN} already has the https fix. The server was just reloaded so the site should work."
 else
+ if [ -f "/etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed" ]; then
+echo "Something is wrong. The backup file for this https fix exists, but the config does not have the settings."
+exit 66
+ fi
 
-## Then add the config lines if it doesn't.
+## Then set the new config if it doesn't.
+### Back up the http declaration and remove it (this way, the actual Apache file stays small, without loads of commented lines)
+sed -n '/##inkHTTPstart/,/##inkHTTPstop/p' /etc/apache2/sites-available/${DOMAIN}.conf > /etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed
+sed -i '/^##inkHTTPstart/,/^##inkHTTPstop/{/^##inkHTTPstart/!{/^##inkHTTPstop/!d}}' /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i '/##inkHTTPstart/d' /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i 's/##inkHTTPstop/##inkHTTPremoved/' /etc/apache2/sites-available/${DOMAIN}.conf
+### Add the new lines
 echo "
 
 ##INKHTTPSFIX=fixed
@@ -31,7 +41,7 @@ echo "
                ServerName ${DOMAIN}
                Redirect permanent / https://${DOMAIN}/
        </VirtualHost>
-##verbFIX" >> /etc/apache2/sites-available/${DOMAIN}.conf
+##verbFIXhttps" >> /etc/apache2/sites-available/${DOMAIN}.conf
 service apache2 reload
 	echo "${DOMAIN} now redirects all http traffic to SSL-secure https."
 fi
