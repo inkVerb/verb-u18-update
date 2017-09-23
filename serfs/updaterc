@@ -14,6 +14,10 @@ set -e
 
 # Download and unzip
 cd /var/www
+## Remove any existing roundcube folder
+if [ -d roundcube ]; then
+rm -rf roundcube ; fi
+## Get the update
 /var/local/verb/serfs/inkget roundcube.current
 unzip roundcube.current.zip
 rm -f roundcube.current.zip
