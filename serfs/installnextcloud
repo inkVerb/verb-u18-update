@@ -51,6 +51,8 @@ chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
 chown -R www-data:www-data /var/www/html/blue.nextcloud
 ## Run the Nextcloud script
 /var/local/verb/donjon/nextcloudprep.sh
+## Set up cron for updates
+echo "*/15  *  *  *  * www-data php -f /var/www/vapps/nextcloud/cron.php" > /etc/cron.d/nextcloud
 
 # Create the database and credentials
 mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "

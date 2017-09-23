@@ -16,7 +16,7 @@ set -e
 ## ./inkcertaddle NAME.verb.ink (will apply ONLY to NAME.verb.ink)
 ## ./inkcertaddle blog.NAME.verb.ink (BAD NEWS: this won't work!! blog.NAME.verb.ink does not have a certificate by itself, use: 'inkcertaddallle NAME.verb.ink')
 ## ./inkcertaddle blog.NAME.verb.ink NAME.verb.ink
-## ./inkcertaddle inkisaverb.com (will apply to all subdomains of inkisaverb.com)
+## ./inkcertaddle inkisaverb.com (BAD NEWS: this won't work!! inkisaverb.com does not have a certificate by itself, use: 'inkcertaddallle inkisaverb.com')
 ## ./inkcertaddle poetryiscode.com inkisaverb.com (if the SSL cert for poetryiscode.com is included in the CN of the certificate for inkisaverb.com)
 
 
