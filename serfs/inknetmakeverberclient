@@ -75,12 +75,12 @@ NEWCAVERBERURI="$(echo ${NEWCAVERBERHOST} | rev | cut -d'.' -f-3 | rev)"
 NEWCAVERBERNAME="$(echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
 NEWCAVERBERIP=$2
 ### Settings
-/var/local/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-/var/local/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-/var/local/verb/serfs/setinkgetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-/var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-/var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-/var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
+/var/local/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}
+/var/local/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}
+/var/local/verb/serfs/setinkgetrepo ${NEWCAVERBERHOST}
+/var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}
+/var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}
+/var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}
 fi
 
 # Set configs
