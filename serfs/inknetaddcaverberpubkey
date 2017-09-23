@@ -29,7 +29,7 @@ SECONDARYCAVNAME="$(echo ${CA2URI} | sed 's/\./_/g')"
 if [ -z "$1" ]; then
 . /var/local/verb/configs/inknet/inker.client.cnf
 else
-. /var/local/verb/configs/inknet/secondarycav.${SECONDARYCAVNAME}.cnf
+. /var/local/verb/configs/inknet/2cav.${SECONDARYCAVNAME}.cnf
 fi
 
 # Check to acknowledge if already added
@@ -63,19 +63,21 @@ echo "Can't download CA key. You're using the old one. I quit."
 exit 44
 fi
 
-# Add the CA Verber key to the Client's global known_hosts
+# Add the CA Verber key to the Client's iVapp Sailor's known_hosts
 ## Make sure known_hosts exists
-if [ ! -f "~/.ssh/known_hosts" ];then
-touch ~/.ssh/known_hosts; fi
+#if [ ! -f ~/.ssh/known_hosts ];then
+#touch ~/.ssh/known_hosts; fi
+if [ ! -f "/var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/known_hosts" ];then
+touch /var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/known_hosts; fi
 ## Remove any previous keys for this CA (sed delete the line with the pattern)
-sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" ~/.ssh/known_hosts
+sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" /var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/known_hosts
 ## Include this new CA key
-echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub).${CAVERBERURI}"  >> ~/.ssh/known_hosts
+echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub).${CAVERBERURI}"  >> /var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/known_hosts
 #######OR THIS: (add URI to the end, but as of 2017 makes no difference)
 ### Remove any previous keys for this CA (sed delete the line with the pattern)
-#sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" ~/.ssh/known_hosts
+#sed -i "/@cert-authority \*\.${CAVERBERURI}.*.${CAVERBERURI}/d" /var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/known_hosts
 ### Include this new CA key
-#echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub)"  >> ~/.ssh/known_hosts
+#echo "@cert-authority *.${CAVERBERURI} $(cat /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub)"  >> /var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/known_hosts
 
 # Finish
 echo "Inker CA key from ${CAVERBERURI} has been added and is up to date."

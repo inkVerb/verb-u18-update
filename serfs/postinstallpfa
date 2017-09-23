@@ -15,7 +15,7 @@ deny from all
 chown -R www-data:www-data /var/www/email/postfixadmin/.htaccess
 
 # Set the setup password so it can't work until setpfapass runs agian
-sed -i "s/$CONF\['setup_password'\] = .*/$CONF\['setup_password'\] = ''; #NOT_SET_RUN_setup_THEN_pfapass/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/\$CONF\['setup_password'\] = .*/\$CONF\['setup_password'\] = ''; #NOT_SET_RUN_setup_THEN_pfapass/g" /var/www/email/postfixadmin/config.local.php
 sed -i "/\/\/ With this long hash/d" /var/www/email/postfixadmin/config.local.php
 
 # Finish

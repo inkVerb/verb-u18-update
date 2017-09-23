@@ -23,12 +23,13 @@ Primary TLD: ${SITETLD}
 Primary URI: ${nameURI}
 Host: ${SITEHOST}
 Timezone: ${SITETIMECITY}, ${SITETIMEREGION}
+Update channel: ${SITEUPDATEREPO}
 Version: ${VERNO}
-Type: ${VERNO}
+Type: ${VTYPE}
 
-Email
-Email URI: ${emailTLDURI}
-Status: ${SITEMAILSTATUS}
+Email main domain URI: ${emailURI}
+Email server URI: ${emailTLDURI}
+Email Status: ${SITEMAILSTATUS}
 Snail: ${SITESNAIL}
 RC path: ${SITERCPATH}
 PFA path: ${SITEPFAPATH}

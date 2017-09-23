@@ -7,8 +7,10 @@ set -e
 
 # This is also used to setup this Verber as an Inker, see below
 
+# TIP: Get the Host and IP info from the CA Verber using showinknetcainfo
+
 # How to use:
-## ./inknetmakeverberclient [CA Verber host] [CA Verber IP]
+## ./inknetmakeverberclient [CA Verber Host] [CA Verber IP]
 
 # Eg: (almost certainly exactly this, but verify from inkVerb instructions at registration and available Inkers, probably region-specific)
 ## ./inknetmakeverberclient ink.ink.verb.ink 999.999.99.999 (for ink namespace - the master Inker site)
@@ -65,6 +67,7 @@ NEWINIVSAILORNAME="I_AM_INKER"
 /var/local/verb/serfs/setinknetrepo "I_AM_INKER"
 sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /var/local/verb/configs/siteinkget
 else
+
 ## To make this a standard CA Verber
 ### Variables
 NEWCAVERBERHOST=$1
@@ -78,13 +81,6 @@ NEWCAVERBERIP=$2
 /var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
 /var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}.${NEWCAVERBERURI}
-### Install ivApp
-/var/local/verb/serfs/inknetinstallivapp
-### inkNet ivApp Sailor (to login to the CA Verber)
-#### Password generator
-NEWINIVSAILORNAME=sail$(pwgen -s -1 -A 14)
-#### Add the Sailor
-/var/local/verb/serfs/inknetivappaddsailor ${NEWINIVSAILORNAME}
 fi
 
 # Set configs
@@ -100,13 +96,8 @@ CAVERBERIP=\"${NEWCAVERBERIP}\"
 CLIENTHOST=\"${NEWCLIENTHOST}\"
 CLIENTURI=\"${NEWCLIENTURI}\"
 CLIENTNAME=\"${NEWCLIENTNAME}\"
-CLIENTSAILOR=\"${NEWINIVSAILORNAME}\"
+CLIENTSAILOR=\"NOT_SET\"
 " > /var/local/verb/configs/inknet/inker.client.cnf
-
-# Verify proper configuration
-## For the user
-if [ ! -d ~/.ssh ]; then
-mkdir .ssh; fi
 ## For the system
 ### Prepare /etc/ssh/ssh_config
 if [ ! -d /etc/ssh/inknet ]; then
@@ -117,6 +108,13 @@ Host *
  IdentityFile /etc/ssh/inknet/in_cli_${NEWCLIENTNAME}_key
 ##
 " >> /etc/ssh/ssh_config
+
+# Install ivApp
+/var/local/verb/serfs/inknetinstallivapp
+## inkNet ivApp Sailor (to login to the CA Verber)
+if [ "${1}" != "I_AM_INKER" ]; then
+/var/local/verb/serfs/inknetivappnewclientsailor
+fi
 
 # Reload SSH services
 service ssh restart
@@ -129,10 +127,6 @@ I am Inker!
 Now, run inknetinstallca
 "
 exit 0; fi
-
-# Get the CA Client key
-if [ ! -f /etc/ssh/inknet/in_ca_${NEWCAVERBERNAME}_key.pub ]; then
-/var/local/verb/serfs/inknetaddcaverberpubkey; fi
 
 # Finish
 echo "Done. This Verber is now ready to connect as a Client to a CA Inker.

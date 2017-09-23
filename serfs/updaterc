@@ -28,6 +28,10 @@ sed -i "s/\$config\['enable_installer'\].*/\$config\['enable_installer'\] = fals
 cd /var/www
 rm -rf /var/www/roundcube
 
+# Forwarding plugin
+cp /var/www/email/roundcube/plugins/forward/config.inc.php.dist /var/www/email/roundcube/plugins/forward/config.inc.php
+sed -i "s/\$rcmail_config\['forward_sql_dsn'\].*/\$rcmail_config\['forward_sql_dsn'\] = 'mysql:\/\/mail:mailpass${SITEMAILPASSAPG}@localhost\/mail';/g" /var/www/email/roundcube/plugins/forward/config.inc.php
+
 # Copy the branding files
 cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/verbink_logo.png /var/www/email/roundcube/skins/larry/images/
 cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/verbink_logo.png /var/www/email/roundcube/

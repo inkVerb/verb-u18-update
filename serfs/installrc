@@ -48,11 +48,11 @@ cd /var/www/email
 rm -rf roundcube
 unzip roundcube.current.zip
 rm -f roundcube.current.zip
-/var/local/verb/serfs/inkget roundcube.plugins.current
-unzip roundcube.plugins.current.zip
-cp -R plugins roundcube/
-rm -rf plugins
-rm -f roundcube.plugins.current.zip
+#/var/local/verb/serfs/inkget roundcube.plugins.current
+#unzip roundcube.plugins.current.zip
+#cp -R plugins roundcube/
+#rm -rf plugins
+#rm -f roundcube.plugins.current.zip
 
 # Create the MySQL database and user
 mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
@@ -68,7 +68,6 @@ sed -i "s/SITERCPATH.*/SITERCPATH=${RCFOLDER}/g" /var/local/verb/configs/sitemai
 cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.rc
 ln -s /var/www/email/roundcube /var/www/html/${SITEEMAILTLD}.rc/${RCFOLDER}
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
-chown -R www-data:www-data /var/www/email/roundcube
 a2ensite rc.${emailTLDURI}
 service apache2 reload
 
@@ -87,7 +86,8 @@ apt install -y \
   libpspell-dev \
   php-pspell \
   aspell-en
-pear install Net_IDNA2-0.1.1
+## Install this silently so it doesn't get errors
+pear install -f Net_IDNA2-0.1.1
 ## Should already be enabled, but enable just in case, Ex Ratione had some problems
 phpenmod intl zip
 service apache2 restart
@@ -111,6 +111,9 @@ cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/verbink_logo.pn
 cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/watermark.jpg /var/www/email/roundcube/skins/larry/images/
 cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/favicon.ico /var/www/email/roundcube/skins/larry/images/
 cp /var/local/verb/configs/conflab/email/roundcube/roundcubepics/favicon.ico /var/www/email/roundcube/
+
+# Own
+chown -R www-data:www-data /var/www/email/roundcube
 
 # Composer Plugins
 ## This is excerpted from installrcinkplugins
@@ -141,7 +144,7 @@ sed -i '/\"require\": {/ a\
 ### Then, run install ( -n / --no-interaction = no interaction)
 php composer.phar install -n
 
-# Set up PFA forwarding plugin
+# Set up forwarding plugin
 cp /var/www/email/roundcube/plugins/forward/config.inc.php.dist /var/www/email/roundcube/plugins/forward/config.inc.php
 sed -i "s/\$rcmail_config\['forward_sql_dsn'\].*/\$rcmail_config\['forward_sql_dsn'\] = 'mysql:\/\/mail:mailpass${SITEMAILPASSAPG}@localhost\/mail';/g" /var/www/email/roundcube/plugins/forward/config.inc.php
 ## Commented legacy pfadmin_forwarding

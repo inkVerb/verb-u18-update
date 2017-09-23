@@ -8,5 +8,6 @@ set -e
 ## ./inkver
 
 . /var/local/verb/configs/inklists/verberverno
-echo "${VERNO}"
+. /var/local/verb/configs/sitenameip
+echo "${SITEUPDATEREPO} ${VERNO}"
 

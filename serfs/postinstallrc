@@ -9,6 +9,6 @@ set -e
 
 
 # Set installer to false
-sed -i "s/$config\['enable_installer'\].*/$config\['enable_installer'\] = false;/g" /var/www/email/roundcube/config/config.inc.php
+sed -i "s/\$config\['enable_installer'\].*/\$config\['enable_installer'\] = false;/g" /var/www/email/roundcube/config/config.inc.php
 
 echo "Finished. Roudcube installer disabled."

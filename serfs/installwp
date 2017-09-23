@@ -86,6 +86,9 @@ cp wp-config-sample.php wp-config.php
 sed -i "s/database_name_here/${DBASE}/g" wp-config.php
 sed -i "s/username_here/${DBUSER}/g" wp-config.php
 sed -i "s/password_here/${DBPASSWORD}/g" wp-config.php
+echo "
+/** inkVerb Sets the URL */
+define( 'WP_SITEURL', 'http://${DOMAIN}' );" >> wp-config.php
 
 # Add the secure salt and key strings
 AUTH_KEY=$(pwgen -s -1 27)
@@ -104,6 +107,7 @@ sed -i "s/define('AUTH_SALT',        'put your unique phrase here');/define('AUT
 sed -i "s/define('SECURE_AUTH_SALT', 'put your unique phrase here');/define('SECURE_AUTH_SALT', '${SECURE_AUTH_SALT}');/g" wp-config.php
 sed -i "s/define('LOGGED_IN_SALT',   'put your unique phrase here');/define('LOGGED_IN_SALT',   '${LOGGED_IN_SALT}');/g" wp-config.php
 sed -i "s/define('NONCE_SALT',       'put your unique phrase here');/define('NONCE_SALT',       '${NONCE_SALT}');/g" wp-config.php
+
 
 # Reset all permissions and reload
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}

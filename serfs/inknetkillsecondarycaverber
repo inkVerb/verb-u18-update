@@ -16,7 +16,7 @@ set -e
 FULLKILLNAME=$1
 KILLCAVERBERNAME=$(echo $FULLKILLNAME | cut -c1-18)
 
-rm /var/local/verb/configs/inknet/secondarycav.${KILLCAVERBERNAME}.cnf
+rm /var/local/verb/configs/inknet/2cav.${KILLCAVERBERNAME}.cnf
 
 # Finish
 echo "The secondary CA Verber credentials for ${KILLCAVERBERNAME} have been deleted."
