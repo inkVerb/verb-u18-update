@@ -41,5 +41,5 @@ cp ~/${CLIENTNAME}/client.verber.${CLIENTNAME}.cnf /var/local/verb/configs/inkne
 rm -rf ${CLIENTNAME}
 
 # Finish
-echo "The CA-signed cert for this Verber has been installed. This Verber's root may now use the inkNet to connect to the Inker for other services, such as inkCert."
+echo "The CA-signed cert for this Verber has been installed. This Verber may now use inkNet to connect to the Inker for other services, such as inkCert."
 

@@ -34,20 +34,10 @@ NEWINIVSAILORNAME=sail$(pwgen -s -1 -A 14)
 sed -i "s/CLIENTSAILOR=.*/CLIENTSAILOR=\"${NEWINIVSAILORNAME}\"/g" ${CLIENTCFG}
 
 # Get the CA Public key for this Client
-## Back up any old key first
-if [ -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub ]; then
-rm -f /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub.vbak
-mv /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub /etc/ssh/inknet/in_ca_${CAVERBERNAME}_key.pub.vbak; fi
 ## Based on primary or secondary
 if [ -z "$1" ]; then
 /var/local/verb/serfs/inknetaddcaverberpubkey
 else
 /var/local/verb/serfs/inknetaddcaverberpubkey ${CA2URICFG}
 fi
-
-# Verify .ssh directory
-if [ ! -d "/var/local/ivapp/inknet/sailor/${NEWINIVSAILORNAME}/.ssh" ]; then
-mkdir -p /var/local/ivapp/inknet/sailor/${NEWINIVSAILORNAME}/.ssh; fi
-
-# Add the CA Public key here: /var/local/ivapp/inknet/sailor/${NEWINIVSAILORNAME}/.ssh/known_hosts
 

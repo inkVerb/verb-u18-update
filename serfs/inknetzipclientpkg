@@ -10,7 +10,7 @@ set -e
 ## This uses some variables interchangeably. This is for compatability since CLIENTNAME comes from the config file retrieved using VCNAME and VTYPE. Altering this could break the script later because of coterminous but separate jargon dependencies.
 
 # How to use:
-## ./inknetzipclientpkg [vrk/verber type] [client name]
+## ./inknetzipclientpkg [vrk/verber type] [Client Host/Name]
 
 # Eg: (for Verber)
 ## ./inknetzipclientpkg verber joeyhost_joeysite_verb_ink

@@ -7,7 +7,7 @@ set -e
 ## Prerequisite: inknetaddvrkclient/inknetaddverberclient
 
 # How to use:
-## ./inknetaddclientkey [vrk/verber type] [Client name or host] ["FULL KEY" - in quotes! - optional]
+## ./inknetaddclientkey [vrk/verber type] [Client Host/Name] ["FULL KEY" - in quotes! - optional]
 
 # Eg: (for Verber)
 ## ./inknetaddclientkey verber joeyhost_joeysite_verb_ink
@@ -85,10 +85,12 @@ echo "You aren't entering a key. I quit."; exit 55; fi
 
 # Add the key
 if [ "${VTYPE}" = "vrk" ]; then
-echo "${VCKEY}" >> /etc/ssh/authorized_keys/${CLIENTUSERNAME}
+echo "${VCKEY}" >> /var/local/ivapp/inknet/vrker/${CLIENTUSERNAME}/.ssh/authorized_keys
 fi
 if [ "${VTYPE}" = "verber" ]; then
-echo "${VCKEY}.${VCURI}" >> /etc/ssh/authorized_keys/${CLIENTUSERNAME}
+echo "${VCKEY}.${VCURI}" >> /var/local/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
+## Remove any duplication of the URI
+sed -i "s/${VCURI}\.${VCURI}/${VCURI}/" /var/local/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
 fi
 
 # Finish

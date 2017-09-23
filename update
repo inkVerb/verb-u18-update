@@ -174,6 +174,98 @@ fi
 ##############END#UPDATE#PATCH#
 
 
+UPDATE_PATCH_VERNO=0.814
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
+
+# Move to working directory of the patch
+if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/" ]; then
+cd /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/; fi
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/
+
+# eg: echo "I would update the serfs here, but that happens automatically."
+# Roundcube
+sed -i "s/\$config\['smtp_auth_type'\] =.*/\$config\['smtp_auth_type'\] = 'PLAIN';/" /var/www/email/roundcube/config/defaults.inc.php
+sed -i "s/\$config\['imap_auth_type'\] =.*/\$config\['imap_auth_type'\] = 'PLAIN';/" /var/www/email/roundcube/config/defaults.inc.php
+cp -f roundcube/config/* /var/local/verb/configs/conflab/email/roundcube/config/
+cp -f roundcube/roundcubepics/* /var/local/verb/configs/conflab/email/roundcube/roundcubepics/
+#apt install libjs-jquery
+
+###########################
+# Set and refresh the current version into inklists
+sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
+. /var/local/verb/configs/inklists/verberverno
+echo "Verber updated to v${VERNO}"
+else
+echo "${UPDATE_PATCH_VERNO} patch not necessary..."
+fi
+##############END#UPDATE#PATCH#
+
+
+UPDATE_PATCH_VERNO=0.815
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
+
+# Move to working directory of the patch
+if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/" ]; then
+cd /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/; fi
+
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/
+
+## Set correct permissions for web directories
+chmod -R 755 /var/www/html/0ne
+chmod -R 755 /var/www/html/0sitedefaultInProgress
+chmod -R 755 /var/local/verb/configs/site-files/newdomain.tld
+chmod -R 755 /var/local/verb/configs/site-files/newgurusubdir
+chmod -R 755 /var/local/verb/configs/site-files/newonesubdir
+
+## Roundcube & PFA
+cp -f roundcube/roundcubepics/* /var/local/verb/configs/conflab/email/roundcube/roundcubepics/
+cp -f roundcube/roundcubepics/* /var/local/verb/configs/conflab/email/roundcube/roundcubepics/skins/larry/images/
+cp -f roundcube/roundcubepics/* /var/www/email/roundcube/skins/larry/images/
+cp -f roundcube/roundcubepics/* /var/www/email/roundcube/
+cp -f roundcube/config/* /var/local/verb/configs/conflab/email/roundcube/config/
+cp -f roundcube/config/* /var/local/verb/configs/conflab/email/roundcube/config/
+cp -f postfixadmin/* /var/local/verb/configs/conflab/email/postfixadmin/
+
+###########################
+# Set and refresh the current version into inklists
+sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
+. /var/local/verb/configs/inklists/verberverno
+echo "Verber updated to v${VERNO}"
+else
+echo "${UPDATE_PATCH_VERNO} patch not necessary..."
+fi
+##############END#UPDATE#PATCH#
+
+UPDATE_PATCH_VERNO=0.816
+if [ $(echo ${UPDATE_PATCH_VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") -gt $(echo ${VERNO} | sed -e "s/\.//" | sed -e "s/^0*//") ] ; then
+
+# Move to working directory of the patch
+if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/" ]; then
+cd /var/local/verb/${VUPDATE_REPO}/${UPDATE_PATCH_VERNO}/; fi
+
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# Donjon
+chmod +x donjon/*
+cp -f donjon/* /var/local/verb/donjon
+
+
+###########################
+# Set and refresh the current version into inklists
+sed -i "s/VERNO=.*/VERNO=${UPDATE_PATCH_VERNO}/g" /var/local/verb/configs/inklists/verberverno
+. /var/local/verb/configs/inklists/verberverno
+echo "Verber updated to v${VERNO}"
+else
+echo "${UPDATE_PATCH_VERNO} patch not necessary..."
+fi
+##############END#UPDATE#PATCH#
 
 
 # Finish

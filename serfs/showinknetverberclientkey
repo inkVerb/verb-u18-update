@@ -18,10 +18,7 @@ exit 22; fi
 . /var/local/verb/configs/inknet/inker.client.cnf
 
 # Display info
-echo "
-Client Type: \"verber\"
-Client Name: \"${CLIENTNAME}\"
-Copy and paste the ENTIRE long key below, as is, into the \"Activate Client key\" area on the inkNet CA Inker:
+echo "Copy and paste the ENTIRE long key below, as is, into the \"Activate Client key\" area on the inkNet CA Inker:
 "
-cat /etc/ssh/inknet/in_cli_${CLIENTNAME}_key.pub
+cat /var/local/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/in_cli_${CLIENTNAME}_key.pub
 

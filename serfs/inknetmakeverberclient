@@ -105,11 +105,11 @@ mkdir /etc/ssh/inknet; fi
 echo "
 ## Added by inkNet ##
 Host *
- IdentityFile /etc/ssh/inknet/in_cli_${NEWCLIENTNAME}_key
+ IdentityFile ~/.ssh/in_cli_${NEWCLIENTNAME}_key
 ##
 " >> /etc/ssh/ssh_config
 
-# Install ivApp
+# Install ivApp for inkNet & CA Key
 /var/local/verb/serfs/inknetinstallivapp
 ## inkNet ivApp Sailor (to login to the CA Verber)
 if [ "${1}" != "I_AM_INKER" ]; then

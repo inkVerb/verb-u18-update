@@ -154,9 +154,13 @@ if [ "${USER}" != "root" ]; then
 rm -f /etc/ssh/authorized_keys/${USER}
 ln -sfn ~/.ssh/authorized_keys /etc/ssh/authorized_keys/${USER}
 fi
-### Change the setting to recognize the new location
-echo "## inkNet: Change the location of user keys (to avoid locations such as www-data/.ssh)
-AuthorizedKeysFile /etc/ssh/authorized_keys/%u" >> /etc/ssh/sshd_config
+
+######## NO BEING STRANGE
+#### Change the setting to recognize the new location
+#echo "## inkNet: Change the location of user keys (to avoid locations such as www-data/.ssh)
+#AuthorizedKeysFile /etc/ssh/authorized_keys/%u" >> /etc/ssh/sshd_config
+##############
+
 ## Comment any previous HostCerts - THEY WILL CONFLICT!! (which probably don't exist, but just in case...)
 sed -i "s/HostCertificate/#inkVerb-COMMENT HostCertificate/g" /etc/ssh/sshd_config
 ## Add the standard key to the SSH config

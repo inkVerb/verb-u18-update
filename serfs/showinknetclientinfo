@@ -30,11 +30,11 @@ fi
 . /var/local/verb/configs/sitenameip
 
 # Display info
-echo "
+echo " Your Client info:
+
 Host: ${CLIENTHOST}
-URI:  ${CLIENTURI}
-Client Name: ${CLIENTNAME}
-Client Type: \"verber\"
+Name: ${CLIENTNAME}
 IP:   ${SITEIP}
+Type: \"verber\"
 "
 

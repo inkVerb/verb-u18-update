@@ -27,4 +27,6 @@ echo "ivApp is not instlled yet. I quit."; exit 22; fi
 # Create the inkNet Client tool links
 rm -rf /var/local/ivapp/inknet/${IVAPPGROUPDIR}/${ADDINIVUSER}/tools
 ln -sfn /var/local/verb/tools/${IVAPPGROUPDIR} /var/local/ivapp/inknet/${IVAPPGROUPDIR}/${ADDINIVUSER}/tools
+mkdir -p /var/local/ivapp/inknet/${IVAPPGROUPDIR}/${ADDINIVUSER}/.ssh
+chown -R ${ADDINIVUSER}:${ADDINIVUSER} /var/local/ivapp/inknet/${IVAPPGROUPDIR}/${ADDINIVUSER}
 

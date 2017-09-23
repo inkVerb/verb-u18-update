@@ -16,6 +16,6 @@ ADDINIVSAILOR=$1
 # Create the inkNet Client tool links
 rm -rf /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
 ln -sfn /var/local/verb/tools/sailor /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
-
-# Add the CA Public key here: /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/.ssh/known_hosts
+mkdir -p /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/.ssh
+chown -R ${ADDINIVSAILOR}:${ADDINIVSAILOR} /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}
 
