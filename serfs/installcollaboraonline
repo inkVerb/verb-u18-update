@@ -32,7 +32,7 @@ exit 0; fi
 
 # Install it
 docker pull collabora/code
-			docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e 'domain=nextcloud\\.${SITENAME}\\.verb\\.blue' --restart always --cap-add MKNOD collabora/code
+                       docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e "domain=nextcloud.${SITENAME}.verb.blue" --restart always --cap-add MKNOD collabora/code
 
 # Firewall
 ufw allow ${PORT}
@@ -43,16 +43,6 @@ a2enmod proxy
 a2enmod proxy_wstunnel
 a2enmod proxy_http
 a2enmod ssl
-## Config files
-cp /var/local/verb/configs/site-files/conf/collabora.${blueURI}.conf-collabora /etc/apache2/sites-available/collabora.${blueURI}.conf
-sed -i "s/por286/${PORT}/g" /etc/apache2/sites-available/collabora.${blueURI}.conf
-## inkCert is already installed (check first to avoid errors, apply inkCert-LE or inkCert Proper as needed)
-if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${SITEDOMAIN}.conf; then 
-/var/local/verb/serfs/inkcertaddle collabora.${blueURI} ${blueURI}
-fi
-if grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${SITEDOMAIN}.conf; then
-/var/local/verb/serfs/inkcertadd collabora.${blueURI}
-fi
 ## Reload
 service apache2 reload
 
