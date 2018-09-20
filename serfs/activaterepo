@@ -2,7 +2,7 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This activates the repo....verb.guru folder so it the web will give an index
+# This activates the repo....verb.guru folder so the web will provide an index
 
 # How to use:
 ## ./activaterepo [on/off]
@@ -33,7 +33,7 @@ fi
 if [ "$1" = "on" ]
 then
     rm -rf /var/www/html/guru.repo
-    ln -s /var/www/guru/repo /var/www/html/guru.repo
+    ln -sfn /var/www/guru/repo /var/www/html/guru.repo
     echo "repo on."
 exit 0
 fi
@@ -45,3 +45,4 @@ then
     echo "repo off."
 exit 0
 fi
+

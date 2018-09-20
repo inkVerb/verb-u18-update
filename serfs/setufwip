@@ -13,4 +13,5 @@ set -e
 IP_ADDRESS=$1
 
 ufw allow from ${IP_ADDRESS}
-sed -i "s/SITEUFWIP.*/SITEUFWIP=${IP_ADDRESS}/g" /var/local/verb/configs/siteufwip
+sed -i "s/SITEUFWIP.*/SITEUFWIP=\"${IP_ADDRESS}\"/g" /var/local/verb/configs/siteufwip
+

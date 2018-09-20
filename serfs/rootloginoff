@@ -9,5 +9,5 @@ set -e
 ## ./rootloginoff
 
 sed -i "s/PermitRootLogin.*/PermitRootLogin without-password/g" /etc/ssh/sshd_config
-service ssh reload
+systemctl reload ssh
 

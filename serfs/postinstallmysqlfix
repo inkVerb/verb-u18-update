@@ -14,7 +14,7 @@ set -e
 APPNAME=$1
 
 # Include the config
-. /var/local/verb/configs/verbapp.${APPNAME}
+. /var/local/verb/configs/vapp.${APPNAME}
 
 mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
 REVOKE ALL PRIVILEGES ON *.* FROM '${APPDDBUSR}'@'localhost';

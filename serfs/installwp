@@ -26,12 +26,12 @@ DBPASSWORD=$4
 CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
 
 # Basic credential check
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You must designate a domain. Read the How to use. Can't continue."
 exit 22; fi
 # Check if already installed
 ## Config
-if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN} ]; then
+if [ -f /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN} ]; then
 echo "This is already installed."
 exit 0; fi
 ## Directory
@@ -42,14 +42,15 @@ exit 0; fi
 # Domain presence check
 if [ ! -d "/var/www/domains/${DOMAIN}" ]; then
 /var/local/verb/serfs/adddomain ${DOMAIN}
+wait
 fi
 
 # Auto database
-if [ -z $4 ]; then
+if [ -z ${4} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DBASE=wp$(echo $CLEANNAME | cut -c1-24)$(pwgen -s -1 6); fi
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBUSER=${DBASE}
 fi
 
@@ -78,7 +79,7 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Put the settings in the WordPress config file
 cd wp.${DOMAIN}
@@ -88,7 +89,8 @@ sed -i "s/username_here/${DBUSER}/g" wp-config.php
 sed -i "s/password_here/${DBPASSWORD}/g" wp-config.php
 echo "
 /** inkVerb Sets the URL */
-define( 'WP_SITEURL', 'http://${DOMAIN}' );" >> wp-config.php
+define( 'WP_SITEURL', 'http://${DOMAIN}' );
+define( 'WP_HOME', 'http://${DOMAIN}' );" >> wp-config.php
 
 # Add the secure salt and key strings
 AUTH_KEY=$(pwgen -s -1 27)
@@ -108,10 +110,9 @@ sed -i "s/define('SECURE_AUTH_SALT', 'put your unique phrase here');/define('SEC
 sed -i "s/define('LOGGED_IN_SALT',   'put your unique phrase here');/define('LOGGED_IN_SALT',   '${LOGGED_IN_SALT}');/g" wp-config.php
 sed -i "s/define('NONCE_SALT',       'put your unique phrase here');/define('NONCE_SALT',       '${NONCE_SALT}');/g" wp-config.php
 
-
 # Reset all permissions and reload
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
-service apache2 reload
+apache2ctl graceful
 
 echo "These are setup:
 

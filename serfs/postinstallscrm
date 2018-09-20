@@ -11,6 +11,8 @@ set -e
 # Set installer to false
 echo "*    *    *    *    *     cd /var/www/vapps/suitecrm; php -f cron.php > /dev/null 2>&1" >> /var/local/verb/configs/verbcron
 cp /var/local/verb/configs/verbcron /etc/cron.d/verber
+#chmod 644 /etc/cron.d/verber
+chmod 755 /etc/cron.d/verber
 
 # Finish
 echo "SuiteCRM cron job has been added to the system."

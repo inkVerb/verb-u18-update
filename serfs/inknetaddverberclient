@@ -36,7 +36,7 @@ ADDNAME="$(echo ${ICHOST} | sed 's/\./_/g')"
 ADDURI="$(echo ${ADDHOST} | rev | cut -d'.' -f-3 | rev)"
 URINAME="$(echo ${ADDURI} | sed 's/\./_/g')"
 
-if [ -z "$2" ]; then
+if [ -z ${2} ]; then
 echo "Dude. You need both options. Read the instructions."
 exit 0
 fi
@@ -83,6 +83,7 @@ CLIENTPORT=\"${ADDLOGINPORT}\"
 
 # Create the ivApp user
 /var/local/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrb
+wait
 
 # Create the inkNet Client tool links
 ln -sfn /var/local/verb/tools/verber /var/local/ivapp/inknet/verber/${ADDUSERNAME}/tools

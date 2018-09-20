@@ -1,0 +1,36 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds the inkDKIM key to an existing DNS TXT record in the inkDNS zone file on this Verber
+
+# How to use:
+## ./inkdnsaddinkdkim [domain]
+
+
+DNSDOMAIN=$1
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Check if already added
+if grep -Fq "; inkDKIM key" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db; then
+echo "The inkDKIM key for ${DNSDOMAIN} has already been added. Use inkdnskillinkdkim to remove it."
+exit 0; fi
+if grep -Fq "dkim._domainkey" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db; then
+echo "The ${DNSDOMAIN} zone file seems to have been tampered with. It should say nothing about DKIM keys at this point, but it does. Fix that first."
+exit 11; fi
+
+# Echo the key
+echo "; inkDKIM key ${DNSDOMAIN}" >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+echo $(cat /etc/opendkim/keys/${DNSDOMAIN}/inkdkim.txt) >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+echo ";; End inkDKIM key ${DNSDOMAIN}" >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+## Add the domain to the record host name
+sed -i "s/inkdkim\._domainkey/inkdkim\._domainkey\.${DNSDOMAIN}\./" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+
+# Set the Serial No
+/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Finish
+echo "The inkDKIM key has been added to the ${DNSDOMAIN} DNS zone file."
+

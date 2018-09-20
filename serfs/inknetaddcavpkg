@@ -18,7 +18,7 @@ SECPATH=$1
 cd ~/
 
 # If sec path not specified in command line
-if [ -z "$1" ]; then
+if [ -z ${1} ]; then
 echo "Please copy-paste the code the CA Verber gave you, then press Enter."
 read SECPATH
 fi
@@ -33,9 +33,9 @@ echo "You aren't entering the path. I quit."; exit 55; fi
 wget -q https://${CAVERBERHOST}/inknet/${SECPATH}/${CLIENTNAME}.ink --no-check-certificate
 
 # Unpack
-mv ${CLIENTNAME}.ink ${CLIENTNAME}.zip
-unzip ${CLIENTNAME}.zip
-rm -f ${CLIENTNAME}.zip
+mv ${CLIENTNAME}.ink ${CLIENTNAME}.vtxz
+/var/local/verb/serfs/vtxzout ${CLIENTNAME}
+rm -f ${CLIENTNAME}.vtxz
 . ~/${CLIENTNAME}/verbername
 cp ~/${CLIENTNAME}/client.verber.${CLIENTNAME}.cnf /var/local/verb/configs/inknet/client.${VERBERNAME}.inker.login.cnf
 rm -rf ${CLIENTNAME}

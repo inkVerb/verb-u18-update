@@ -26,5 +26,7 @@ runuser -l ${CLIENTSAILOR} -c "ssh-keygen -t rsa -N '' -f /var/local/ivapp/inkne
 echo "Ready for the next step...
 "
 /var/local/verb/serfs/showinknetclientinfo
+wait
 /var/local/verb/serfs/showinknetverberclientkey
+wait
 

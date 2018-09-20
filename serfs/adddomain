@@ -4,6 +4,7 @@ set -e
 
 # This adds domains with OpenDKIM profiles and keys and inkCert and Apache configs.
 ## This also creates a folder for the domain in www/domains which an ftpguru can access
+## This also creates an inkDNS zone file, complete with mail records
 
 # How to use:
 ## ./adddomain [newdomain.tld]
@@ -18,7 +19,7 @@ NEWDOMAIN=$1
 # Check the domain shell
 if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWDOMAIN} ]; then
 echo "The shell for ${NEWDOMAIN} does not exist yet. Creating it..."
-/var/local/verb/serfs/newdomainshell ${NEWDOMAIN}
+/var/local/verb/serfs/newdomainshell ${NEWDOMAIN}; wait
 fi
 
 # Check if it already exists
@@ -41,8 +42,11 @@ fi
 ln -sfn /var/www/domains/${NEWDOMAIN} /var/www/html/
 chown -R www-data:www-data /var/www/html/${NEWDOMAIN}
 chown -R www-data:www-data /var/www/domains/${NEWDOMAIN}
+chmod -R 755 /var/www/domains/${NEWDOMAIN}
 a2ensite ${NEWDOMAIN}
-service apache2 reload
+apache2ctl graceful
+## Just in case...
+systemctl start apache2
 
 # inkCert
 ## Ensure that you don't get double entries

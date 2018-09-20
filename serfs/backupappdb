@@ -7,7 +7,7 @@ set -e
 # How to use:
 ## ./backupappdb [app namespace] [securename 0-9, a-z, and A-Z only] [-nl for no link, optional]
 
-## This uses the same app namespace as installAPPNAME and verbapp.APPNAME configs
+## This uses the same app namespace as installAPPNAME and vapp.APPNAME configs
 ## This does not work for ghost sites
 ## For WordPress installed to a domain, the namespace follows the format: wp-DOMAIN.TLD or wp-SUB.DOMAIN.TLD
 
@@ -22,17 +22,17 @@ SECNAME=$2
 
 # Include the configs
 . /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/verbapp.${APPNAME}
+. /var/local/verb/configs/vapp.${APPNAME}
 
 # Export the database
-cd /var/local/verb/serfs
-/var/local/verb/serfs/mysqlex ${APPDBASE}
-mv /var/local/verb/serfs/${APPDBASE}.sql /var/www/guru/verb.${APPDBASE}.${SECNAME}.vbak.sql
+cd /var/www/guru
+/var/local/verb/serfs/mysqlex ${APPDBASE}; wait
+mv /var/www/guru/${APPDBASE}.sql /var/www/guru/verb.${APPDBASE}.${SECNAME}.vbak.sql
 
 # Finish
 if [ "$3" = "-nl" ]
 then
-	echo "The database for ${APPNAME} has been backed up to the 'guru' folder.
+echo "The database for ${APPNAME} has been backed up to the 'guru' folder.
 
 Note that the app remains live.
 "
@@ -43,9 +43,8 @@ ln -s /var/www/html/${SITETLD}/verb.${APPDBASE}.${SECNAME}.vbak.sql /var/www/htm
 chown -R www-data:www-data /var/www/html/${SITETLD}/verb.${APPDBASE}.${SECNAME}.vbak.sql
 echo "The database for ${APPNAME} has been backed up and can be downloaded at:
 
-http://${nameURI}/${APPDBASE}-${SECNAME}.sql
+https://${nameURI}/verb.${APPDBASE}.${SECNAME}.vbak.sql
 
 Note that the app remains live.
 "
-
 

@@ -15,7 +15,7 @@ CA2URICFG=$1
 SECONDARYCACFG="$(echo ${CA2URICFG} | sed 's/\./_/g')"
 
 # Set the Client config
-if [ -z "$1" ]; then
+if [ -z ${1} ]; then
 CLIENTCFG=/var/local/verb/configs/inknet/inker.client.cnf
 else
 CLIENTCFG=/var/local/verb/configs/inknet/2cav.${SECONDARYCACFG}.cnf
@@ -29,15 +29,18 @@ NEWINIVSAILORNAME=sail$(pwgen -s -1 -A 14)
 
 # Add the Sailor
 /var/local/verb/serfs/inknetivappaddsailor ${NEWINIVSAILORNAME}
+wait
 
 # Set Sailor name in the config
 sed -i "s/CLIENTSAILOR=.*/CLIENTSAILOR=\"${NEWINIVSAILORNAME}\"/g" ${CLIENTCFG}
 
 # Get the CA Public key for this Client
 ## Based on primary or secondary
-if [ -z "$1" ]; then
+if [ -z ${1} ]; then
 /var/local/verb/serfs/inknetaddcaverberpubkey
+wait
 else
 /var/local/verb/serfs/inknetaddcaverberpubkey ${CA2URICFG}
+wait
 fi
 

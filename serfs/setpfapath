@@ -9,7 +9,7 @@ set -e
 ## ./setpfapath [folder]
 
 # Eg:
-## To use at boxes.NAME.verb.email/mysecretpath do: ./installpfa easy mysecretpath
+## To use at pfa.NAME.verb.email/mysecretpath do: ./installpfa easy mysecretpath
 
 
 # Include the config file
@@ -18,10 +18,10 @@ set -e
 
 PFAFOLDER=$1
 
-rm -rf /var/www/html/${SITEEMAILTLD}.boxes
-cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.boxes
-ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.boxes/${PFAFOLDER}
-chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.boxes
-sed -i "s/SITEPFAPATH=.*/SITEPFAPATH=${PFAFOLDER}/g" /var/local/verb/configs/sitemail
-sed -i "s/\$CONF\['postfix_admin_url'\] = 'https:\/\/.*/\$CONF\['postfix_admin_url'\] = 'https:\/\/boxes\.${SITENAME}\.verb\.${SITEEMAILTLD}\/${PFAFOLDER}';/g" /var/www/email/postfixadmin/config.inc.php
+rm -rf /var/www/html/${SITEEMAILTLD}.pfa
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.pfa
+ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.pfa/${PFAFOLDER}
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.pfa
+sed -i "s/SITEPFAPATH=.*/SITEPFAPATH=\"${PFAFOLDER}\"/g" /var/local/verb/configs/sitemailpass
+sed -i "s/\$CONF\['postfix_admin_url'\] = 'https:\/\/.*/\$CONF\['postfix_admin_url'\] = 'https:\/\/pfa\.${SITENAME}\.verb\.${SITEEMAILTLD}\/${PFAFOLDER}';/g" /var/www/email/postfixadmin/config.inc.php
 

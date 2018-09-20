@@ -45,7 +45,7 @@ chown -R www-data:www-data /var/www/html/${TLD}.${SUBDOMAIN}
 if [ ! -f "/var/local/verb/inst/setupverb" ]; then
 echo "...reloading Apache..."
 a2ensite ${SUBDOMAIN}.${tldURI}
-service apache2 reload
+apache2ctl graceful
 
 # inkCert
 ## If inkCert has already run

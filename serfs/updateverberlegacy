@@ -13,12 +13,11 @@ set -e
 
 # Download and unpack the latest checked version from the Inkver repo
 cd /var/local/verb/
-/var/local/verb/serfs/inkget verber.update.legacy
-unzip verber.update.legacy.zip
-rm -f verber.update.legacy.zip
+/var/local/verb/serfs/inkget verber.update.legacy; wait
+/var/local/verb/serfs/vtxzout verber.update.legacy; wait
 
 # Run the update script
-/var/local/verb/verber.update.legacy/update
+/var/local/verb/verber.update.legacy/update; wait
 
 # Remove the entire updater
 rm -rf /var/local/verb/verber.update.legacy

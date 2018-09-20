@@ -12,8 +12,8 @@ set -e
 SWAPSIZENO=$1
 
 # Prepare
-## Turn it off if you want (for changes)
-swapoff /var/swap.img
+## Make sure it's off, quietly
+swapoff /var/swap.img 2>/dev/null
 cd /var
 touch swap.img
 chmod 600 swap.img

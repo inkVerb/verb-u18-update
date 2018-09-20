@@ -40,7 +40,7 @@ echo "Odoo 10" > /var/www/html/red.odoo
 ## Set the IP address in the Apache config file
 cp -f /var/local/verb/configs/site-files/conf/odoo.${redURI}.conf-odoo /etc/apache2/sites-available/odoo.${redURI}.conf
 sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/odoo.${redURI}.conf
-service apache2 reload
+apache2ctl graceful
 ## inkCert SSL certs
 ### Not setup
 if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${redURI}; then
@@ -50,11 +50,13 @@ fi
 if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${redURI}; then
 echo "inkCert-LE is already setup for ${redURI}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertaddle odoo.${redURI}
+wait
 fi
 ### inkCert-IC DONE
 if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${redURI}; then
 echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertadd odoo.${redURI}
+wait
 fi
 
 # Set the site-wide app-install config
@@ -63,7 +65,7 @@ sed -i "s/REDodoo=.*/REDodoo=\"Odoo10\"/g" /var/local/verb/configs/siteinstallst
 # Write the config for backup
 echo "#!/bin/sh
 Odoo was installed as red.
-" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+" > /var/local/verb/configs/vapp.${CVAPPNAME}
 
 # Record the port in the Odoo port inklist
 echo "odoo.${redURI} 8069" >> /var/local/verb/configs/inklists/odoositeports

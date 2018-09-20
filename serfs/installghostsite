@@ -24,7 +24,7 @@ EMAILPASS=$3
 NEWPORT=$4
 
 # Basic credential check
-if [ -z $4 ]; then
+if [ -z ${4} ]; then
 echo "You need to set all four variables (domain, ghost port, email, and password) to install Ghost to a domain. See \"How to use\" in the serf."
 exit 55
 fi
@@ -67,7 +67,7 @@ cp /var/local/verb/configs/site-files/conf/newghostsite.conf /etc/apache2/sites-
 sed -i "s/ghostsite286/${DOMAIN}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/2368/${NEWPORT}/g" /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/${DOMAIN}.conf
-service apache2 reload
+apache2ctl graceful
 ## inkCert SSL certs
 ### Not setup
 if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}; then
@@ -77,11 +77,13 @@ fi
 if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}; then
 echo "inkCert-LE is already setup for ${DOMAIN}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertaddle ${DOMAIN}
+wait
 fi
 ### inkCert-IC DONE
 if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}; then
 echo "inkCert-IC is already setup for ${DOMAIN}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertadd ${DOMAIN}
+wait
 fi
 
 # Make it a service at startup
@@ -94,7 +96,7 @@ echo "#!/bin/sh
 GHOSTDOMAIN=\"${DOMAIN}\"
 GHOSTPORT=\"${NEWPORT}\"
 GHOSTEMAIL=\"${EMAILUSER}\"
-GHOSTEMLPAS=\"${EMAILPASS}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+GHOSTEMLPAS=\"${EMAILPASS}\"" > /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Record the port in the Ghost port inklist
 echo "${DOMAIN} ${NEWPORT}" >> /var/local/verb/configs/inklists/ghostsiteports

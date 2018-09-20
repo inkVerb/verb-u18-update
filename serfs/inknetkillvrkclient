@@ -13,7 +13,7 @@ KILLHOST=$2
 KILLMACHINE="$(echo ${KILLHOST} | sed 's/\./_/g')"
 KILLVRKCLIENT="${KILLUSER}_${KILLMACHINE}"
 
-if [ -z "$2" ]; then
+if [ -z ${2} ]; then
 echo "Enter the user, a space, then the machine. Get your machine name with: hostname -f"; exit 55; fi
 
 # Chek if it exists

@@ -12,7 +12,7 @@ set -e
 ## ./mysqluninstall
 
 
-service mysql stop
+systemctl stop mysql
 killall -KILL mysql mysqld_safe mysqld
 apt --yes purge mysql-server mysql-client
 apt --yes autoremove --purge

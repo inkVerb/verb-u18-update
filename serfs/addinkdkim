@@ -2,7 +2,8 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This adds inkDKIM (OpenDKIM) records for a specific domain
+# This adds inkDKIM (OpenDKIM) records for a specific domain in the inkDKIM records
+## This DOES NOT add the records to inkDNS zone files
 ## This is used by newdomain and newdomaincgi
 ## This is not used by addsubdomain or addsubdomaincgi
 ## This is not used by any serfs that create new verb subdomains
@@ -25,7 +26,6 @@ chown opendkim:opendkim inkdkim.private
 echo "inkdkim._domainkey.${DKIMDOMAIN} ${DKIMDOMAIN}:inkdkim:/etc/opendkim/keys/${DKIMDOMAIN}/inkdkim.private" >> /etc/opendkim/KeyTable
 echo "${DKIMDOMAIN} inkdkim._domainkey.${DKIMDOMAIN}" >> /etc/opendkim/SigningTable
 echo "${DKIMDOMAIN}" >> /etc/opendkim/TrustedHosts
-/etc/init.d/opendkim restart
-/etc/init.d/postfix reload
-/etc/init.d/postfix restart
+systemctl reload opendkim
+systemctl reload postfix
 

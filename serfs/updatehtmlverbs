@@ -20,6 +20,7 @@ cd /var/www/html
 if [ ! -e 0sitedefaultInProgress ]; then
 cp -r /var/local/verb/configs/conflab/html/0sitedefaultInProgress .
 chmod -R 755 0sitedefaultInProgress; fi
+if [ ! -e vsslsitedefault ]; then cp -r 0sitedefaultInProgress vsslsitedefault; fi
 if [ ! -e 0ne ]; then
 mkdir 0ne
 echo "<?php header(\"Location: http://${inkURI}\"); die(); ?>" > /var/www/html/0ne/index.php
@@ -47,21 +48,29 @@ if [ ! -e ink.shop ]; then cp -r 0ne ink.shop; fi
 if [ ! -e ink.sn ]; then cp -r 0ne ink.sn; fi
 if [ ! -e ink.wiki ]; then cp -r 0ne ink.wiki; fi
 if [ ! -e blue ]; then cp -r 0ne blue
+echo "<?php header(\"Location: http://caldav.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-caldav.php
+echo "<?php header(\"Location: http://carddav.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-carddav.php
 echo "<?php header(\"Location: http://chat.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-chat.php
 echo "<?php header(\"Location: http://collabora.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-collabora.php
+echo "<?php header(\"Location: http://dav.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-dav.php
 echo "<?php header(\"Location: http://nextcloud.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-nextcloud.php
 echo "<?php header(\"Location: http://owncloud.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-owncloud.php
 echo "<?php header(\"Location: http://pydio.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-pydio.php
 echo "<?php header(\"Location: http://seafile.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-seafile.php
+echo "<?php header(\"Location: http://webdav.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-webdav.php
 echo "<?php header(\"Location: http://xmpp.${blueURI}\"); die(); ?>" > /var/www/html/blue/index-xmpp.php
 echo "<?php header(\"Location: http://${blueURI}\"); die(); ?>" > /var/www/html/blue/index-blue.php
 fi
+if [ ! -e blue.ccaldavalda ]; then cp -r 0ne blue.caldav; fi
+if [ ! -e blue.carddav ]; then cp -r 0ne blue.carddav; fi
 if [ ! -e blue.chat ]; then cp -r 0ne blue.chat; fi
 if [ ! -e blue.collabora ]; then cp -r 0ne blue.collabora; fi
+if [ ! -e blue.dav ]; then cp -r 0ne blue.dav; fi
 if [ ! -e blue.nextcloud ]; then cp -r 0ne blue.nextcloud; fi
 if [ ! -e blue.owncloud ]; then cp -r 0ne blue.owncloud; fi
 if [ ! -e blue.pydio ]; then cp -r 0ne blue.pydio; fi
 if [ ! -e blue.seafile ]; then cp -r 0ne blue.seafile; fi
+if [ ! -e blue.webdav ]; then cp -r 0ne blue.webdav; fi
 if [ ! -e blue.xmpp ]; then cp -r 0ne blue.xmpp; fi
 if [ ! -e guru ]; then cp -r 0ne guru
 echo "<?php header(\"Location: http://hrm.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-guru.php
@@ -70,6 +79,7 @@ echo "<?php header(\"Location: http://cgi.${guruURI}\"); die(); ?>" > /var/www/h
 echo "<?php header(\"Location: http://ftp.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-ftp.php
 echo "<?php header(\"Location: http://files.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-files.php
 echo "<?php header(\"Location: http://fossil.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-fossil.php
+echo "<?php header(\"Location: http://ldap.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-ldap.php
 echo "<?php header(\"Location: http://net2ftp.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-net2ftp.php
 echo "<?php header(\"Location: http://repo.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-repo.php
 echo "<?php header(\"Location: http://sql.${guruURI}\"); die(); ?>" > /var/www/html/guru/index-sql.php
@@ -78,6 +88,7 @@ if [ ! -e guru.cgi ]; then cp -r 0ne guru.cgi; fi
 if [ ! -e guru.ftp ]; then cp -r 0ne guru.ftp; fi
 if [ ! -e guru.files ]; then cp -r 0ne guru.files; fi
 if [ ! -e guru.fossil ]; then cp -r 0ne guru.fossil; fi
+if [ ! -e guru.ldap ]; then cp -r 0ne guru.ldap; fi
 if [ ! -e guru.net2ftp ]; then cp -r 0ne guru.net2ftp; fi
 if [ ! -e guru.repo ]; then cp -r 0ne guru.repo; fi
 if [ ! -e guru.sql ]; then cp -r 0ne guru.sql; fi
@@ -105,7 +116,7 @@ if [ ! -e kiwi.studio ]; then cp -r 0ne kiwi.studio; fi
 if [ ! -e kiwi.voip ]; then cp -r 0ne kiwi.voip; fi
 if [ ! -e kiwi.webrtc ]; then cp -r 0ne kiwi.webrtc; fi
 if [ ! -e pink ]; then cp -r 0ne pink
-echo "<?php header(\"Location: http://${inkURI}\"); die(); ?>" > /var/www/html/rocks/index-pink.php
+echo "<?php header(\"Location: http://${inkURI}\"); die(); ?>" > /var/www/html/pink/index-pink.php
 fi
 if [ ! -e red ]; then cp -r 0ne red
 echo "<?php header(\"Location: http://act.${redURI}\"); die(); ?>" > /var/www/html/red/index-act.php
@@ -173,11 +184,8 @@ echo "<?php header(\"HTTP/1.1 301 Moved Permanently\"); header(\"Location: http:
 fi
 
 # Own
-## Check to see if web service is installed
-if [ $(grep -c '^www-data:' /etc/passwd) = 1 ]; then
-## Own all the html/ dirs
 chown -R www-data:www-data /var/www/html
-fi
+
 # Finish
 echo "Done. Except for any installed apps, Verber html folders have been set to original setup state."
 

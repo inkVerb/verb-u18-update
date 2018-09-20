@@ -11,3 +11,4 @@ set -e
 DBASE=$1
 
 mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf ${DBASE} < ${DBASE}.sql
+

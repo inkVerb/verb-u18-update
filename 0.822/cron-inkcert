@@ -1,0 +1,3 @@
+# This is an example of a script in a file like this added via: crontab FILE
+# This is not currently used, but would run the following script every day at 3:33 A.M.
+33 3 * * * root /var/local/verb/configs/inkcert/inkcertle-renew-all.sh

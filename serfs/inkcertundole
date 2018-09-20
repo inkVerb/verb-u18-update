@@ -17,7 +17,7 @@ set -e
 DOMAIN=$1
 
 # Check variables
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 

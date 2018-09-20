@@ -35,7 +35,7 @@ ICMACHINE="$2"
 ADDMACHINE="$(echo ${ICMACHINE} | sed 's/_/\./g')"
 SCRMACHINE="$(echo ${ICMACHINE} | sed 's/\./_/g')"
 ADDCLIENTNAME="${ADDUSER}_${SCRMACHINE}"
-if [ -z "$3" ]; then
+if [ -z ${3} ]; then
 ADDIP="NOT_SET"
 else
 ADDIP="$3"
@@ -80,6 +80,7 @@ CLIENTPORT=\"${ADDLOGINPORT}\"
 
 # Create the IVapp user
 /var/local/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrk
+wait
 
 # Create the inkNet Client tool links
 ln -sfn /var/local/verb/tools/vrker /var/local/ivapp/inknet/vrker/${ADDUSERNAME}/tools

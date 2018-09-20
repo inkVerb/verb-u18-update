@@ -16,14 +16,13 @@ PFAPASS=$1
 . /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpath
 
-# Download and unzip
+# Download and unpack
 cd /var/www/email
-/var/local/verb/serfs/inkget postfixadmin.current
 if [ -d /var/www/email/postfixadmin.vbak ]; then
 rm -rf /var/www/email/postfixadmin.vbak; fi
 mv /var/www/email/postfixadmin /var/www/email/postfixadmin.vbak
-unzip postfixadmin.current.zip
-rm -f postfixadmin.current.zip
+/var/local/verb/serfs/inkget postfixadmin; wait
+/var/local/verb/serfs/vtxzout postfixadmin; wait
 
 # Set the templates_c dir
 mkdir -p /var/www/email/postfixadmin/templates_c
@@ -32,7 +31,7 @@ mkdir -p /var/www/email/postfixadmin/templates_c
 cp /var/www/email/postfixadmin.vbak/config.local.php /var/www/email/postfixadmin/config.local.php
 
 # Copy the branding files
-cp /var/local/verb/configs/conflab/email/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
+cp /var/local/verb/configs/conflab/vmail/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
 
 # Own
 chown -R www-data:www-data /var/www/email/postfixadmin
@@ -50,7 +49,7 @@ echo "
 Postfix Admin update complete.
 
 IF... you don't have an administrator, run Setup at:
- https://boxes.${emailTLDURI}/${SITEPFAPATH}/setup.php
+ https://pfa.${emailTLDURI}/${SITEPFAPATH}/setup.php
 - You must create your own password on the Setup page, then add it via: setpfapass
 - Go back to the Setup page and finish the process.
 - Then run ./postinstallpfa
@@ -59,10 +58,10 @@ IF... you don't have an administrator, run Setup at:
 
 IMPORTANT:
 Now, you NEED to run the database upgrade at:
- https://boxes.${emailTLDURI}/${SITEPFAPATH}/upgrade.php
+ https://pfa.${emailTLDURI}/${SITEPFAPATH}/upgrade.php
 - Then run ./postinstallpfa
 - Then login at:
- https://boxes.${emailTLDURI}/${SITEPFAPATH}
+ https://pfa.${emailTLDURI}/${SITEPFAPATH}
 
 ...That's it.
 If all works well, you may delete the backup wtih updatepfarmvbak before updating again.
@@ -74,7 +73,7 @@ echo "
 Postfix Admin update complete.
 
 IF... you don't have an administrator, run Setup at:
- https://boxes.${emailTLDURI}/${SITEPFAPATH}/setup.php
+ https://pfa.${emailTLDURI}/${SITEPFAPATH}/setup.php
 - Use the install password 'inkverb77'
 - Then run ./postinstallpfa
 
@@ -82,10 +81,10 @@ IF... you don't have an administrator, run Setup at:
 
 IMPORTANT:
 Now, you NEED to run the database upgrade at:
- https://boxes.${emailTLDURI}/${SITEPFAPATH}/upgrade.php
+ https://pfa.${emailTLDURI}/${SITEPFAPATH}/upgrade.php
 - Then run ./postinstallpfa
 - Then login at:
- https://boxes.${emailTLDURI}/${SITEPFAPATH}
+ https://pfa.${emailTLDURI}/${SITEPFAPATH}
 
 ...That's it.
 If all works well, you may delete the backup wtih updatepfarmvbak before updating again.

@@ -18,7 +18,7 @@ exit 0; fi
 
 # Check to see if "fixhttps" has already been added
 if grep -q "##INKHTTPSFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
-service apache2 reload
+apache2ctl graceful
 	echo "${DOMAIN} already has the https fix. The server was just reloaded so the site should work."
 else
  if [ -f "/etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed" ]; then
@@ -33,6 +33,15 @@ sed -i '/^##inkHTTPstart/,/^##inkHTTPstop/{/^##inkHTTPstart/!{/^##inkHTTPstop/!d
 sed -i '/##inkHTTPstart/d' /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i 's/##inkHTTPstop/##inkHTTPremoved/' /etc/apache2/sites-available/${DOMAIN}.conf
 ### Add the new lines
+#### WordPress?
+if -d /var/www/vapps/wp.${DOMAIN}; then
+sed -i "/WP_SITEURL/d" /var/www/vapps/wp.${DOMAIN}/wp-config.php
+sed -i "/WP_HOME/d" /var/www/vapps/wp.${DOMAIN}/wp-config.php
+echo "define( 'WP_SITEURL', 'https://${DOMAIN}' );
+define( 'WP_HOME', 'https://${DOMAIN}' );" >> /var/www/vapps/wp.${DOMAIN}/wp-config.php
+fi
+
+#### Apache
 echo "
 
 ##INKHTTPSFIX=fixed
@@ -42,7 +51,7 @@ echo "
                Redirect permanent / https://${DOMAIN}/
        </VirtualHost>
 ##verbFIXhttps" >> /etc/apache2/sites-available/${DOMAIN}.conf
-service apache2 reload
+apache2ctl graceful
 	echo "${DOMAIN} now redirects all http traffic to SSL-secure https."
 fi
 

@@ -35,11 +35,11 @@ exit 0
 fi
 
 # Auto database
-if [ -z $4 ]; then
+if [ -z ${4} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBUSER=${DBASE}; fi
 
 # Download and establish drupal in the server to the site inkblog
@@ -145,14 +145,14 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}
 
 # Reset all permissions
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
 
 # Set up the Apache config
 cp /var/local/verb/configs/site-files/conf/blog.${inkURI}.conf-october /etc/apache2/sites-available/blog.${inkURI}.conf
-service apache2 reload
+apache2ctl graceful
 ## inkCert SSL certs
 ### Not setup
 if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
@@ -162,11 +162,13 @@ fi
 if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-LE is already setup for ${inkURI}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertaddallle ${inkURI}
+wait
 fi
 ### inkCert-IC DONE
 if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertadd blog.${inkURI}
+wait
 fi
 
 # Set the site-wide inkblog config

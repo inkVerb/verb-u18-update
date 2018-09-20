@@ -1,0 +1,30 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This removes a subdomain A & AAAA records from an existing DNS record in the inkDNS zone file on this Verber
+
+# How to use:
+## ./inkdnskillsub [subdomain] [domain]
+
+
+DNSSUBDOM=$1
+DNSDOMAIN=$2
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Check if already added
+if ! grep -Fq "${DNSSUBDOM}.${DNSDOMAIN}" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db; then
+echo "The subdomain ${DNSSUBDOM} has not been added to ${DNSDOMAIN}. Use inkdnsaddsub to add it."
+exit 0; fi
+
+# Remove the record
+sed -i "/; Subdomain Records Added by inkDNS ${DNSSUBDOM}\.${DNSDOMAIN}/,+2d" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+
+# Set the Serial No
+/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Finish
+echo "The subdomain ${DNSSUBDOM} has been removed from the ${DNSDOMAIN} DNS zone file."
+

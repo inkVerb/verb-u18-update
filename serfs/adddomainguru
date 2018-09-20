@@ -11,3 +11,4 @@ set -e
 OLDDOMAIN=$1
 
 ln -s /var/www/domains/${OLDDOMAIN} /srv/guru/_domains/${OLDDOMAIN}
+

@@ -2,7 +2,7 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This installs the inkCert SSL certificare service
+# This installs the inkCert SSL certificate service
 ## Currently, inkCert uses letsencrypt for main websites with options for "inkCert proper", the non-standard inkVerb CA service.
 ## To use letsencrypt for websites, run -le variants of inkcert- serfs, such as inkcertdole
 
@@ -35,12 +35,7 @@ ln -sfn /etc/inkcert/req /var/www/guru/
 cp /var/local/verb/configs/inkcert/verber-openssl.cnf /etc/inkcert/client/openssl.cnf
 
 # Set configs
-sed -i "s/INKCERTINSTALLED=NOT_YET/INKCERTINSTALLED=DONE/g" /var/local/verb/configs/inkcert/inkcertstatus
-
-## Set up the symlink and cronjob
-if [! -f /etc/cron.daily/inkcert-renew-all.sh ]; then
-ln -sfn /var/local/verb/configs/inkcert/inkcert-renew-all.sh /etc/cron.weekly/
-fi
+sed -i "s/INKCERTINSTALLED=\"NOT_YET\"/INKCERTINSTALLED=\"DONE\"/g" /var/local/verb/configs/inkcert/inkcertstatus
 
 # Finish
 echo "

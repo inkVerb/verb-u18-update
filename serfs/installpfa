@@ -10,7 +10,7 @@ set -e
 ## ./installpfa [path folder] [secure option]
 ### PostfixAdmin setup secure option: use "secure" for a password required, otherwise anything else including empty
 
-# Eg: (To use at boxes.NAME.verb.email/mysecretpath do:)
+# Eg: (To use at pfa.NAME.verb.email/mysecretpath do:)
 ## ./installpfa mysecretpath
 ## ./installpfa mysecretpath secure
 
@@ -21,70 +21,82 @@ set -e
 . /var/local/verb/configs/sitemailpass
 . /var/local/verb/configs/sitemailpath
 
-# Check to see if already installed
+# Check dependencies and to see if already installed
+if [ ${SITEMAILSTATUS} != "VMAIL_SERVER" ]; then
+echo "
+The email server must be installed first. Run: installpostfix
+"
+exit 22; fi
 if [ ${SITEPFAPATH} = "PFA_NOT_ALLOWED" ]; then
 echo "
 This is a backup email server and PostfixAdmin is not allowed.
 "
-exit 0
-fi
+exit 0; fi
 if [ ${SITEPFAPATH} != "PFA_NOT_INSTALLED" ]; then
 echo "
 PostfixAdmin is already installed.
 "
-exit 0
-fi
+exit 0; fi
+if grep -Fq "Webmail Defaults" /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db; then
+echo "Proceeding..."; else
+echo "
+Webmail Defaults already declared in the DNS zone file. This won't work.
+"
+exit 22; fi
 
 PFAFOLDER=$1
 PFAPASS=$2
 
 # Download from repo
 cd /var/www/email
-/var/local/verb/serfs/inkget postfixadmin.current
-unzip postfixadmin.current.zip
-rm -f postfixadmin.current.zip
+/var/local/verb/serfs/inkget postfixadmin; wait
+rm -rf postfixadmin
+/var/local/verb/serfs/vtxzout postfixadmin; wait
+## Fix a bug
+mkdir -p /var/www/email/postfixadmin/templates_c
 
 # Settings
 ## Whether secure or standard password
 ### If using 'secure', you must set the hash via pfapass
 if [ "${PFAPASS}" != "secure" ]
 then
-    cp /var/local/verb/configs/conflab/email/postfixadmin/postfixadmin286-config.inc.php /var/www/email/postfixadmin/config.local.php
+    cp /var/local/verb/configs/conflab/vmail/postfixadmin/postfixadmin286-config.inc.php /var/www/email/postfixadmin/config.local.php
 fi
 
 if [ "${PFAPASS}" = "secure" ]
 then
-    cp /var/local/verb/configs/conflab/email/postfixadmin/postfixadmin286-secure-config.inc.php /var/www/email/postfixadmin/config.local.php
+    cp /var/local/verb/configs/conflab/vmail/postfixadmin/postfixadmin286-secure-config.inc.php /var/www/email/postfixadmin/config.local.php
 fi
 
-# Write the config
-sed -i "s/SITEPFAPATH.*/SITEPFAPATH=${PFAFOLDER}/g" /var/local/verb/configs/sitemailpath
-
 # Settings
-sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/postfixadmin/config.inc.php
-sed -i "s/nameURI286/${nameURI}/g" /var/www/email/postfixadmin/config.inc.php
-sed  -i "s/mailpassword/mailpass${SITEMAILPASSAPG}/g" /var/www/email/postfixadmin/config.inc.php
-sed  -i "s/rcfolder286/${SITERCPATH}/g" /var/www/email/postfixadmin/config.inc.php
-sed  -i "s/pfafolder286/${PFAFOLDER}/g" /var/www/email/postfixadmin/config.inc.php
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/nameURI286/${nameURI}/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/mailpassword/mailpass${SITEMAILPASSAPG}/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/rcfolder286/${SITERCPATH}/g" /var/www/email/postfixadmin/config.local.php
+sed -i "s/pfafolder286/${PFAFOLDER}/g" /var/www/email/postfixadmin/config.local.php
 
 # Copy the branding files
-cp /var/local/verb/configs/conflab/email/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
+cp /var/local/verb/configs/conflab/vmail/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
 
 ### Should be depreciated after fixed in source
 # Fix the bad password message
-sed -i "s/Your password must contain at least %s character(s)/Your password must contain at least %s letters (A-Z, a-z)/g" /var/local/verb/configs/conflab/email/postfixadmin/languages/*
+sed -i "s/Your password must contain at least %s character(s)/Your password must contain at least %s letters (A-Z, a-z)/g" /var/www/email/postfixadmin/languages/*
 
 # Set Apache
-cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.boxes
-ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.boxes/${PFAFOLDER}
-chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.boxes
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.pfa
+ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.pfa/${PFAFOLDER}
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.pfa
 chown -R www-data:www-data /var/www/email/postfixadmin
-a2ensite boxes.${emailTLDURI}
-service apache2 reload
+sed -i "s/; Webmail Defaults/; Webmail Defaults\npfa\.${emailTLDURI}\.\tIN  A\t\t${SITEIP}\npfa\.${emailTLDURI}\.\tIN  AAAA\t${SITEIPV6}/" /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db
+a2ensite pfa.${emailTLDURI}
+apache2ctl graceful
+
+# Write the config
+sed -i "s/SITEPFAPATH.*/SITEPFAPATH=\"${PFAFOLDER}\"/g" /var/local/verb/configs/sitemailpath
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, boxes.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
+sed -i "/^domains =/ s/$/, pfa.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Finished
 if [ "${PFAPASS}" = "secure" ]
@@ -102,7 +114,7 @@ For setup, note:
   - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
 
 Set up all this at:
- https://boxes.${emailTLDURI}/${PFAFOLDER}/setup.php
+ https://pfa.${emailTLDURI}/${PFAFOLDER}/setup.php
 
 - Then run ./postinstallpfa
 "
@@ -110,7 +122,8 @@ exit 0
 fi
 
 echo "
-Everything looks good.
+Postfix Admin is installed and ready to be set up.
+
 For setup, note:
 - Use the install password 'inkverb77'
 - Use any email you want admin, the admin password must include two numbers and two letters
@@ -118,8 +131,9 @@ For setup, note:
   - Add the domain: ${nameURI}
   - Create a user, such as me@${nameURI} etc
   - Use this new email and password to test the IMAP/SMTP connection in the third step of this next (webmail) setup process
+
 Set up all this at:
- https://boxes.${emailTLDURI}/${PFAFOLDER}/setup.php
+ https://pfa.${emailTLDURI}/${PFAFOLDER}/setup.php
 - Then run ./postinstallpfa
 "
 

@@ -1,0 +1,32 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This adds a subdomain A & AAAA records to an existing DNS record in the inkDNS zone file on this Verber
+
+# How to use:
+## ./inkdnsaddsub [subdomain] [domain]
+
+
+DNSSUBDOM=$1
+DNSDOMAIN=$2
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Check if already added
+if grep -Fq "${DNSSUBDOM}.${DNSDOMAIN}" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db; then
+echo "The subdomain ${DNSSUBDOM} has already been added to ${DNSDOMAIN}. Use inkdnskillsub to remove it."
+exit 0; fi
+
+# Echo the record
+echo "; Subdomain Records Added by inkDNS ${DNSSUBDOM}\.${DNSDOMAIN}" >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+echo "${DNSSUBDOM}\.${DNSDOMAIN}\tIN  A\t\t${SITEIP}" >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+echo "${DNSSUBDOM}\.${DNSDOMAIN}\tIN  AAAA\t\t${SITEIPV6}" >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+
+# Set the Serial No
+/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Finish
+echo "The subdomain ${DNSSUBDOM} has been added to the ${DNSDOMAIN} DNS zone file."
+

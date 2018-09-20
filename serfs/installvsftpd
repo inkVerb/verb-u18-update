@@ -54,11 +54,11 @@ usermod -d /srv/vsftpd/ftp ftp
 
 # Start the service
 ## This is expirimental
-service vsftpd start
+systemctl start vsftpd
 
 # Restart
 ## Former is commented, new is expirimental and may be redundant
-service vsftpd restart
+systemctl reload vsftpd
 #restart vsftpd
 
 # Set the firewall to allow the site port

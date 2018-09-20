@@ -2,9 +2,9 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This unzips the certificates from the CA and moves files where they need to go
-## The .zip file produced by inkCert's Intermediate CA should be uploaded to /etc/inkcert/req/. Links to this folder are in verb/req and guru/req for convenience.
-## In case you did not get your certificate from inkCert, the .zip file contains a DOMAIN folder and it's contents look like this:
+# This unpacks the certificates from the CA and moves files where they need to go
+## The .ict file produced by inkCert's Intermediate CA should be uploaded to /etc/inkcert/req/. Links to this folder are in verb/req and guru/req for convenience.
+## In case you did not get your certificate from inkCert, the .ict file contains a DOMAIN folder and it's contents look like this:
 ### DOMAIN/DOMAIN.cert.pem
 ### DOMAIN/interm.inkcert.cert.pem
 ### DOMAIN/ca.inkcert.cert.pem
@@ -12,15 +12,16 @@ set -e
 ## Only .pem files are acceptable
 
 # How to use:
-## ./inkcertaddkeyset [domain.tld]
+## ./inkcertaddkeyset [domain.tld] [req.domain.tld.filename.ict]
 
 DOMAIN=$1
-ZIPFILENAME=$2
+ICTFILENAME=$2
 
-# Unzip the file
+# Unpack the file
 cd /etc/inkcert
-unzip req/${ZIPFILENAME}
-rm -f req/${ZIPFILENAME}
+mv ${ICTFILENAME} ${DOMAIN}.vtxz
+/var/local/verb/serfs/vtxzout ${DOMAIN}
+mv ${DOMAIN} req/
 
 # Move files in place
 mkdir /etc/inkcert/live/${DOMAIN}

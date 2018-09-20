@@ -1,0 +1,26 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This removes an existing domain inkDNS zone file from this Verber
+
+# How to use:
+## ./inkdnskilldomain [domain]
+
+
+DNSDOMAIN=$1
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Check if added
+if [ -e "/var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db" ]; then
+echo "The domain ${DNSDOMAIN} zone file has not been created. Use inkdnsadddomain to add it."
+exit 0; fi
+
+# Remove the record
+rm -f /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+
+# Finish
+echo "${DNSDOMAIN} DNS zone file removed."
+

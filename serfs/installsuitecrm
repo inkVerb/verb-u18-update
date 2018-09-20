@@ -22,7 +22,7 @@ CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
-if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
+if [ -f /var/local/verb/configs/vapp.${CVAPPNAME} ]; then
 echo "This is already installed."
 exit 0; fi
 ## Directory
@@ -31,11 +31,11 @@ echo "SuiteCRM already exists in the system. If it isn't working, look deeper on
 exit 22; fi
 
 # Auto database
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DBUSER=${DBASE}; fi
 
 # Include the config file
@@ -45,9 +45,8 @@ DBUSER=${DBASE}; fi
 
 # Download and unpack the latest checked version from inkisaverb.com/repo
 cd /var/www/vapps
-/var/local/verb/serfs/inkget ${CVAPPNAME}.current
-unzip ${CVAPPNAME}.current.zip
-rm -f ${CVAPPNAME}.current.zip
+/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
+/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
 cd /var/www/html
 rm -rf red.crm
 ln -s /var/www/vapps/${CVAPPNAME} /var/www/html/red.crm
@@ -64,7 +63,7 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}
 
 echo "These are setup:
 

@@ -11,5 +11,6 @@ set -e
 # Include the configs
 . /var/local/verb/configs/sitenameip
 
-rm -f /var/www/guru/*.vbak.zip
-rm -f /var/www/html/${SITETLD}/*.vbak.zip -f
+rm -f /var/www/guru/*.vbak
+rm -f /var/www/html/${SITETLD}/*.vbak -f
+

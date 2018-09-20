@@ -16,6 +16,7 @@ OLDDOMAIN=$2
 if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN} ]; then
 echo "The shell for ${OLDDOMAIN} does not exist yet. Creating it..."
 /var/local/verb/serfs/newdomainshell ${OLDDOMAIN}
+wait
 fi
 
 # Check if it already exists
@@ -36,8 +37,13 @@ cp -rf /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${SUBDO
 ln -s /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN} /var/www/html/
 chown -R www-data:www-data /var/www/html/${SUBDOMAIN}.${OLDDOMAIN}
 chown -R www-data:www-data /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
+chmod -R 755 /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
 a2ensite ${SUBDOMAIN}.${OLDDOMAIN}
-service apache2 reload
+apache2ctl graceful
+
+# inkDNS
+/var/local/verb/serfs/inkdnsaddsub ${SUBDOMAIN} ${OLDDOMAIN}
+wait
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line

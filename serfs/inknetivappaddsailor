@@ -11,7 +11,8 @@
 ADDINIVSAILOR=$1
 
 # Add the user
-/var/local/verb/donjon/ivappaddsailor ${ADDINIVSAILOR} /var/local/verb/configs/inknet/ivinknet-sail.conf
+/var/local/verb/donjon/ivapp/ivappaddsailor ${ADDINIVSAILOR} /var/local/verb/configs/inknet/ivinknet-sail.conf
+wait
 
 # Create the inkNet Client tool links
 rm -rf /var/local/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools

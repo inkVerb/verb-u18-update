@@ -33,7 +33,7 @@ set -e
 NEWPORT=$1
 
 sed -i "s/Port.*/Port ${NEWPORT}/g" /etc/ssh/sshd_config
-sed -i "s/SITEPORT.*/SITEPORT=${NEWPORT}/g" /var/local/verb/configs/siteport
+sed -i "s/SITEPORT.*/SITEPORT=\"${NEWPORT}\"/g" /var/local/verb/configs/siteport
 ufw allow ${NEWPORT}
 # Deny the previous port from the config file which has been written, but not yet refreshed
 ufw deny ${SITEPORT}

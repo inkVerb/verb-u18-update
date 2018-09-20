@@ -53,7 +53,7 @@ exit 0
 fi
 
 if [ "${INKCERTED}" = "DONE_LE" ]; then
- if [ $2 = "r" ]; then
+ if [ "$2" = "r" ]; then
 echo "Refreshing Let's Encrypt certs to include any subdomains of ${DOMAIN} since the last renewal. Don't do this too often."
  else
 echo "inkCert is already setup for ${DOMAIN} with Letsencrypt.
@@ -142,19 +142,22 @@ if [ "${DOMAIN}" = "${unoURI}" ]; then
 fi
 
 # Stop Apache
-apachectl -k graceful-stop
-## Hard stop in case it doesn't work
-service apache2 stop
+apache2ctl graceful-stop; wait
+systemctl stop apache2; wait
 
 # Get the certs
-## the --quiet / -q option doesn't seem to work
+##NOTE make the system wait before and after Letsencrypt because sometimes LE can stumble over it's own feet.
+sleep 1
 letsencrypt certonly --standalone --expand --keep-until-expiring -c /var/local/verb/configs/inkcert/cli-ini/cli.${DOMAIN}.ini
+sleep 1
+# the --quiet / -q option doesn't seem to work
 # Additional options if not doing certonly: --no-redirect --no-hsts --no-uir
 # https://certbot.eff.org/docs/using.html#command-line
 # https://certbot.eff.org/#ubuntuxenial-apache
 
 # Turn Apache on again
-service apache2 start
+#apache2ctl start; wait
+systemctl start apache2; wait
 
 # Verify the certs
 if [ ! -d /etc/inkcert/le/live/${DOMAIN} ]; then

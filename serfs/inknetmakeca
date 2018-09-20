@@ -63,6 +63,7 @@ if [ "${INKCERTINSTALLED}" = "NOT_YET" ]; then
 echo "inkCert not yet installed. Installing now...
 "
 /var/local/verb/serfs/inkcertinstall
+wait
 fi
 
 # Set based on web directory and Apache status
@@ -88,18 +89,22 @@ else
   rm -f /etc/apache2/sites-available/${NEWCAHOST}.conf; fi
   if [ -e /etc/apache2/sites-enabled/${NEWCAHOST}.conf ]; then
   rm -f /etc/apache2/sites-enabled/${NEWCAHOST}.conf; fi
- /var/local/verb/serfs/addsubdomain ${SITEHOST} ${nameURI}
+  /var/local/verb/serfs/addsubdomain ${SITEHOST} ${nameURI}
+  wait
 ### Set up SSL certs based on situation
 #### If not done
   if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
   echo "Need SSL certs for ${NEWCAURI}. Getting via inkCert-LE (Letsencrypt)..."
   /var/local/verb/serfs/inkcertdole ${NEWCAURI}
+  wait
   fi
 #### If domain is already done via inkCert-LE
   if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
   echo "Need to update inkCert-LE (Letsencrypt) SSL certs for ${NEWCAURI} to include ${SITEHOST}.${NEWCAURI}..."
   /var/local/verb/serfs/inkcertreqle ${NEWCAURI} r
+  wait
   /var/local/verb/serfs/inkcertaddallle ${NEWCAURI}
+  wait
   fi
 #### If domain is handled via inkCert Proper
   if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWCAURI}; then
@@ -169,8 +174,8 @@ echo "HostKey /etc/ssh/inknet/in_cav_${NEWCANAME}_key" >> /etc/ssh/sshd_config
 echo "HostCertificate /etc/ssh/inknet/in_cav_${NEWCANAME}_key-cert.pub" >> /etc/ssh/sshd_config
 
 # Reload SSH services
-service ssh restart
-service sshd restart
+systemctl reload ssh
+systemctl reload sshd
 
 # Write the CA inkNet configs
 echo "#!/bin/sh

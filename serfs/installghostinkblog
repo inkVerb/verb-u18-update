@@ -24,7 +24,7 @@ EMAILUSER=$1
 EMAILPASS=$2
 
 # Basic credential check
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 echo "You need to set two variables (email and password) to install Ghost to a domain. See \"How to use\" in the serf."
 exit 55
 fi
@@ -68,7 +68,7 @@ echo "Ghost" > /var/www/html/ink.blog
 ## Set the IP address in the Apache config file
 cp /var/local/verb/configs/site-files/conf/blog.${inkURI}.conf-ghost /etc/apache2/sites-available/blog.${inkURI}.conf
 sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/blog.${inkURI}.conf
-service apache2 reload
+apache2ctl graceful
 ## inkCert SSL certs
 ### Not setup
 if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
@@ -78,11 +78,13 @@ fi
 if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-LE is already setup for ${inkURI}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertaddallle ${inkURI}
+wait
 fi
 ### inkCert-IC DONE
 if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
 /var/local/verb/serfs/inkcertadd blog.${inkURI}
+wait
 fi
 
 # Make it a service at startup
@@ -94,7 +96,7 @@ sed -i "s/INKblog=.*/INKblog=\"Ghost\"/g" /var/local/verb/configs/siteinstallsta
 # Write the config for backup
 echo "#!/bin/sh
 GHOSTEMAIL=\"${EMAILUSER}\"
-GHOSTEMLPAS=\"${EMAILPASS}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+GHOSTEMLPAS=\"${EMAILPASS}\"" > /var/local/verb/configs/vapp.${CVAPPNAME}
 
 ### Below (Forever) is expirimental on inkVerb, but working, and should be replaced with a way to run Ghost as a proper service at startup
 # Run Ghost with Forever

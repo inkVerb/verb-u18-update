@@ -12,9 +12,8 @@ set -e
 . /var/local/verb/configs/sitenameip
 
 cd /guru/fossil/
-/var/local/verb/serfs/inkget fossil.current
-unzip fossil.current.zip
-rm -f fossil.current.zip
+/var/local/verb/serfs/inkget fossil; wait
+/var/local/verb/serfs/vtxzout fossil; wait
 chmod +x /guru/fossil/fossil
 apt remove -y fossil
 mv /guru/fossil/fossil /usr/bin

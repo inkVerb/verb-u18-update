@@ -15,7 +15,7 @@ set -e
 
 # Include the configs
 . /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/verbapp.${APPNAME}
+. /var/local/verb/configs/vapp.${APPNAME}
 
 APPNAME=$1
 
@@ -26,7 +26,7 @@ DROP USER ${APPDDBUSR}@localhost;
 FLUSH PRIVILEGES;"
 
 # Kill the config
-rm -f /var/local/verb/configs/verbapp.${APPNAME}
+rm -f /var/local/verb/configs/vapp.${APPNAME}
 
 # Kill the directories
 rm -rf /var/www/vapps/${APPNAME}

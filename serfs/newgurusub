@@ -22,7 +22,7 @@ sed -i "s/guruURI286/${guruURI}/g" /etc/apache2/sites-available/${NEWUNOSUB}.${u
 cp -R /var/local/verb/configs/site-files/newgurusubdir /var/www/guru/_subs.guru/${NEWGURUSUB}
 chown -R www-data:www-data /var/www/guru/_subs.guru/${NEWGURUSUB}
 a2ensite ${NEWGURUSUB}.${guruURI}
-service apache2 reload
+apache2ctl graceful
 cp /var/www/html/guru/index-newgurusub.php /var/www/html/guru/index-${NEWGURUSUB}.php
 chown -R www-data:www-data /var/www/html/guru
 

@@ -1,0 +1,46 @@
+#!/bin/sh
+#inkVerb! repo donjon dragon, verb.ink
+set -e
+
+# This updates the Ampache repo package
+
+# How to use:
+## ./ampache.updaterepo
+
+
+CVAPPNAME=ampache
+# Include the repo versions
+. /var/local/verb/configs/inklists/repoverlist
+DISTVER="${ampache}"
+
+# Announce
+echo "Updating the Ampache package to v${DISTVER}..."
+cd /var/local/verb/repo
+
+# Get the package
+curl -LO https://github.com/ampache/ampache/releases/download/${DISTVER}/ampache-${DISTVER}_all.zip
+## Check the hash
+CHECKSHA=$(shasum -a 256 ampache-${DISTVER}_all.zip)
+if [ "${CHECKSHA}" = "${ampachesha} ampache-${DISTVER}_all.zip" ]; then
+echo "Download checks out."
+else
+echo "SHA check failed. The downloaded file is not what was expected. Did you set both the Ampache version AND the Ampache SHA per instructions?"
+exit 44
+fi
+
+# Set it as the new package
+rm -f ${CVAPPNAME}.legacy.vtxz
+touch ${CVAPPNAME}.vtxz
+mv ${CVAPPNAME}.vtxz ${CVAPPNAME}.legacy.vtxz
+mkdir ${CVAPPNAME}
+mv ampache-${DISTVER}_all.zip ${CVAPPNAME}
+cd ${CVAPPNAME}
+unzip ampache-${DISTVER}_all.zip
+rm ampache-${DISTVER}_all.zip
+cd ..
+/var/local/verb/serfs/vtxzin ${CVAPPNAME}; wait
+rm -rf ${CVAPPNAME}
+
+# Finish
+echo "Done. This repo now has Ampache v${DISTVER}."
+

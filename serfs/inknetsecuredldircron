@@ -30,8 +30,10 @@ echo "#!/bin/sh
 find /var/www/html/${IAMCAHOST}/inknet/* -type d -mmin +30 -exec rm -rf {} \;
 " > /var/local/verb/configs/inknet/inknetrmcertdldirs.sh
 chmod +x /var/local/verb/configs/inknet/inknetrmcertdldirs.sh
-echo "14,44 * * * * root /var/local/verb/configs/inknet/inknetrmcertdldirs.sh" >> /var/local/verb/configs/verbcron
+echo "14,44 * * * * root /var/local/verb/configs/inknet/inknetrmcertdldirs.sh > /dev/null 2>&1" >> /var/local/verb/configs/verbcron
 cp -f /var/local/verb/configs/verbcron /etc/cron.d/verber
+#chmod 644 /etc/cron.d/verber
+chmod 755 /etc/cron.d/verber
 
 # Finish
 echo "This server is now keeping the web inknet/ folder cleaned at 14 and 44 minutes past each hour."

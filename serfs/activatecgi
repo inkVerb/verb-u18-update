@@ -2,7 +2,7 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This activates the cgi....verb.guru folder so it the web will give an index
+# This activates the cgi....verb.guru folder so the web will provide an index
 
 # How to use:
 ## ./activatecgi [on/off]
@@ -32,7 +32,7 @@ fi
 if [ "$1" = "on" ]
 then
     rm -rf /var/www/html/guru.cgi
-    ln -s /var/www/guru/cgi /var/www/html/guru.cgi
+    ln -sfn /var/www/guru/cgi /var/www/html/guru.cgi
     echo "cgi on."
 exit 0
 fi
@@ -44,3 +44,4 @@ then
     echo "cgi off."
 exit 0
 fi
+

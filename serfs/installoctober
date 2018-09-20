@@ -25,7 +25,7 @@ CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
-if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN} ]; then
+if [ -f /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN} ]; then
 echo "This is already installed."
 exit 0; fi
 ## Directory
@@ -35,16 +35,16 @@ exit 22; fi
 
 
 # Options
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You must designate a domain."
 exit 22; fi
 
 # Auto database
-if [ -z $4 ]; then
+if [ -z ${4} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DBASE=oct$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 6); fi
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBUSER=${DBASE}; fi
 
 # Include the config file
@@ -154,7 +154,7 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Reset all permissions
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}

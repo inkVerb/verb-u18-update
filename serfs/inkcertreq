@@ -52,7 +52,7 @@ fi
 # Include and check the inkCert domain config
 . /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
 if [ "${INKCERTED}" = "DONE_IC" ]; then
- if [ $2 = "r" ]; then
+ if [ "$2" = "r" ]; then
 echo "Refreshing inkCert Proper certs to include any subdomains of ${DOMAIN} since the last renewal. Don't do this too often."
  else
 

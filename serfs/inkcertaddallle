@@ -21,17 +21,18 @@ SITEDOMAIN=$1
 CERTDOMAIN=$2
 
 # Check variables
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 
 # Set variable for same certificate as domain (most all scenarios)
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 CERTDOMAIN=$1
 fi
 
 # For the main domain first
 /var/local/verb/serfs/inkcertaddle ${SITEDOMAIN}
+wait
 
 # For any/all sub-domains
 cd /etc/apache2/sites-available
@@ -41,6 +42,7 @@ find . -name "*.${SITEDOMAIN}.conf"|while read findsitesubdomain; do
  sitesubdomain=$(basename ${findsitesubdomain} .conf)
 ## Run inkCertAddLE per site config
  /var/local/verb/serfs/inkcertaddle ${sitesubdomain} ${CERTDOMAIN}
+wait
 done
 
 # Finish

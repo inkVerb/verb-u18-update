@@ -8,8 +8,8 @@ set -e
 ## ./inkget [app repo name]
 
 # Eg:
-## ./inkget mediawiki.current
-## ./inkget owncloud.apps.current
+## ./inkget mediawiki
+## ./inkget nextcloud
 ## ./inkget wpbb
 
 
@@ -23,14 +23,27 @@ echo "inkNet is not setup, so no repo is available. Can't download the necessary
 exit 22
 fi
 
+# zjz
+if [ $INKGET_METHOD = "ZJZ" ]; then
+/var/local/verb/donjon/repoupdate/${APPNAME}.updaterepo; wait
+cp /var/local/verb/repo/${APPNAME}.vtxz .
+echo "Copied for install."
+ if [ $INKGET_REPO = "TEMP" ]; then
+rm /var/local/verb/repo/${APPNAME}.vtxz
+echo "Temp repo files cleaned-up."
+ else
+echo "Repo files kept."
+ fi
+fi
+
 # wget
 if [ $INKGET_METHOD = "USE_WGET" ]; then
-wget https://${INKGET_REPO}/repo/${APPNAME}.zip --no-check-certificate
+wget https://${INKGET_REPO}/repo/${APPNAME}.vtxz --no-check-certificate
 fi
 
 # inker
 if [ $INKGET_METHOD = "INKER_CP" ]; then
-cp /var/local/ink/repo/${APPNAME}.zip .
+cp /var/local/ink/repo/${APPNAME}.vtxz .
 fi
 
 ## DEV NOTE: Other secure methods are planned in the roadmap
@@ -40,7 +53,7 @@ fi
 
 
 # Exit if failed
-if [ ! -f ${APPNAME}.zip ]; then
+if [ ! -f ${APPNAME}.vtxz ]; then
 echo "Couldn't get the file! I quit."
 exit 44; fi
 

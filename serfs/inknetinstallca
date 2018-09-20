@@ -27,6 +27,7 @@ exit 0; fi
 if [ ! -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
 echo "...installing CA now..."
 /var/local/verb/serfs/inknetmakeca
+wait
 fi
 
 # Include the config
@@ -44,12 +45,15 @@ exit 0; fi
 
 # Create the first CA Verber/Inker self-signing master keys for the settings added in inknetmakeca
 /var/local/verb/serfs/inknetnewcaselfauthpubkey
+wait
 
 # Create the first host key on this CA Verber, for the settings added in inknetmakeca
 /var/local/verb/serfs/inknetnewcahostkey
+wait
 
 # Install ivApp
 /var/local/verb/serfs/inknetinstallivapp
+wait
 
 # Set the inkNet config
 sed -i "s/INKNETSTATUS=\"MADE_INSTALL_READY\"/INKNETSTATUS=\"INSTALLED\"/g" /var/local/verb/configs/inknet/ca.verber.cnf

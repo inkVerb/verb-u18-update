@@ -27,12 +27,12 @@ CERTDOMAIN=$2
 . /var/local/verb/configs/inkcert/inkcertstatus
 
 # Check variables
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 
 # Set variable for same certificate as domain (most all scenarios)
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 CERTDOMAIN=$1
 fi
 
@@ -79,8 +79,8 @@ sed -i "s/SSLCertificateFile/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/g" /etc
 sed -i "s/SSLCertificateKeyFile/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/g" /etc/apache2/sites-available/${SITEDOMAIN}.conf
 
 # Insert the inkCert certs
-sed -i "s/#INKVERB-INKCERT=INK_.*/#INKVERB-INKCERT=DONE_IC\n\t\tSSLCertificateFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.cert\.pem\n\t\tSSLCertificateKeyFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.key\.pem\n\t\tSSLCertificateChainFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.ca-chain\.cert\.pem/g" /etc/apache2/sites-available/${SITEDOMAIN}.conf
-service apache2 start
+sed -i "s/#INKVERB-INKCERT=INK_.*/#INKVERB-INKCERT=DONE_IC\n\t\tSSLCertificateFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.cert\.pem\n\t\tSSLCertificateKeyFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.key\.pem\n\t\tSSLCertificateChainFile\t\/etc\/inkcert\/live\/${CERTDOMAIN}\/${CERTDOMAIN}\.ca-chain\.cert\.pem\n\t\t#INKVERB-INKCERT-stop/" /etc/apache2/sites-available/${SITEDOMAIN}.conf
+apache2ctl start
 
 # Create the inkCert-DOMAIN config file
 echo "#!/bin/sh
@@ -89,12 +89,13 @@ INKCERTED=DONE_IC" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITED
 # inkCert status & exit
 if [ "${FIRSTINKCERTADD}" = "NOT_YET" ]; then
 ## Config status: first inkCert done
-sed -i "s/FIRSTINKCERTADD=NOT_YET/FIRSTINKCERTADD=DONE/g" /var/local/verb/configs/inkcert/inkcertstatus
+sed -i "s/FIRSTINKCERTADD=\"NOT_YET\"/FIRSTINKCERTADD=\"DONE\"/g" /var/local/verb/configs/inkcert/inkcertstatus
 ## Create the cron job
 ### Add inkCertLE's auto updater to the cron
-echo "3 3 * * * root /var/local/verb/configs/inkcert/inkcert-renew-all.sh" >> /var/local/verb/configs/verbcron
-### Set cron to run the verbcron
-cp /var/local/verb/configs/verbcron /etc/cron.d/verber
+##################inkcert-renew-all.sh DOES NOT EXIST YET!!! inkCert Proper has yet to be created!!
+#echo "3 3 * * * root /var/local/verb/configs/inkcert/inkcert-renew-all.sh > /dev/null 2>&1" >> /var/local/verb/configs/verbcron
+#cp -f /var/local/verb/configs/verbcron /etc/cron.d/verber
+#chmod 644 /etc/cron.d/verber
 fi
 
 # Finish

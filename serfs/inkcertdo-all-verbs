@@ -16,33 +16,32 @@ set -e
 . /var/local/verb/configs/sitetldstatus
 
 if [ $VERBemail=true ]; then
-/var/local/verb/serfs/inkcertdo ${emailURI}
-fi
+/var/local/verb/serfs/inkcertdo ${emailURI}; fi
+wait
 if [ $VERBone=true ]; then
-/var/local/verb/serfs/inkcertdo ${oneURI}
-fi
+/var/local/verb/serfs/inkcertdo ${oneURI}; fi
+wait
 if [ $VERBink=true ]; then
-/var/local/verb/serfs/inkcertdo ${inkURI}
-fi
+/var/local/verb/serfs/inkcertdo ${inkURI}; fi
+wait
 if [ $VERBblue=true ]; then
-/var/local/verb/serfs/inkcertdo ${blueURI}
-fi
+/var/local/verb/serfs/inkcertdo ${blueURI}; fi
+wait
 if [ $VERBguru=true ]; then
-/var/local/verb/serfs/inkcertdo ${guruURI}
-fi
+/var/local/verb/serfs/inkcertdo ${guruURI}; fi
+wait
 if [ $VERBkiwi=true ]; then
-/var/local/verb/serfs/inkcertdo ${kiwiURI}
-fi
+/var/local/verb/serfs/inkcertdo ${kiwiURI}; fi
+wait
 if [ $VERBpink=true ]; then
-/var/local/verb/serfs/inkcertdo ${pinkURI}
-fi
+/var/local/verb/serfs/inkcertdo ${pinkURI}; fi
+wait
 if [ $VERBred=true ]; then
-/var/local/verb/serfs/inkcertdo ${redURI}
-fi
+/var/local/verb/serfs/inkcertdo ${redURI}; fi
+wait
 if [ $VERBrocks=true ]; then
-/var/local/verb/serfs/inkcertdo ${rocksURI}
-fi
+/var/local/verb/serfs/inkcertdo ${rocksURI}; fi
+wait
 if [ $VERBuno=true ]; then
-/var/local/verb/serfs/inkcertdo ${unoURI}
-fi
+/var/local/verb/serfs/inkcertdo ${unoURI}; fi
 

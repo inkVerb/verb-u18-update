@@ -17,7 +17,7 @@ DOMAIN=$1
 
 # Check to see if "fixwww" has already been added
 if grep -q "##INKWWWFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
-service apache2 reload
+apache2ctl graceful
 	echo "${DOMAIN} already has the www subdomain fix. The server was just reloaded so the site should work."
 else
 
@@ -30,8 +30,15 @@ echo "
         ServerName www.${DOMAIN}
         Redirect permanent / http://${DOMAIN}/
         </VirtualHost>
+<IfModule mod_ssl.c>
+        <VirtualHost _default_:443>
+        ServerName www.${DOMAIN}
+        Redirect permanent / https://${DOMAIN}/
+        </VirtualHost>
+</IfModule>
+
 ##verbFIXwww" >> /etc/apache2/sites-available/${DOMAIN}.conf
-service apache2 reload
+apache2ctl graceful
 	echo "${DOMAIN} now has the www subdomain fix and is ready to go."
 fi
 

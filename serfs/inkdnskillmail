@@ -1,0 +1,29 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This removes the mail subdomain A & AAAA records in the inkDNS zone file on this Verber
+
+# How to use:
+## ./inkdnskillmail [domain]
+
+
+DNSDOMAIN=$1
+
+# Include the configs
+. /var/local/verb/configs/sitenameip
+
+# Check if already added
+if ! grep -Fq "; Hostname Mail Record Defaults" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db; then
+echo "Mail Record Defaults don't exist for ${DNSDOMAIN}. Use inkdnsaddmail to add them."
+exit 0; fi
+
+# Remove the records
+sed -i "/; Hostname Mail Record Defaults/,/;; End Mail Defaults/d" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+
+# Set the Serial No
+/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Finish
+echo "The Mail Record Defaults have been removed from the ${DNSDOMAIN} DNS zone file."
+

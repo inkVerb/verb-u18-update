@@ -1,0 +1,25 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+set -e
+
+# This sets a new serial number for an existing DNS record in the inkDNS zone file on this Verber
+
+# How to use:
+## ./inkdnsserial [domain]
+
+
+DNSDOMAIN=$1
+
+# Check if the zone file exists
+if [ ! -f "/var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db" ]; then
+echo "The domain ${DNSDOMAIN} has no DNS zone file. That comes first."
+exit 22; fi
+
+# Set the new serial
+## Create a timestamp-based serial number to the second (how inkVerb does it)
+SERNO="$(date '+%Y%m%d%H%M%S')\t\t; Serial No"
+## Set it in the file
+sed -i "/; Serial No/c ${SERNO}" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+## Ensure the time can increment beyond the timestamp by one second
+sleep 1
+

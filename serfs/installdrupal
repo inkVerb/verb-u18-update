@@ -32,7 +32,7 @@ CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
-if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN} ]; then
+if [ -f /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN} ]; then
 echo "This is already installed."
 exit 0; fi
 ## Directory
@@ -41,12 +41,12 @@ echo "That Drupal site already exists in the system. If it isn't working, look d
 exit 22; fi
 
 # Verify that a domain is specified
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You must designate a domain."
 exit 22; fi
 
 # Audo Drupal distro
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DD="CURRENT_INK_REPO"; fi
 
 # If Drupal version set to "current"
@@ -54,11 +54,11 @@ if [ "$2" = "current" ]; then
 DD="CURRENT_INK_REPO"; fi
 
 # Auto database
-if [ -z $5 ]; then
+if [ -z ${5} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBASE=drupal$(echo $CLEANNAME | cut -c1-20)$(pwgen -s -1 6); fi
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DBUSER=${DBASE}; fi
 
 # Distro settings
@@ -208,7 +208,7 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Reset all permissions
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}

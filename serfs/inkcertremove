@@ -47,13 +47,14 @@ if [ ! -d /etc/inkcert/live/${DOMAIN} ]; then
 sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/SSLCertificateFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/SSLCertificateKeyFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
 
-## Remove the inkCert cert configs
-sed -i "s/#INKVERB-INKCERT=DONE_IC\n\t\tSSLCertificateFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/cert\.crt\n\t\tSSLCertificateKeyFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/privkey\.key\n\t\SSLCACertificateFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/ca\.interm\.crt\n\t\tSSLCertificateChainFile\t\/etc\/inkcert\/le\/live\/${DOMAIN}\/chain\.pem/#INKVERB-INKCERT=NO_REMOVED_IC/g" /etc/apache2/sites-available/${DOMAIN}.conf
+## Remove the inkCert cert lines
+sed -i '/^#INKVERB-INKCERT=DONE_IC/,/^#INKVERB-INKCERT-stop/{/^#INKVERB-INKCERT=DONE_IC/!{/^#INKVERB-INKCERT-stop/!d}}' /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i '/#INKVERB-INKCERT=DONE_IC/#INKVERB-INKCERT=INK_REMOVED/' /etc/apache2/sites-available/${DOMAIN}.conf
+sed -i '/#INKVERB-INKCERT-stop/d' /etc/apache2/sites-available/${DOMAIN}.conf
+apache2ctl graceful
 
-service apache2 restart
-
-echo "#!/bin/sh
-INKCERT=NO_REMOVED_IC" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
+## Note to the config
+sed -i "s/INKCERTED=DONE_LE/INKCERT=NO_REMOVED_LE/" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
 
 # Finish
 echo "inkCert has been uninstalled from ${DOMAIN}. Using Snakeoil certs."

@@ -98,7 +98,7 @@ echo "Success! The Client key for ${CLIENTURI} has been added."
 
 ## Serf message
 echo "
-Now, you need to run inknetzipclientpkg
+Now, you need to run inknetpackclientpkg
 
 Follow the instructions."
 

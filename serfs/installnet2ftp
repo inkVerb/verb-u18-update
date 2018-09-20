@@ -9,19 +9,20 @@ set -e
 ## ./installvsftpd
 
 
+CVAPPNAME=net2ftp
+
 # Include the configs
 . /var/local/verb/configs/sitenameip
 . /var/local/verb/configs/siteurilist
 
-# Download and unzip
+# Download and unpack
 cd /var/www/vapps
-/var/local/verb/serfs/inkget net2ftp.current
-unzip net2ftp.current.zip
-rm -f net2ftp.current.zip
+/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
+/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
 rm -rf /var/www/html/guru.net2ftp
 ln -s /var/www/vapps/net2ftp /var/www/html/guru.net2ftp
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
 chown -R www-data:www-data /var/www/html/guru.net2ftp
-chown -R www-data:www-data /var/www/vapps/net2ftp
 
 # Settings
 cd net2ftp

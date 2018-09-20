@@ -24,34 +24,34 @@ Eg: ./inkcertdole ${inkURI}
 "
 exit 0; fi
 
-if [ $VERBemail=true ]; then
-/var/local/verb/serfs/inkcertdole ${emailURI}
-fi
-if [ $VERBone=true ]; then
-/var/local/verb/serfs/inkcertdole ${oneURI}
-fi
-if [ $VERBink=true ]; then
-/var/local/verb/serfs/inkcertdole ${inkURI}
-fi
-if [ $VERBblue=true ]; then
-/var/local/verb/serfs/inkcertdole ${blueURI}
-fi
-if [ $VERBguru=true ]; then
-/var/local/verb/serfs/inkcertdole ${guruURI}
-fi
-if [ $VERBkiwi=true ]; then
-/var/local/verb/serfs/inkcertdole ${kiwiURI}
-fi
+# Let each run wait 1 second to avoid congesting the server
 if [ $VERBpink=true ]; then
-/var/local/verb/serfs/inkcertdole ${pinkURI}
-fi
+/var/local/verb/serfs/inkcertdole ${pinkURI}; fi
+wait
+if [ $VERBemail=true ]; then
+/var/local/verb/serfs/inkcertdole ${emailURI}; fi
+wait
+if [ $VERBone=true ]; then
+/var/local/verb/serfs/inkcertdole ${oneURI}; fi
+wait
+if [ $VERBink=true ]; then
+/var/local/verb/serfs/inkcertdole ${inkURI}; fi
+wait
+if [ $VERBblue=true ]; then
+/var/local/verb/serfs/inkcertdole ${blueURI}; fi
+wait
+if [ $VERBguru=true ]; then
+/var/local/verb/serfs/inkcertdole ${guruURI}; fi
+wait
+if [ $VERBkiwi=true ]; then
+/var/local/verb/serfs/inkcertdole ${kiwiURI}; fi
+wait
 if [ $VERBred=true ]; then
-/var/local/verb/serfs/inkcertdole ${redURI}
-fi
+/var/local/verb/serfs/inkcertdole ${redURI}; fi
+wait
 if [ $VERBrocks=true ]; then
-/var/local/verb/serfs/inkcertdole ${rocksURI}
-fi
+/var/local/verb/serfs/inkcertdole ${rocksURI}; fi
+wait
 if [ $VERBuno=true ]; then
-/var/local/verb/serfs/inkcertdole ${unoURI}
-fi
+/var/local/verb/serfs/inkcertdole ${unoURI}; fi
 

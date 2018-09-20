@@ -1,0 +1,44 @@
+#!/bin/sh
+#inkVerb! repo donjon dragon, verb.ink
+set -e
+
+# This updates the NextCloud repo package
+
+# How to use:
+## ./owncloud.updaterepo
+
+
+CVAPPNAME=owncloud
+# Include the repo versions
+. /var/local/verb/configs/inklists/repoverlist
+DISTVER="${owncloud}"
+
+# Announce
+echo "Updating the ownCloud package to v${DISTVER}..."
+cd /var/local/verb/repo
+
+# Get the package
+curl -LO https://download.owncloud.org/community/owncloud-${DISTVER}.tar.bz2
+## Check the hash
+curl -LO https://download.owncloud.org/community/owncloud-${DISTVER}.tar.bz2.sha256
+CHECKSHA=$(shasum -a 256 -c owncloud-${DISTVER}.tar.bz2.sha256 < owncloud-${DISTVER}.tar.bz2)
+if [ "${CHECKSHA}" = "owncloud-${DISTVER}.tar.bz2: OK" ]; then
+echo "Download checks out."
+rm owncloud-${DISTVER}.tar.bz2.sha256
+else
+echo "SHA check failed. Dunno why."
+exit 44
+fi
+
+# Set it as the new package
+rm -f ${CVAPPNAME}.legacy.vtxz
+touch ${CVAPPNAME}.vtxz
+mv ${CVAPPNAME}.vtxz ${CVAPPNAME}.legacy.vtxz
+tar -xvjf owncloud-${DISTVER}.tar.bz2
+rm owncloud-${DISTVER}.tar.bz2
+/var/local/verb/serfs/vtxzin ${CVAPPNAME}; wait
+rm -rf ${CVAPPNAME}
+
+# Finish
+echo "Done. This repo now has ownCloud v${DISTVER}."
+

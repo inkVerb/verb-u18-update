@@ -28,17 +28,17 @@ echo "That directory already exists for that domain. Choose a different director
 exit 22; fi
 
 # Options
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You must designate a domain."
 exit 22; fi
 ## Auto options
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DIRECTORY=iwp$(pwgen -s -1 1); fi
-if [ -z $5 ]; then
+if [ -z ${5} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBASE=iwp$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 5); fi
-if [ -z $4 ]; then
+if [ -z ${4} ]; then
 DBUSER=${DBASE}; fi
 
 # Include the config file
@@ -46,9 +46,8 @@ DBUSER=${DBASE}; fi
 
 # Download and establish IWPAdmin in the server to pre-created domain
 cd /var/www/vapps
-/var/local/verb/serfs/inkget ${CVAPPNAME}.current
-unzip -o ${CVAPPNAME}.current.zip
-rm -f ${CVAPPNAME}.current.zip
+/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
+/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
 mv ${CVAPPNAME} ${DOMAIN}
 mv ${CVAPPNAME} ${CVAPPNAME}.${DOMAIN}
 ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}/${DIRECTORY}
@@ -64,7 +63,7 @@ echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
 APPDDBPAS=${DBPASSWORD}
-IWPADMIN_DIRECTORY=\"${DIRECTORY}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}.${DOMAIN}
+IWPADMIN_DIRECTORY=\"${DIRECTORY}\"" > /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Reset all permissions
 chown -R www-data:www-data /var/www/html/${DOMAIN}/${DIRECTORY}

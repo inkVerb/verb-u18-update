@@ -41,8 +41,17 @@ fi
 ln -sfn /var/www/domains/${NEWDOMAIN} /var/www/html/
 chown -R www-data:www-data /var/www/html/${NEWDOMAIN}
 chown -R www-data:www-data /var/www/domains/${NEWDOMAIN}
+chmod -R 755 /var/www/domains/${NEWDOMAIN}
 a2ensite ${NEWDOMAIN}
-service apache2 reload
+apache2ctl graceful
+
+# inkDNS
+/var/local/verb/serfs/inkdnsadddomain ${NEWDOMAIN}
+wait
+/var/local/verb/serfs/inkdnsaddmail ${NEWDOMAIN}
+wait
+/var/local/verb/serfs/inkdnsaddinkdkim ${NEWDOMAIN}
+wait
 
 # inkCert
 ## Ensure that you don't get double entries

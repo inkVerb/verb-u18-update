@@ -19,6 +19,7 @@ git clone https://github.com/inkverb/${SITEUPDATEREPO}
 # Run the update script
 chmod +x /var/local/verb/${SITEUPDATEREPO}/update
 /var/local/verb/${SITEUPDATEREPO}/update
+wait
 
 # Remove the entire updater
 rm -rf /var/local/verb/${SITEUPDATEREPO}

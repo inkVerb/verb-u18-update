@@ -2,7 +2,7 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This prepares core Verber config files for a domain, with OpenDKIM profiles and keys and inkCert configs, WITHOUT including the actual domain itself or its Apache configs and html folder.
+# This prepares core Verber config files for a domain, with OpenDKIM profiles and keys and inkCert and inkDNS configs, WITHOUT including the actual domain itself or its Apache configs and html folder.
 ## This is intended as a subscript to be used by adddomain or adddomaincgi
 ## This does NOT:
 ### Add the domain to inkCert for SSL requests
@@ -26,8 +26,13 @@ echo "#!/bin/sh
 INKCERTED=NOT_YET
 " > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWDOMAIN}
 
-# OpenDKIM
-/var/local/verb/serfs/addinkdkim ${NEWDOMAIN}
+# inkDKIM
+/var/local/verb/serfs/addinkdkim ${NEWDOMAIN}; wait
+
+# inkDNS
+/var/local/verb/serfs/inkdnsadddomain ${NEWDOMAIN}; wait
+/var/local/verb/serfs/inkdnsaddmail ${NEWDOMAIN}; wait
+/var/local/verb/serfs/inkdnsaddinkdkim ${NEWDOMAIN}; wait
 
 # Finish
 echo "Great! With no error messages, ${NEWDOMAIN} is ready to be added on the Verber."

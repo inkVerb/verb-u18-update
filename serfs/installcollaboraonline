@@ -16,23 +16,24 @@ CVAPPNAME=collaboraonline
 . /var/local/verb/configs/siteurilist
 
 ## Set the port
-if [ -z "$1" ]; then
+if [ -z ${1} ]; then
 PORT=9980
 else
 PORT=$1
 fi
 
 # Check if already installed
-if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
+if [ -f /var/local/verb/configs/vapp.${CVAPPNAME} ]; then
 echo "This is already installed. I quit."
 exit 0; fi
 
 # Make sure Docker is installed
 /var/local/verb/serfs/installdocker
+wait
 
 # Install it
 docker pull collabora/code
-                       docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e "domain=nextcloud.${SITENAME}.verb.blue" --restart always --cap-add MKNOD collabora/code
+docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e "domain=nextcloud.${blueURI}" --restart always --cap-add MKNOD collabora/code
 
 # Firewall
 ufw allow ${PORT}
@@ -44,13 +45,13 @@ a2enmod proxy_wstunnel
 a2enmod proxy_http
 a2enmod ssl
 ## Reload
-service apache2 reload
+apache2ctl graceful
 
 # Write the config for status
 echo "#!/bin/sh
 COVAPPSTATUS=\"INSTALLED\"
 COPORT=${PORT}
-COHOST=\"nextcloud.${blueURI}\"" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+COHOST=\"nextcloud.${blueURI}\"" > /var/local/verb/configs/vapp.${CVAPPNAME}
 
 echo "Collabora Online is now installed...
 

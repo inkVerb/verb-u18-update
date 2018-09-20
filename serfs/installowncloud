@@ -9,6 +9,11 @@ set -e
 # How to use:
 ## ./installowncloud [dbase] [dbuser] [dbpassword]
 
+# Eg:
+## ./installowncloud
+## ./installowncloud bestdbase trump besteverpass
+
+
 
 CVAPPNAME=owncloud
 
@@ -22,38 +27,41 @@ DBPASSWORD=$3
 CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
 
 # Check if already installed
-if [ -f /var/local/verb/configs/verbapp.${CVAPPNAME} ]; then
-echo "This is already installed. I quit."
+## Config
+if [ -f /var/local/verb/configs/vapp.${CVAPPNAME} ]; then
+echo "This is already installed."
 exit 0; fi
+## Directory
+if [ -d /var/www/vapps/${CVAPPNAME} ]; then
+echo "ownCloud already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
+exit 22; fi
 
 # Auto database
-if [ -z $3 ]; then
+if [ -z ${3} ]; then
 DBPASSWORD=$(pwgen -s -1 10); fi
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
-if [ -z $2 ]; then
+if [ -z ${2} ]; then
 DBUSER=${DBASE}; fi
 
 # Do it
 cd /var/www/vapps
 ## Get and unpack
-/var/local/verb/serfs/inkget ${CVAPPNAME}.current
-unzip ${CVAPPNAME}.current.zip
-rm -f ${CVAPPNAME}.current.zip
-## Apps
-cd ${CVAPPNAME}/apps
-/var/local/verb/serfs/inkget ${CVAPPNAME}.apps.current
-unzip ${CVAPPNAME}.apps.current.zip
-rm -f ${CVAPPNAME}.apps.current.zip
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+echo "Getting ownCloud, this could take a minute or so..."
+/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
+rm -rf owncloud
+/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
+## Install it
 rm -rf /var/www/html/blue.owncloud
-## Link & own
 ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/blue.owncloud
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
 chown -R www-data:www-data /var/www/html/blue.owncloud
-
-# Set "remember me" in the login #(legacy)
-#sed -i "s/<rememberlogin>false<\/rememberlogin>/<rememberlogin>true<\/rememberlogin>/g" /var/www/vapps/owncloud/apps/files_external/appinfo/info.xml
+## Run the ownCloud script
+#/var/local/verb/donjon/owncloudprep.sh; wait # May be unique to Nextcloud
+## Set up cron for updates
+echo "*/15  *  *  *  * www-data php -f /var/www/vapps/owncloud/cron.php" > /etc/cron.d/owncloud
+#chmod 644 /etc/cron.d/owncloud
+chmod 755 /etc/cron.d/owncloud
 
 # Create the database and credentials
 mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
@@ -65,15 +73,19 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/verbapp.${CVAPPNAME}
+APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}
 
 echo "These are setup:
 
 Database user: ${DBUSER}
 Database password: ${DBPASSWORD}
 Database name: ${DBASE}
+Host: localhost
 
 *Don't make any other changes during the install!
-Go to http://owncloud.${blueURI} to install.
+
+Go to https://owncloud.${blueURI} to install.
+
+After, you may want to run setowncloudbfdoff to disable brute force detection in order to allow some client apps to work. You can always turn it on again with setowncloudbfdon
 "
 

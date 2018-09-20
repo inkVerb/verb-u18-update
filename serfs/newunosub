@@ -21,7 +21,7 @@ sed -i "s/unoURI286/${unoURI}/g" /etc/apache2/sites-available/${NEWUNOSUB}.${uno
 cp -R /var/local/verb/configs/site-files/newunosubdir /var/www/uno/${NEWUNOSUB}
 chown -R www-data:www-data /var/www/uno/${NEWUNOSUB}
 a2ensite ${NEWUNOSUB}.${unoURI}
-service apache2 reload
+apache2ctl graceful
 cp /var/www/html/uno/index-newunosub.php /var/www/html/uno/index-${NEWUNOSUB}.php
 chown -R www-data:www-data /var/www/html/uno
 

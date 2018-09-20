@@ -10,23 +10,34 @@ set -e
 
 FWDDOM=$1
 
+# Verify it was created by the pointdomain serf
+if [ $(grep -c "#inkVerb-pointdomain" "/var/www/html/${FWDDOM}/index.php") = 0 ]; then
+echo "This domain's index.php file was not created by pointdomain. Doing nothing."
+exit 0; fi
+
 # Set and own
-rm /var/www/html/${FWDDOM}/index.php
 
 # In the event of index.php
-if [ -f /var/www/html/${FWDDOM}/index.php ]; then
+if [ -f /var/www/html/${FWDDOM}/index.php ] && [ -f /var/www/html/${FWDDOM}/index.php.vback ]; then
+if grep -Fq "#inkVerb-php" /var/www/html/${FWDDOM}/index.php; then
+rm /var/www/html/${FWDDOM}/index.php
 mv /var/www/html/${FWDDOM}/index.php.vback /var/www/html/${FWDDOM}/index.php
 echo "${FWDDOM}'s index.php file has been restored."
 fi
+fi
 
 # In the event of index.html
-if [ -f /var/www/html/${FWDDOM}/index.html ]; then
+if [ -f /var/www/html/${FWDDOM}/index.php ] && [ -f /var/www/html/${FWDDOM}/index.html.vback ]; then
+if grep -Fq "#inkVerb-html" /var/www/html/${FWDDOM}/index.php; then
+rm /var/www/html/${FWDDOM}/index.php
 mv /var/www/html/${FWDDOM}/index.html.vback /var/www/html/${FWDDOM}/index.html
 echo "${FWDDOM}'s index.html file has been restored."
 fi
 
 # In the event of index.htm
-if [ -f /var/www/html/${FWDDOM}/index.htm ]; then
+if [ -f /var/www/html/${FWDDOM}/index.php ] && [ -f /var/www/html/${FWDDOM}/index.htm.vback ]; then
+if grep -Fq "#inkVerb-htm" /var/www/html/${FWDDOM}/index.php; then
+rm /var/www/html/${FWDDOM}/index.php
 mv /var/www/html/${FWDDOM}/index.htm.vback /var/www/html/${FWDDOM}/index.htm
 echo "${FWDDOM}'s index.htm file has been restored."
 fi

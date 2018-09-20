@@ -21,7 +21,7 @@ echo "That domain isn't even installed. I quit."
 exit 22
 fi
 if [ ! -d /var/www/html/${DOMAIN}/wp-content ]; then
-echo "That domain is installed, but it doesn't have WordPress. I quit."
+echo "That domain doesn't have WordPress. I quit."
 exit 22
 fi
 

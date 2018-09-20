@@ -21,15 +21,17 @@ set -e
 DOMAIN=$1
 
 # Check variables
-if [ -z $1 ]; then
+if [ -z ${1} ]; then
 echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 
 # Request and get the certs
 /var/local/verb/serfs/inkcertreq ${DOMAIN}
+wait
 
 # Install the certs
 /var/local/verb/serfs/inkcertadd ${DOMAIN}
+wait
 
 # Finish
 echo "

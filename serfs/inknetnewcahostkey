@@ -32,8 +32,8 @@ ssh-keygen -s ~/.ssh/inknet/ca/in_ca_${IAMCANAME}_key -N "" -I in_cav_${IAMCANAM
 ### Now exists: /etc/ssh/inknet/in_cav_${CAVERBERNAME}_key-cert.pub
 
 # Restart
-service ssh restart
-service sshd restart
+systemctl reload ssh
+systemctl reload sshd
 
 # Finish
 echo "A new hostkey has been created and signed for this CA Verber."

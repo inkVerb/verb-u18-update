@@ -11,7 +11,7 @@ set -e
 DOMAIN=$1
 
 # Verify that it has been fixed
-if grep -q "##INKALIASFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
+if grep -q "##INKHTTPSFIX=fixed" /etc/apache2/sites-available/${DOMAIN}.conf; then
 
 # Replace it with the original file
 ## From the original file
@@ -22,6 +22,18 @@ sed -i '/##inkHTTPremoved/d' /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i '/^##INKHTTPSFIX=fixed/,/^##verbFIXhttps/{/^##INKHTTPSFIX=fixed/!{/^##verbFIXhttps/!d}}' /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i '/##INKHTTPSFIX=fixed/d' /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i '/##verbFIXhttps/d' /etc/apache2/sites-available/${DOMAIN}.conf
+## Put the original settings back
+cat /etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed >> /etc/apache2/sites-available/${DOMAIN}.conf
+apache2ctl graceful
+rm /etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed
+echo "${DOMAIN} now accepts http traffic."
+## WordPress?
+if -d /var/www/vapps/wp.${DOMAIN}; then
+sed -i "/WP_SITEURL/d" /var/www/vapps/wp.${DOMAIN}/wp-config.php
+sed -i "/WP_HOME/d" /var/www/vapps/wp.${DOMAIN}/wp-config.php
+echo "define( 'WP_SITEURL', 'http://${DOMAIN}' );
+define( 'WP_HOME', 'http://${DOMAIN}' );" >> /var/www/vapps/wp.${DOMAIN}/wp-config.php
+fi
 
 # If it's not already there, just exit
 else

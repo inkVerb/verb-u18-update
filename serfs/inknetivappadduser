@@ -19,7 +19,8 @@ if [ ! -d "/var/local/ivapp/inknet" ]; then
 echo "ivApp is not instlled yet. I quit."; exit 22; fi
 
 # Add the user
-/var/local/verb/donjon/ivappadduser ${ADDINIVUSER} ${ADDINIVPASS} /var/local/verb/configs/inknet/ivinknet-${ADDINIVCONF}.conf
+/var/local/verb/donjon/ivapp/ivappadduser ${ADDINIVUSER} ${ADDINIVPASS} /var/local/verb/configs/inknet/ivinknet-${ADDINIVCONF}.conf
+wait
 
 # Include the user type config
 . /var/local/verb/configs/inknet/ivinknet-${ADDINIVCONF}.conf

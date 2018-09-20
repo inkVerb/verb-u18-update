@@ -60,11 +60,17 @@ NEWCAVERBERNAME="I_AM_INKER"
 NEWCAVERBERIP="I_AM_INKER"
 NEWINIVSAILORNAME="I_AM_INKER"
 /var/local/verb/serfs/setinkcertsslca "I_AM_INKER"
+wait
 /var/local/verb/serfs/setinkcertsshca "I_AM_INKER"
+wait
 /var/local/verb/serfs/setinkgetrepo "I_AM_INKER"
+wait
 /var/local/verb/serfs/setinknetsslca "I_AM_INKER"
+wait
 /var/local/verb/serfs/setinknetsshca "I_AM_INKER"
+wait
 /var/local/verb/serfs/setinknetrepo "I_AM_INKER"
+wait
 sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /var/local/verb/configs/siteinkget
 else
 
@@ -76,11 +82,17 @@ NEWCAVERBERNAME="$(echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
 NEWCAVERBERIP=$2
 ### Settings
 /var/local/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}
+wait
 /var/local/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}
+wait
 /var/local/verb/serfs/setinkgetrepo ${NEWCAVERBERHOST}
+wait
 /var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}
+wait
 /var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}
+wait
 /var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}
+wait
 fi
 
 # Set configs
@@ -111,14 +123,16 @@ Host *
 
 # Install ivApp for inkNet & CA Key
 /var/local/verb/serfs/inknetinstallivapp
+wait
 ## inkNet ivApp Sailor (to login to the CA Verber)
 if [ "${1}" != "I_AM_INKER" ]; then
 /var/local/verb/serfs/inknetivappnewclientsailor
+wait
 fi
 
 # Reload SSH services
-service ssh restart
-service sshd restart
+systemctl reload ssh
+systemctl reload sshd
 
 # Don't get CA Inker keys if this is an Inker
 if [ "${1}" = "I_AM_INKER" ]; then

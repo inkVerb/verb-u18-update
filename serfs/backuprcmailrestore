@@ -2,7 +2,7 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This restores a RoundCube backup .zip file backed-up using backuprcmail
+# This restores a RoundCube backup .vbak file backed-up using backuprcmail
 ## You may run installemail prior to this, however this will completely overwrite the old roundcube
 ## and the old roundcube, settings, and database will be backed up in www/email
 
@@ -10,16 +10,16 @@ set -e
 ## or you must create the symlink from the html/email.roundcube folder to the email/roundcube folder
 
 # Instructions:
-## The file can have any name, even if you changed it from the original, as long as it ends in .zip
+## The file can have any name, even if you changed it from the original, as long as it ends in .vbak
 ## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
 
 # NOTE:
-## This is relatively benign and arguably unnecessary because it only affects SOME user settings only within the RoundCube app itself, and only for identical email inboxes created or imported in PostfixAdmin
-## This is in addition to backupemail and backupemailrestore (which only affect Postfix) and neither overlaps nor conflicts
+## This is relatively benign and arguably unnecessary because it only affects SOME user settings only within the RoundCube app itself, and only for identical email inpfa created or imported in PostfixAdmin
+## This is in addition to backupvmail and backupvmailrestore (which only affect Postfix) and neither overlaps nor conflicts
 ## There is no backup or backuprestore for PostfixAdmin since PFA's database is a controller of and slave to Postfix.
 
 # How to use:
-## ./backuprcmailrestore [filename, NO .zip]
+## ./backuprcmailrestore [filename]
 
 # Eg:
 ## ./backuprcmailrestore verb.roundcube.a52.vbak
@@ -32,20 +32,23 @@ FILENAME=$1
 . /var/local/verb/configs/siteurilist
 . /var/local/verb/configs/sitemailpath
 
-# Backup whatever the original status is
+# Backup and remove whatever the original status is
 cd /var/local/verb/serfs
-/var/local/verb/serfs/mysqlex rcmail
+/var/local/verb/serfs/mysqlex rcmail; wait
 mv /var/local/verb/serfs/rcmail.sql /var/www/email/roundcube/verb.rcmail.restore-originalbackedup.vbak.sql
 cp /var/local/verb/configs/sitemail /var/www/email/roundcube/sitemail-restore-originalbackedup
 cd /var/www/email
-zip -r verb.rcmail.restore-originalbackedup.vbak.zip roundcube
-mv /var/www/email/verb.rcmail.restore-originalbackedup.vbak.zip /var/www/guru/
+/var/local/verb/serfs/vtxzin roundcube
+mv roundcube.vtxz verb.roundcube.restore-originalbackedup.vbak
+mv /var/www/email/verb.roundcube.restore-originalbackedup.vbak /var/www/guru/
+/var/local/verb/serfs/mysqlkilldb rcmail; wait
+/var/local/verb/serfs/mysqlkilluser rcmailusr; wait
 rm -rf roundcube
 
-# Unzip the file
+# Unpack the file
 cd /var/www/guru
-unzip ${FILENAME}.zip
-rm -f ${FILENAME}.zip
+mv ${FILENAME} roundcube.vtxz
+/var/local/verb/serfs/vtxzout roundcube
 mv roundcube /var/www/email/
 
 # Restore and include RC settings in the sitemail config
@@ -58,9 +61,8 @@ sed -i "s/SITERCPATH.*/SITERCPATH=${SITERCPATH}/g" /var/local/verb/configs/sitem
 
 # Restore the database
 /var/local/verb/serfs/mysqlnewdb rcmail rcmailusr rcpass${SITERCPASSAPG}
-mv /var/www/email/roundcube/rcmail.sql /var/local/verb/serfs/
-cd /var/local/verb/serfs/
-/var/local/verb/serfs/mysqlin rcmail
+cd /var/www/email/roundcube
+/var/local/verb/serfs/mysqlin rcmail; wait
 rm -f rcmail.sql
 
 # Own

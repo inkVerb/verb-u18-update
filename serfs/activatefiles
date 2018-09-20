@@ -2,7 +2,7 @@
 #inkVerbSerf! verb.ink
 set -e
 
-# This activates the files....verb.guru folder so it the web will give an index
+# This activates the files....verb.guru folder so the web will provide an index
 ## Prerequisite: installvsftpd
 
 # How to use:
@@ -33,7 +33,7 @@ fi
 if [ "$1" = "on" ]
 then
     rm -rf /var/www/html/guru.files
-    ln -s /var/www/guru/files /var/www/html/guru.files
+    ln -sfn /var/www/guru/files /var/www/html/guru.files
     echo "files on."
 exit 0
 fi
@@ -45,3 +45,4 @@ then
     echo "files off."
 exit 0
 fi
+
