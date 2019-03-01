@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds the Auto-Update must-use plugin from inkVerb with its 'mu-plugin' folder for an already-installed WordPress site.
 ## The plugin has further information embedded
@@ -13,7 +13,7 @@ set -e
 DOMAIN=$1
 
 # Copy the folder
-cp -R /var/local/verb/configs/conflab/mu-plugins /var/www/html/${DOMAIN}/wp-content
+cp -R /opt/verb/conf/lab/mu-plugins /var/www/html/${DOMAIN}/wp-content
 
 # Own
 chown -R www-data:www-data /var/www/html/${DOMAIN}/wp-content/mu-plugins

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This changes ownership of the configs directory
 
@@ -9,5 +9,5 @@ set -e
 
 
 # File permissions for configs
-chmod 640 -R /var/local/verb/configs
+chmod 660 -R /opt/verb/conf
 

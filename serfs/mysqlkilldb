@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This drops (deletes) a MySQL user
 
@@ -10,6 +10,6 @@ set -e
 
 DBASE=$1
 
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 DROP DATABASE ${DBASE};"
 

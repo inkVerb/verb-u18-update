@@ -1,8 +1,8 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This activates the files....verb.guru folder so the web will provide an index
+# This activates the files....verb.vip folder so the web will provide an index
 ## Prerequisite: installvsftpd
 
 # How to use:
@@ -14,7 +14,7 @@ set -e
 
 
 # Include the config
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/siteurilist
 
 if [ "$1" = "-h" ]
 then
@@ -25,23 +25,23 @@ Examples:
  ./activatefiles off
 
  allowed arguments:
- on	(files.${guruURI} becomes a web-accessible folder)
- off	(files.${guruURI} returns to a redirect to ${inkURI})"
+ on	(files.${vipURI} becomes a web-accessible folder)
+ off	(files.${vipURI} returns to a redirect to ${inkURI})"
 exit 0
 fi
 
 if [ "$1" = "on" ]
 then
-    rm -rf /var/www/html/guru.files
-    ln -sfn /var/www/guru/files /var/www/html/guru.files
+    rm -rf /var/www/html/vip.files
+    ln -sfn /var/www/vip/files /var/www/html/vip.files
     echo "files on."
 exit 0
 fi
 
 if [ "$1" = "off" ]
 then
-    rm -f /var/www/html/guru.files
-    cp -R /var/www/html/0ne /var/www/html/guru.files
+    rm -f /var/www/html/vip.files
+    cp -R /var/www/html/0ne /var/www/html/vip.files
     echo "files off."
 exit 0
 fi

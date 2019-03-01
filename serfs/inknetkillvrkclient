@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This deletes a Vrk Client's profile and kills the inkNet JailKit user
 
@@ -14,22 +14,22 @@ KILLMACHINE="$(echo ${KILLHOST} | sed 's/\./_/g')"
 KILLVRKCLIENT="${KILLUSER}_${KILLMACHINE}"
 
 if [ -z ${2} ]; then
-echo "Enter the user, a space, then the machine. Get your machine name with: hostname -f"; exit 55; fi
+echo "Enter the user, a space, then the machine. Get your machine name with: hostname -f"; exit 5; fi
 
 # Chek if it exists
-if [ ! -e "/var/local/verb/configs/inknet/vrk/client.vrk.${KILLVRKCLIENT}.cnf" ]; then
+if [ ! -e "/opt/verb/conf/inknet/vrk/client.vrk.${KILLVRKCLIENT}.cnf" ]; then
 echo "That Verber Client doesn't exist here."
-exit 22; fi
+exit 8; fi
 
 # Include the Client's config
-. /var/local/verb/configs/inknet/vrk/client.vrk.${KILLVRKCLIENT}.cnf
+. /opt/verb/conf/inknet/vrk/client.vrk.${KILLVRKCLIENT}.cnf
 
 # Kill the inkNet ivApp user
 userdel -r ${CLIENTUSERNAME}
-rm -rf /var/local/ivapp/inknet/vrker/${CLIENTUSERNAME}
+rm -rf /opt/ivapp/inknet/vrker/${CLIENTUSERNAME}
 
 # Remove directories
-rm -f /var/local/verb/configs/inknet/vrk/client.vrk.${KILLVRKCLIENT}.cnf
+rm -f /opt/verb/conf/inknet/vrk/client.vrk.${KILLVRKCLIENT}.cnf
 
 # Remove the SSH authorized_key file
 rm -f /etc/ssh/authorized_keys/${CLIENTUSERNAME}

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This logs into a CA Verber
 ## You can use the name or the URI, host.namespace.verb.ink or host_namespace_verb_ink
@@ -14,19 +14,19 @@ set -e
 
 
 # Check & include the config
-if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+if [ ! -f /opt/verb/conf/inknet/inker.client.cnf ]; then
 echo "This is not yet connected to a CA Verber via inkNet."
-exit 22; fi
+exit 8; fi
 
 # Include the correct configs
-. /var/local/verb/configs/inknet/inker.client.cnf
+. /opt/verb/conf/inknet/inker.client.cnf
 ## Add secondary CA Verber credentials if present
 if [ "$1" = "CA1" ]; then
-. /var/local/verb/configs/inknet/client.${CAVERBERNAME}.inker.login.cnf
+. /opt/verb/conf/inknet/client.${CAVERBERNAME}.inker.login.cnf
 else
 CAV2HOST=$1
 CAV2NAME="$(echo ${CAV2HOST} | sed 's/\./_/g')"
-. /var/local/verb/configs/inknet/2cav.${CAV2NAME}.cnf
+. /opt/verb/conf/inknet/2cav.${CAV2NAME}.cnf
 fi
 
 # Set variable

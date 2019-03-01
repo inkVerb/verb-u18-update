@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This completely removes MySQL
 ## WARNING: This WILL cause the Apocalypse!

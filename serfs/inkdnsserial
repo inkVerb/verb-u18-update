@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets a new serial number for an existing DNS record in the inkDNS zone file on this Verber
 
@@ -11,15 +11,26 @@ set -e
 DNSDOMAIN=$1
 
 # Check if the zone file exists
-if [ ! -f "/var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db" ]; then
-echo "The domain ${DNSDOMAIN} has no DNS zone file. That comes first."
-exit 22; fi
+if [ ! -f "/opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}" ]; then
+echo "The domain \"${DNSDOMAIN}\" has no DNS zone file. That comes first."
+exit 8; fi
 
 # Set the new serial
-## Create a timestamp-based serial number to the second (how inkVerb does it)
-SERNO="$(date '+%Y%m%d%H%M%S')\t\t; Serial No"
-## Set it in the file
-sed -i "/; Serial No/c ${SERNO}" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
-## Ensure the time can increment beyond the timestamp by one second
-sleep 1
-
+## Create the datestamp
+DATESTAMP="$(date '+%Y%m%d')"
+## Set the increment for today
+touch /opt/verb/conf/inkdns/serial
+OLDSERIAL="$(cat /opt/verb/conf/inkdns/serial)"
+### Keep it to two digits
+if [ "${OLDSERIAL}" -gt "98" ]; then
+OLDSERIAL="0"; fi
+### Keep the digits double
+NEWSERIAL=$(expr ${OLDSERIAL} + 1)
+if [ "${NEWSERIAL}" -le "9" ]; then
+NEWSERIAL="0${NEWSERIAL}"; fi
+### Record the serial
+echo "${NEWSERIAL}" > /opt/verb/conf/inkdns/serial
+## Create a datestamp-based serial number to the second (how inkVerb does it)
+SERNO="${DATESTAMP}${NEWSERIAL}\t\t; Serial No"
+## Set it in the files
+sed -i "/; Serial No/c ${SERNO}" /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds a new subdomain to become newsub.your-name.verb.one.
 
@@ -9,16 +9,16 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 NEWONESUB=$1
 
 # Copy and prepare Apache server config files
-cp /var/local/verb/configs/site-files/conf/newonesub.conf /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf 
+cp /opt/verb/conf/site-files/conf/newonesub.conf /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf 
 sed -i "s/newonesub/${NEWONESUB}/g" /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf
-sed -i "s/oneURI286/${oneURI}/g" /etc/apache2/sites-available/${NEWUNOSUB}.${unoURI}.conf
-cp -R /var/local/verb/configs/site-files/newonesubdir /var/www/one/${NEWONESUB}
+sed -i "s/oneURI286/${oneURI}/g" /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf
+cp -R /opt/verb/conf/site-files/newonesubdir /var/www/one/${NEWONESUB}
 chown -R www-data:www-data /var/www/one/${NEWONESUB}
 a2ensite ${NEWONESUB}.${oneURI}
 apache2ctl graceful
@@ -26,5 +26,5 @@ cp /var/www/html/one/index-newonesub.php /var/www/html/one/index-${NEWONESUB}.ph
 chown -R www-data:www-data /var/www/html/one
 
 # inkCert, at end of the "domains =" line
-sed -i "/^domains =/ s/$/, ${NEWONESUB}.${oneURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${oneURI}.ini
+sed -i "/^domains =/ s/$/, ${NEWONESUB}.${oneURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${oneURI}.ini
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This "hard" kills a domain added with adddomain or adddomaincgi
 ## This removes everything. The server probably wouldn't even know that the domain existed, except for any connected vapp
@@ -10,7 +10,7 @@ set -e
 
 ## This DOES:
 ### Remove the SSL certificate for the domain and all subdomains thereof.
-### Remove files formerly in the domain from the server, which are retained in the domains folder that an ftpguru can access
+### Remove files formerly in the domain from the server, which are retained in the domains folder that an ftpvip can access
 ### Remove files for subdomains in the domains folder, just the same.
 ### Remove any subdomain folders belonging to the domain.
 ### Remove opekDKIM/inkDKIM keys.
@@ -28,7 +28,7 @@ rm -f /etc/apache2/sites-enabled/*${KILLDOMAIN}.conf
 rm -f /etc/apache2/sites-available/${KILLDOMAIN}.conf
 rm -f /etc/apache2/sites-available/*${KILLDOMAIN}.conf
 apache2ctl graceful
-/var/local/verb/serfs/killdomainshell ${KILLDOMAIN}; wait
+/opt/verb/serfs/killdomainshell ${KILLDOMAIN}; wait
 rm -f /var/www/html/${KILLDOMAIN}
 rm -f /var/www/html/*${KILLDOMAIN}
 rm -rf /var/www/domains/${KILLDOMAIN}

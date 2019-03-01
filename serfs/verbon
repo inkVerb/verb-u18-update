@@ -1,11 +1,11 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This turns on a tld of the verb sites, such as verb.red, but not the other verb.tld sites, all are on until turned off via verboff
 ## This is done through a2ensite
-## For *.verb.one or custom *.verb.guru, this only turns on NAME.verb.one and one.NAME.verb.one
-## All other custom verb.one and custom verb.guru sites must be turned on again via newonesub
+## For *.verb.one or custom *.verb.vip, this only turns on NAME.verb.one and one.NAME.verb.one
+## All other custom verb.one and custom verb.vip sites must be turned on again via newonesub
 
 # How to use:
 ## ./verbon [tld]
@@ -15,12 +15,12 @@ set -e
 
 
 # Include the config file
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 SITEON=$1
 
-sed -i "s/VERB${SITEON}=.*/VERB${SITEON}=true/g" /var/local/verb/configs/sitetldstatus
+sed -i "s/VERB${SITEON}=.*/VERB${SITEON}=true/g" /opt/verb/conf/sitetldstatus
 
 if [ "${SITEON}" = "email" ]
 then
@@ -30,6 +30,13 @@ then
 exit 0
 fi
 
+if [ "${SITEON}" = "city" ]
+then
+    a2ensite ${cityURI} city.${cityURI} center.${cityURI}
+    apache2ctl graceful
+    echo "Done."
+exit 0
+fi
 
 if [ "${SITEON}" = "one" ]
 then
@@ -51,15 +58,15 @@ fi
 
 if [ "${SITEON}" = "blue" ]
 then
-    a2ensite ${blueURI} blue.${blueURI} nextcloud.${blueURI} owncloud.${blueURI} pydio.${blueURI} seafile.${blueURI}
+    a2ensite ${blueURI} blue.${blueURI} nc.${blueURI} owncloud.${blueURI} seafile.${blueURI}
     echo "Done."
 exit 0
 fi
 
 
-if [ "${SITEON}" = "guru" ]
+if [ "${SITEON}" = "vip" ]
 then
-    a2ensite ${guruURI} guru.${guruURI} cgi.${guruURI} ftp.${guruURI} files.${guruURI} fossil.${guruURI} mysql.${guruURI} net2ftp.${guruURI} repo.${guruURI}
+    a2ensite ${vipURI} vip.${vipURI} cgi.${vipURI} ftp.${vipURI} files.${vipURI} fossil.${vipURI} mysql.${vipURI} net2ftp.${vipURI} repo.${vipURI}
     apache2ctl graceful
     echo "Done."
 exit 0
@@ -96,15 +103,6 @@ fi
 if [ "${SITEON}" = "rocks" ]
 then
     a2ensite ${rocksURI} rocks.${rocksURI}
-    apache2ctl graceful
-    echo "Done."
-exit 0
-fi
-
-
-if [ "${SITEON}" = "uno" ]
-then
-    a2ensite ${unoURI} uno.${unoURI}
     apache2ctl graceful
     echo "Done."
 exit 0

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds a Verber Client for this inkNet CA Verber to host
 ## This can be run to update an existing config
@@ -18,8 +18,8 @@ set -e
 ## ./inknetaddverberclient joey2.ink.inkisaverb.com 999.999.999.999 (Domain Mod)
 
 # Prerequesites
-if [ -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
-. /var/local/verb/configs/inknet/ca.verber.cnf
+if [ -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
+. /opt/verb/conf/inknet/ca.verber.cnf
  if [ "${INKNETSTATUS}" != "INSTALLED" ]; then
 echo "inkNet not quite installed. First, run inknetinstallca"
 exit 0
@@ -48,7 +48,7 @@ ADDUSERNAME=${CUTUSERNAME}${ADDAPG}
 ADDPASSWORD=$(pwgen -1 -s 15)
 
 # Just in case user already exists
-if [ -f /var/local/verb/configs/inknet/verber/client.verber.${ADDNAME}.cnf ]; then
+if [ -f /opt/verb/conf/inknet/verber/client.verber.${ADDNAME}.cnf ]; then
 echo "Umm... How do I say this...
 
 It looks like you have already done this for this verber. A config already exists for that Verber name.
@@ -64,9 +64,9 @@ exit 0
 fi
 
 # Create the config
-if [ ! -d "/var/local/verb/configs/inknet/verber" ]; then
-mkdir -p /var/local/verb/configs/inknet/verber; fi
-. /var/local/verb/configs/siteport
+if [ ! -d "/opt/verb/conf/inknet/verber" ]; then
+mkdir -p /opt/verb/conf/inknet/verber; fi
+. /opt/verb/conf/siteport
 ADDLOGINPORT=${SITEPORT}
 echo "#!/bin/sh
 # inkNet config, verb.ink
@@ -79,14 +79,14 @@ CLIENTIP=\"${ADDIP}\"
 CLIENTUSERNAME=\"${ADDUSERNAME}\"
 CLIENTPASSWORD=\"${ADDPASSWORD}\"
 CLIENTPORT=\"${ADDLOGINPORT}\"
-" > /var/local/verb/configs/inknet/verber/client.verber.${ADDNAME}.cnf
+" > /opt/verb/conf/inknet/verber/client.verber.${ADDNAME}.cnf
 
 # Create the ivApp user
-/var/local/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrb
+/opt/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrb
 wait
 
 # Create the inkNet Client tool links
-ln -sfn /var/local/verb/tools/verber /var/local/ivapp/inknet/verber/${ADDUSERNAME}/tools
+ln -sfn /opt/verb/tools/verber /opt/ivapp/inknet/verber/${ADDUSERNAME}/tools
 
 # Finish
 echo " \"${ADDHOST}\" has been added as a Verber Client."

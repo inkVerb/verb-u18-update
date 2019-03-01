@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This script allows all of a user's main inkVerb subdomains to point to preferred apps, 
 # This is mainly aesthetic, defining a particular web app to be the king of its color
@@ -15,8 +15,8 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 if [ "$1" = "-h" ]; then
     echo "Usage: ./pointink [subdomin only]
@@ -29,19 +29,19 @@ Examples:
  blue
  chat.blue
  collabora.blue
- nextcloud.blue
+ nc.blue
  owncloud.blue
  pydio.blue
  seafile.blue
  xmpp.blue
- guru
- cgi.guru
- ftp.guru
- files.guru
- fossil.guru
- net2ftp.guru
- mysql.guru
- repo.guru
+ vip
+ cgi.vip
+ ftp.vip
+ files.vip
+ fossil.vip
+ net2ftp.vip
+ mysql.vip
+ repo.vip
  kiwi
  kiwi.ampache
  kiwi.art
@@ -86,8 +86,8 @@ if [ "$1" = "collabora.blue" ]; then
 exit 0
 fi
 
-if [ "$1" = "nextcloud.blue" ]; then
-    cp /var/www/html/blue/index-nextcloud.php /var/www/html/blue/index.php
+if [ "$1" = "nc.blue" ]; then
+    cp /var/www/html/blue/index-nc.php /var/www/html/blue/index.php
     echo "Done."
 exit 0
 fi
@@ -117,50 +117,50 @@ exit 0
 fi
 
 
-if [ "$1" = "guru" ]; then
-    cp /var/www/html/guru/index-guru.php /var/www/html/guru/index.php
+if [ "$1" = "vip" ]; then
+    cp /var/www/html/vip/index-vip.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "cgi.guru" ]; then
-    cp /var/www/html/guru/index-ftp.php /var/www/html/guru/index.php
+if [ "$1" = "cgi.vip" ]; then
+    cp /var/www/html/vip/index-ftp.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "ftp.guru" ]; then
-    cp /var/www/html/guru/index-ftp.php /var/www/html/guru/index.php
+if [ "$1" = "ftp.vip" ]; then
+    cp /var/www/html/vip/index-ftp.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "files.guru" ]; then
-    cp /var/www/html/guru/index-files.php /var/www/html/guru/index.php
+if [ "$1" = "files.vip" ]; then
+    cp /var/www/html/vip/index-files.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "fossil.guru" ]; then
-    cp /var/www/html/guru/index-fossil.php /var/www/html/guru/index.php
+if [ "$1" = "fossil.vip" ]; then
+    cp /var/www/html/vip/index-fossil.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "net2ftp.guru" ]; then
-    cp /var/www/html/guru/index-net2ftp.php /var/www/html/guru/index.php
+if [ "$1" = "net2ftp.vip" ]; then
+    cp /var/www/html/vip/index-net2ftp.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "repo.guru" ]; then
-    cp /var/www/html/guru/index-repo.php /var/www/html/guru/index.php
+if [ "$1" = "repo.vip" ]; then
+    cp /var/www/html/vip/index-repo.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi
 
-if [ "$1" = "sql.guru" ]; then
-    cp /var/www/html/guru/index-sql.php /var/www/html/guru/index.php
+if [ "$1" = "sql.vip" ]; then
+    cp /var/www/html/vip/index-sql.php /var/www/html/vip/index.php
     echo "Done."
 exit 0
 fi

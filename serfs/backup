@@ -1,55 +1,67 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This backs up an installed webapp by exporting the database, app folder, and siteconfig file into one downloadable vbak file in the "guru" folder and symlinked to the main site domain.
+# This backs up an installed webapp by exporting the database, app folder, and siteconfig file into one downloadable vbak file in the "vip" folder and symlinked to the main site domain.
 
 # How to use:
-## ./backup [app namespace] [securename 0-9, a-z, and A-Z only] [-nl for no link, optional]
+## ./backup [app namespace] [securename 0-9, a-z, and A-Z only, optional] [-nl for no link, optional dep]
 
 ## This uses the same app namespace as installAPPNAME and vapp.APPNAME configs
 ## This does not work for ghost sites
 ## For WordPress installed to a domain, the namespace follows the format: wp-DOMAIN.TLD or wp-SUB.DOMAIN.TLD
 
 # Eg:
+## ./backup suitecrm
 ## ./backup orangehrm 583
 ## ./backup wp.inkisaverb.com 7aJk -nl
 ## ./backup wpinkblog b
 
 
 APPNAME=$1
+if [ -z "$2" ]; then
+SECNAME=$(pwgen -s -1 12)
+else
 SECNAME=$2
+fi
+
+# Check if installed
+if [ -z "/opt/verb/conf/vapp.${APPNAME}" ]; then
+echo "${APPNAME} not installed. Nothing to backup."
+exit 0; fi
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/vapp.${APPNAME}
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/vapp.${APPNAME}
 
 # Export the database
 cd /var/www/vapps/${APPNAME}/
-/var/local/verb/serfs/mysqlvappout vapp.${APPNAME}; wait
+/opt/verb/serfs/mysqlvappout vapp.${APPNAME}; wait
+
+# Backup the config
+cp /opt/verb/conf/vapp.${APPNAME} /var/www/vapps/${APPNAME}/
 
 # Pack the directory
 cd /var/www/vapps
-/var/local/verb/serfs/vtxzin ${APPNAME}
+/opt/verb/serfs/vtxzin ${APPNAME}
 mv ${APPNAME}.vtxz verb.${APPNAME}.${SECNAME}.vbak
-mv verb.${APPNAME}.${SECNAME}.vbak /var/www/guru/
+mv verb.${APPNAME}.${SECNAME}.vbak /var/www/vip/
 
 # Finish
-if [ "$3" = "-nl" ]
-then
-echo "${APPNAME} has been backed up to the 'guru' folder.
+if [ "$3" = "-nl" ]; then
+echo "${APPNAME} has been backed up to the 'vip' folder.
 
 Note that the app remains live.
 "
 exit 0
 fi
 
-ln -s /var/www/guru/verb.${APPNAME}.${SECNAME}.vbak /var/www/html/${SITETLD}/
-chown -R www-data:www-data /var/www/html/${SITETLD}/verb.${APPNAME}.${SECNAME}.vbak
-echo "${APPNAME} has been backed up to the 'guru' folder and can also be downloaded at:
+ln -s /var/www/vip/verb.${APPNAME}.${SECNAME}.vbak /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
+chown -R www-data:www-data /var/www/html/${SITESERVE}.serve/${SERVEDIR}/verb.${APPNAME}.${SECNAME}.vbak
+echo "${APPNAME} has been backed up to the 'vip' folder and can also be downloaded at:
 
-http://${nameURI}/verb.${APPNAME}.${SECNAME}.vbak
+http://${SERVEPATH}/verb.${APPNAME}.${SECNAME}.vbak
 
 Note that the app remains live.
 "

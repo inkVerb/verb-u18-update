@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets up a WordPress vapp for multisite
 ## Specifically, this adds the multisite settings in wp-config.php necessary to begin the installation from the WordPress dashboard
@@ -18,7 +18,7 @@ WPDOMAIN=$1
 # Check if already set
 if grep -Fq "define( 'WP_ALLOW_MULTISITE', true );" /var/www/html/${WPDOMAIN}/wp-config.php; then
 echo "Multisite already set. To remove, use: wpmusetoff"
-exit 22; fi
+exit 8; fi
 
 
 # We've got to fenagle this around in order to make the code readable while also doing this properly
@@ -37,7 +37,7 @@ cat /var/www/html/${WPDOMAIN}/wp-config.php.Vmu >> /var/www/html/${WPDOMAIN}/wp-
 ## Check that the universe is in working order
 if [ ! -e "/var/www/html/${WPDOMAIN}/wp-config.php.Vmu" ]; then
 echo "Something is very not right."
-exit 66; fi
+exit 6; fi
 ## Remove & replace the original
 rm -f /var/www/html/${WPDOMAIN}/wp-config.php
 mv /var/www/html/${WPDOMAIN}/wp-config.php.NEW /var/www/html/${WPDOMAIN}/wp-config.php

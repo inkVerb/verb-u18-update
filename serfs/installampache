@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs Ampache from inkisaverb.com/repo and links it to ampache....verb.kiwi
 
@@ -13,12 +13,29 @@ set -e
 CVAPPNAME=ampache
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 DBASE=$1
 DBUSER=$2
 DBPASSWORD=$3
+
+# Install
+cd /var/www/vapps
+/opt/verb/serfs/inkget ${CVAPPNAME}; wait
+### Check
+/opt/verb/serfs/inkget ${CVAPPNAME} check
+if [ "$?" = 4 ]; then
+echo "Repo failed to retrieve the file."
+exit 4; fi
+if [ ! -f ${CVAPPNAME}.vtxz ]; then
+echo "Failed to retrieve from the repo."
+exit 4; fi
+
+/opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
+/opt/verb/serfs/setvapplinkon ${CVAPPNAME}; wait
+chown -R www-data:www-data /var/www/html/kiwi.ampache; wait
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
 
 # Auto database
 if [ -z ${3} ]; then
@@ -28,17 +45,8 @@ DBASE=${CVAPPNAME}$(pwgen -s -1 6); fi
 if [ -z ${2} ]; then
 DBUSER=${DBASE}; fi
 
-# Install
-cd /var/www/vapps
-/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
-/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
-rm -rf /var/www/html/kiwi.ampache
-ln -s /var/www/vapps/${CVAPPNAME} /var/www/html/kiwi.ampache
-chown -R www-data:www-data /var/www/html/kiwi.ampache
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
-
 # Create the database user and credentials
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON *.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}' WITH GRANT OPTION;
 FLUSH PRIVILEGES;"
@@ -50,13 +58,13 @@ FLUSH PRIVILEGES;"
 #sed -i "s/database_username = username/database_username = ${DBUSER}/g" /var/www/vapps/ampache/config/ampache.cfg.php
 #sed -i "s/database_password = password/database_password = ${DBPASSWORD}/g" /var/www/vapps/ampache/config/ampache.cfg.php
 ## Add the tables to the database
-#mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf ${DBASE} < /var/www/vapps/ampache/sql/ampache.sql
+#mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${DBASE} < /var/www/vapps/ampache/sql/ampache.sql
 
 # Write the config for backup
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}
+APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}
 
 echo "These are setup:
 

@@ -1,9 +1,9 @@
 #!/bin/sh
 # inkVerb repo donjon download info list
 
-ampache="https://github.com/ampache/ampache/releases NOTE: download it and get your own SHA256 with \"shasum -a 256 FILE.zip\""
+ampache="https://github.com/ampache/ampache/releases NOTE: still using md5"
 ampache_themes=
-drupal="https://www.drupal.org/download NOTE: use SHA256 for .tar.gz"
+drupal="https://www.drupal.org/download NOTE: Audo-DL, but currently no SHA256 for tar.gz"
 fossil="https://www.fossil-scm.org/fossil/uv/download.html NOTE: download it and get the SHA256 with \"shasum -a 256 FILE.tar.gz\""
 iwpadmin="https://infinitewp.com/installing-download/ NOTE: No SHA. Must include email with the donjon knight."
 mediawiki="https://www.mediawiki.org/wiki/Download NOTE: download it and get your own SHA256 with \"shasum -a 256 FILE.tar.gz\""
@@ -12,11 +12,10 @@ nextcloud="https://nextcloud.com/install/#instructions-server NOTE: SHA retrieve
 orangehrm="https://sourceforge.net/projects/orangehrm/files/stable/"
 owncloud="https://owncloud.org/download/  NOTE: SHA retrieved automatically because ownCloud is cool"
 phpmyadmin="https://www.phpmyadmin.net/ NOTE: use SHA256 from the Download button popup"
-postfixadmin="https://sourceforge.net/projects/postfixadmin/files/postfixadmin/"
+postfixadmin="https://sourceforge.net/projects/postfixadmin/files/postfixadmin/ NOTE: just the plain tar.gz"
 postfixadmingit="https://github.com/postfixadmin/postfixadmin" #for reference, perhaps to replace
-pydio="https://sourceforge.net/projects/ajaxplorer/files/pydio/stable-channel/ NOTE: use SHA1 for .tar.gz"
 roundcube="https://roundcube.net/download/"
 sonerezh="https://www.sonerezh.bzh/"
 suitecrm="https://sourceforge.net/projects/suitecrm/files/"
-zenphoto20="https://github.com/ZenPhoto20/ZenPhoto20"
+zenphoto20="https://github.com/ZenPhoto20/netPhotoGraphics"
 

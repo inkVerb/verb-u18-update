@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This restores a back up of the entire email server, including folders and database, that was made using backupvmail
 ## This only restores the users and their mailpfa as created in PostfixAdmin. Any PostfixAdmin setup will be overwritten.
@@ -9,7 +9,7 @@ set -e
 
 # Instructions:
 ## The file can have any name, even if you changed it from the original, as long as it ends in .vbak
-## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+## The file MUST be uploaded to the "vip" folder, which can be done with vsftp installed and an ftpvip
 ## This can be run before or after running installemail or installpostfix, etc.
 
 # How to use:
@@ -22,32 +22,59 @@ set -e
 FILENAME=$1
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/sitemailpath
-. /var/local/verb/configs/sitemailpass
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpath
+. /opt/verb/conf/sitemailpass
+
+# Set the to-be-replaced SITEMAILPASSAPG
+tbrSMPAPG=${SITEMAILPASSAPG}
 
 # Unpack the file
-cd /var/www/guru
+cd /var/www/vip
 mv ${FILENAME} vmail.vtxz
-/var/local/verb/serfs/vtxzout vmail
+/opt/verb/serfs/vtxzout vmail
 
 # Restore and include RC settings in the sitemail config
-. /var/vmail/sitemailpass-oldrc
-sed -i "s/SITEMAILPASSAPG.*/SITEMAILPASSAPG=${SITEMAILPASSAPG}/g" /var/local/verb/configs/sitemailpass
-. /var/local/verb/configs/sitemailpass
+. /var/www/vip/vmail/sitemailpass-old
+sed -i "s/SITEMAILPASSAPG.*/SITEMAILPASSAPG=\"${SITEMAILPASSAPG}\"/g" /opt/verb/conf/sitemailpass
+. /opt/verb/conf/sitemailpass
 
 # Restore the database
-/var/local/verb/serfs/mysqlkilldb mail; wait
-/var/local/verb/serfs/mysqlkilluser mail; wait
-/var/local/verb/serfs/mysqlnewdb mail mail mailpass${SITEMAILPASSAPG}
-/var/local/verb/serfs/mysqlin mail; wait
+/opt/verb/serfs/mysqlkilldb mail; wait
+/opt/verb/serfs/mysqlkilluser mail; wait
+/opt/verb/serfs/mysqlnewdb mail mail mailpass${SITEMAILPASSAPG}; wait
+cd vmail
+/opt/verb/serfs/mysqlin mail; wait
 rm -f mail.sql
+rm -f sitemailpass-old
+rm -f sitemailpath-old
+rm -f sitenameip-old
+cd ..
 
 # Move the vmail directory into place
 cp -rf vmail /var/
 chmod -R 770 /var/vmail
 chown -R vmail:mail /var/vmail
 rm -rf vmail
+
+# Postfix & Dovecot password
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/dovecot/dovecot-sql.conf.ext
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/amavis/conf.d/50-user
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/postfix/mysql_virtual_alias_domainaliases_maps.cf
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/postfix/mysql_virtual_alias_maps.cf
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/postfix/mysql_virtual_domains_maps.cf
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/postfix/mysql_virtual_mailbox_domainaliases_maps.cf
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/postfix/mysql_virtual_mailbox_maps.cf
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /etc/postfix/mysql_virtual_sender_login_maps.cf
+## If PFA is already installed
+if [ -e "/etc/apache2/sites-enabled/pfa.${emailTLDURI}.conf" ] && [ -f "/var/www/email/postfixadmin/config.local.php" ] && [ "${SITEPFAPATH}" != "PFA_NOT_INSTALLED" ] && [ ${SITEPFAPATH} != "PFA_NOT_ALLOWED" ]; then
+sed -i "s/mailpass${tbrSMPAPG}/mailpass${SITEMAILPASSAPG}/" /var/www/email/postfixadmin/config.local.php; fi
+
+# Restart stuff
+systemctl restart postfix
+systemctl restart dovecot
+systemctl restart amavis
 
 # Finish
 echo "

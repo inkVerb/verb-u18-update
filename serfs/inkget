@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This downloads an app from the site-wide ink repo
 
@@ -16,20 +16,24 @@ set -e
 APPNAME=$1
 
 # Include the config files
-. /var/local/verb/configs/siteinkget
+. /opt/verb/conf/siteinkget
 
 if [ "${INKGET_REPO}" = "NOT_SET" ]; then
 echo "inkNet is not setup, so no repo is available. Can't download the necessary package."
-exit 22
+exit 8
 fi
 
 # zjz
 if [ $INKGET_METHOD = "ZJZ" ]; then
-/var/local/verb/donjon/repoupdate/${APPNAME}.updaterepo; wait
-cp /var/local/verb/repo/${APPNAME}.vtxz .
+/opt/verb/donjon/repoupdate/${APPNAME}.updaterepo; wait
+## Check repo for failed DL
+ if [ "$2" = "check" ] && [ -f "/opt/verb/donjon/repoupdate/${APPNAME}.failed" ]; then
+ exit 4; fi
+## Continue
+cp /opt/verb/repo/${APPNAME}.vtxz .
 echo "Copied for install."
  if [ $INKGET_REPO = "TEMP" ]; then
-rm /var/local/verb/repo/${APPNAME}.vtxz
+rm /opt/verb/repo/${APPNAME}.vtxz
 echo "Temp repo files cleaned-up."
  else
 echo "Repo files kept."
@@ -43,7 +47,7 @@ fi
 
 # inker
 if [ $INKGET_METHOD = "INKER_CP" ]; then
-cp /var/local/ink/repo/${APPNAME}.vtxz .
+cp /opt/ink/repo/${APPNAME}.vtxz .
 fi
 
 ## DEV NOTE: Other secure methods are planned in the roadmap
@@ -55,5 +59,5 @@ fi
 # Exit if failed
 if [ ! -f ${APPNAME}.vtxz ]; then
 echo "Couldn't get the file! I quit."
-exit 44; fi
+exit 4; fi
 

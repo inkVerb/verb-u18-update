@@ -1,8 +1,8 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This activates the repo....verb.guru folder so the web will provide an index
+# This activates the repo....verb.vip folder so the web will provide an index
 
 # How to use:
 ## ./activaterepo [on/off]
@@ -13,8 +13,8 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 if [ "$1" = "-h" ]
 then
@@ -25,23 +25,23 @@ Examples:
  ./activaterepo off
 
  allowed arguments:
- on	(repo.${guruURI} becomes a web-accessible folder)
- off	(repo.${guruURI} returns to a redirect to ${inkURI})"
+ on	(repo.${vipURI} becomes a web-accessible folder)
+ off	(repo.${vipURI} returns to a redirect to ${inkURI})"
 exit 0
 fi
 
 if [ "$1" = "on" ]
 then
-    rm -rf /var/www/html/guru.repo
-    ln -sfn /var/www/guru/repo /var/www/html/guru.repo
+    rm -rf /var/www/html/vip.repo
+    ln -sfn /var/www/vip/repo /var/www/html/vip.repo
     echo "repo on."
 exit 0
 fi
 
 if [ "$1" = "off" ]
 then
-    rm -f /var/www/html/guru.repo
-    cp -R /var/www/html/0ne /var/www/html/guru.repo
+    rm -f /var/www/html/vip.repo
+    cp -R /var/www/html/0ne /var/www/html/vip.repo
     echo "repo off."
 exit 0
 fi

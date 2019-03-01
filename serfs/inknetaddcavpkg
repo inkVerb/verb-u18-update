@@ -1,9 +1,9 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This puts the login credentials into the right place for a Verber
-## This assumes that the key has been already uploaded to the CA, signed, downloaded from the CA, and put on this Verber in the www/guru folder
+## This assumes that the key has been already uploaded to the CA, signed, downloaded from the CA, and put on this Verber in the www/vip folder
 
 # How to use:
 ## ./inknetaddcavpkg [sec path code from CA Verber - optional, will prompt if not entered here]
@@ -12,7 +12,7 @@ set -e
 SECPATH=$1
 
 # Include the config
-. /var/local/verb/configs/inknet/inker.client.cnf
+. /opt/verb/conf/inknet/inker.client.cnf
 
 # Verify working home directory
 cd ~/
@@ -27,17 +27,17 @@ echo "Please copy-paste the code the CA Verber gave you, then press Enter."
 read SECPATH
 fi
 if [ -z "$SECPATH" ]; then
-echo "You aren't entering the path. I quit."; exit 55; fi
+echo "You aren't entering the path. I quit."; exit 5; fi
 
 # Download the package
 wget -q https://${CAVERBERHOST}/inknet/${SECPATH}/${CLIENTNAME}.ink --no-check-certificate
 
 # Unpack
 mv ${CLIENTNAME}.ink ${CLIENTNAME}.vtxz
-/var/local/verb/serfs/vtxzout ${CLIENTNAME}
+/opt/verb/serfs/vtxzout ${CLIENTNAME}
 rm -f ${CLIENTNAME}.vtxz
 . ~/${CLIENTNAME}/verbername
-cp ~/${CLIENTNAME}/client.verber.${CLIENTNAME}.cnf /var/local/verb/configs/inknet/client.${VERBERNAME}.inker.login.cnf
+cp ~/${CLIENTNAME}/client.verber.${CLIENTNAME}.cnf /opt/verb/conf/inknet/client.${VERBERNAME}.inker.login.cnf
 rm -rf ${CLIENTNAME}
 
 # Finish

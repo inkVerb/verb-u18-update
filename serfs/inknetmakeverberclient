@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets the settings for this Verber to be an inkNet Verber Client to a Inker CA Verber
 ## This can be run to update an existing config
@@ -22,8 +22,8 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 # Set variables
 NEWCLIENTURI="${nameURI}"
@@ -45,13 +45,13 @@ ${SITEIP} ${hostURI} ${SITEHOST}
 
 Check with your hosting provider if you still have trouble.
 I quit."
-exit 22; fi
+exit 8; fi
 ## To make this an CA Verber on an Inker (This server must already be an Inker)
 if [ "${1}" = "I_AM_INKER" ]; then
 ### Make sure it really is an Inker
- if [ ! -d /var/local/ink/configs ]; then
+ if [ ! -d /opt/ink/conf ]; then
  echo "No, you're not. Don't even pose."
- exit 22
+ exit 8
  fi
 ### Set special Inker settings
 NEWCAVERBERHOST="I_AM_INKER"
@@ -59,19 +59,19 @@ NEWCAVERBERURI="I_AM_INKER"
 NEWCAVERBERNAME="I_AM_INKER"
 NEWCAVERBERIP="I_AM_INKER"
 NEWINIVSAILORNAME="I_AM_INKER"
-/var/local/verb/serfs/setinkcertsslca "I_AM_INKER"
+/opt/verb/serfs/setinkcertsslca "I_AM_INKER"
 wait
-/var/local/verb/serfs/setinkcertsshca "I_AM_INKER"
+/opt/verb/serfs/setinkcertsshca "I_AM_INKER"
 wait
-/var/local/verb/serfs/setinkgetrepo "I_AM_INKER"
+/opt/verb/serfs/setinkgetrepo "I_AM_INKER"
 wait
-/var/local/verb/serfs/setinknetsslca "I_AM_INKER"
+/opt/verb/serfs/setinknetsslca "I_AM_INKER"
 wait
-/var/local/verb/serfs/setinknetsshca "I_AM_INKER"
+/opt/verb/serfs/setinknetsshca "I_AM_INKER"
 wait
-/var/local/verb/serfs/setinknetrepo "I_AM_INKER"
+/opt/verb/serfs/setinknetrepo "I_AM_INKER"
 wait
-sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /var/local/verb/configs/siteinkget
+sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /opt/verb/conf/siteinkget
 else
 
 ## To make this a standard CA Verber
@@ -81,17 +81,17 @@ NEWCAVERBERURI="$(echo ${NEWCAVERBERHOST} | rev | cut -d'.' -f-3 | rev)"
 NEWCAVERBERNAME="$(echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
 NEWCAVERBERIP=$2
 ### Settings
-/var/local/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}
+/opt/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}
 wait
-/var/local/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}
+/opt/verb/serfs/setinkcertsshca ${NEWCAVERBERHOST}
 wait
-/var/local/verb/serfs/setinkgetrepo ${NEWCAVERBERHOST}
+/opt/verb/serfs/setinkgetrepo ${NEWCAVERBERHOST}
 wait
-/var/local/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}
+/opt/verb/serfs/setinknetsslca ${NEWCAVERBERHOST}
 wait
-/var/local/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}
+/opt/verb/serfs/setinknetsshca ${NEWCAVERBERHOST}
 wait
-/var/local/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}
+/opt/verb/serfs/setinknetrepo ${NEWCAVERBERHOST}
 wait
 fi
 
@@ -109,7 +109,7 @@ CLIENTHOST=\"${NEWCLIENTHOST}\"
 CLIENTURI=\"${NEWCLIENTURI}\"
 CLIENTNAME=\"${NEWCLIENTNAME}\"
 CLIENTSAILOR=\"NOT_SET\"
-" > /var/local/verb/configs/inknet/inker.client.cnf
+" > /opt/verb/conf/inknet/inker.client.cnf
 ## For the system
 ### Prepare /etc/ssh/ssh_config
 if [ ! -d /etc/ssh/inknet ]; then
@@ -122,11 +122,11 @@ Host *
 " >> /etc/ssh/ssh_config
 
 # Install ivApp for inkNet & CA Key
-/var/local/verb/serfs/inknetinstallivapp
+/opt/verb/serfs/inknetinstallivapp
 wait
 ## inkNet ivApp Sailor (to login to the CA Verber)
 if [ "${1}" != "I_AM_INKER" ]; then
-/var/local/verb/serfs/inknetivappnewclientsailor
+/opt/verb/serfs/inknetivappnewclientsailor
 wait
 fi
 

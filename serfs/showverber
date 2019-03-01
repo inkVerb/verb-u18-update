@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This displays the settings and info for this Verber
 ## This is useful for many things, including Clients that need name and IP to connect to it
@@ -10,10 +10,10 @@ set -e
 
 
 # Include the config
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitemailpath
-. /var/local/verb/configs/inklists/verberverno
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpath
+. /opt/verb/conf/inklists/verberverno
 
 # Display info
 echo "Here you go. This Verber's info...

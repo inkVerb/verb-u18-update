@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This creates a domain inkDNS zone file on this Verber
 
@@ -11,22 +11,30 @@ set -e
 DNSDOMAIN=$1
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
+. /opt/verb/conf/sitenameip
 
 # Check if already added
-if [ -e "/var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db" ]; then
+if [ -e "/opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}" ]; then
 echo "The domain ${DNSDOMAIN} zone file has already been created. Use inkdnskilldomain to remove it."
 exit 0; fi
 
-# Copy the file
-cp /var/local/verb/configs/inkdns/dnsdomain.db /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+# DNS zone file
+cp /opt/verb/conf/inkdns/db.dnsdomain /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}
+sed -i "s/hostdomain286/${DNSDOMAIN}/g" /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}
 
-# Replace the data
-sed -i "s/hostdomain286/${DNSDOMAIN}/g" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+# rDNS zone file
+echo "; PTR Domain
+${SITEARPAIP4}		IN  PTR  ${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  ${DNSDOMAIN}." > /opt/verb/conf/inkdns/zones/nv.${DNSDOMAIN}
 
 # Set the Serial No
-/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+/opt/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Refresh zones
+if [ -f "/opt/verb/conf/inkdns/inkdnsstatus" ]; then
+  . /opt/verb/conf/inkdns/inkdnsstatus
+  if [ "${INKDNSSTAT}" = "INSTALLED" ]; then
+/opt/verb/serfs/inkdnsrefreshbind; fi; fi
 
 # Finish
 echo "${DNSDOMAIN} DNS zone file created."
-

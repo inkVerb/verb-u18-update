@@ -8,6 +8,6 @@
 
 
 # Run the installer
-/var/local/verb/donjon/ivapp/installivapp /var/local/verb/configs/inknet/ivapp-inknet.conf
+/opt/verb/donjon/ivapp/installivapp /opt/verb/conf/inknet/ivapp-inknet.conf
 wait
 

@@ -1,12 +1,12 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This kills a subdomain after it has been added with addsubdomain or addsubdomaincgi
 
 ## This DOES NOT:
 ### Removes the SSL certificate for the domain and all subdomains thereof.
-### Remove files formerly in the domain from the server, which are retained in the domains folder that an ftpguru can access
+### Remove files formerly in the domain from the server, which are retained in the domains folder that an ftpvip can access
 ### Remove files for subdomains in the domains folder, just the same.
 ### Remove any subdomain folders belonging to the domain.
 ### Remove opekDKIM/inkDKIM keys.
@@ -24,7 +24,7 @@ rm -f /etc/apache2/sites-enabled/${KILLSUBDOMAIN}.conf
 apache2ctl graceful
 
 # Remove from inkCert
-sed -i "s/, ${KILLSUBDOMAIN}//g" /var/local/verb/configs/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
+sed -i "s/, ${KILLSUBDOMAIN}//g" /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
 
 # Remove http folder symlinks
 rm -f /var/www/html/${KILLSUBDOMAIN}
@@ -34,5 +34,5 @@ rm -f /var/www/html/${KILLSUBDOMAIN}
 /etc/init.d/postfix restart
 
 # Finish
-echo "${KILLSUBDOMAIN} has been removed. But, the folder in www/domains still exists for a Guru to access."
+echo "${KILLSUBDOMAIN} has been removed. But, the folder in www/domains still exists for a VIP to access."
 

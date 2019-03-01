@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This should be run after roundcube has been setup through the web interface at rc.your-name.verb.email/rcpath
 

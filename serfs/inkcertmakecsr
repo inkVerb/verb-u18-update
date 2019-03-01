@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This makes keys and a .csr file based on an inkCert profile made via inkcertsetcsr
 ## Also use this to renew an inkCert certificate
@@ -37,7 +37,7 @@ set -e
 
 
 # Include config
-. /var/local/verb/configs/inkcert/csr-inf/csr.${INFPROFILE}.inf
+. /opt/verb/conf/inkcert/csr-inf/csr.${INFPROFILE}.inf
 
 DOMAIN=$1
 COMMONNAME=$2
@@ -45,7 +45,7 @@ INFPROFILE=$3
 PASSPHRASE=$(pwgen -s -1 105)
 
 # Verify that the domain is installed
-if [ ! -f /var/local/verb/configs/inkcert/csr-inf/siteinkcert-${DOMAIN} ]; then
+if [ ! -f /opt/verb/conf/inkcert/csr-inf/siteinkcert-${DOMAIN} ]; then
 echo "Sorry, Bucko. ${DOMAIN} is not installed yet.
 
 Do that first, then get back to me.
@@ -66,7 +66,7 @@ echo "Generating keys for ${DOMAIN}"
 openssl genrsa -des3 -out csr/${DOMAIN}/${DOMAIN}.key.pem -passout pass:/etc/inkcert/csr/${DOMAIN}/pemfraez 2048
 chmod 600 csr/${DOMAIN}/${DOMAIN}.key.pem
 else
-echo "This key already exists. So, renewing the cert and creating links to the verb/req and guru/req folders for renewal...
+echo "This key already exists. So, renewing the cert and creating links to the verb/req and vip/req folders for renewal...
 (To remove it and have a new cert, use you must revoke the old key and cert with inkcertrevoke or inkcertundo)
 "
 fi
@@ -81,13 +81,13 @@ openssl req -config client/openssl.cnf \
 	-passin pass:/etc/inkcert/csr/${DOMAIN}/pemfraez \
 	-subj "/C=${COUNTRY}/ST=${STATE}/L=${LOCALITY}/O=${ORGANIZATION}/OU=${ORGANIZATIONALUNIT}/CN=${COMMONNAME}/emailAddress=${EMAIL}/unstructuredName=${COMPANYNAME}/"
 
-# Link to accessible folder at verb/req and guru/req
+# Link to accessible folder at verb/req and vip/req
 ln -s /etc/inkcert/csr/${DOMAIN}/${DOMAIN}.key.pem /etc/inkcert/req/
 ln -s /etc/inkcert/csr/${DOMAIN}/${DOMAIN}.csr.pem /etc/inkcert/req/
 
 # Finish
 echo "
-All wrapped-up, key and csr for ${DOMAIN} be waitin' in verb/req/ and guru/req/ fer ye with ${INFPROFILE} info, cap'n.
+All wrapped-up, key and csr for ${DOMAIN} be waitin' in verb/req/ and vip/req/ fer ye with ${INFPROFILE} info, cap'n.
 
 If you plan to give your csr to another Authority than inkCert, you will need: 1. their Root CA & Intermediate CA certificate chain file, 2. your domain's CA-signed certificate named \"${DOMAIN}.cert.pem\", and 3. all three of these PEM encoded files!
 "

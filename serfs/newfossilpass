@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This changes the password for an existing fossil user
 
@@ -12,17 +12,17 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 OLDFOSSIL=$1
 OLDUSER=$2
 NEWPASS=$3
 
-cd /var/www/guru/fossil
+cd /var/www/vip/fossil
 
 # Change the password
 fossil user password ${OLDUSER} ${NEWPASS} --repository ${OLDFOSSIL}.fossil
 
 echo "New ${OLDFOSSIL}.fossil password set for ${OLDUSER}.
-Available on web at fossil.${guruURI}/${OLDFOSSIL}.cgi"
+Available on web at fossil.${vipURI}/${OLDFOSSIL}.cgi"

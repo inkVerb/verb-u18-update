@@ -1,9 +1,9 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This downloads and installs net2ftp manually from inkisaverb.com/repo and linnks it to net2ftp....verb.guru
-# Prereq: vsftp and an ftpguru or ftpfiler for login
+# This downloads and installs net2ftp manually from inkisaverb.com/repo and linnks it to net2ftp....verb.vip
+# Prereq: vsftp and an ftpvip or ftpfiler for login
 
 # How to use:
 ## ./installvsftpd
@@ -12,17 +12,25 @@ set -e
 CVAPPNAME=net2ftp
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 # Download and unpack
 cd /var/www/vapps
-/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
-/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
-rm -rf /var/www/html/guru.net2ftp
-ln -s /var/www/vapps/net2ftp /var/www/html/guru.net2ftp
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
-chown -R www-data:www-data /var/www/html/guru.net2ftp
+/opt/verb/serfs/inkget ${CVAPPNAME}; wait
+### Check
+/opt/verb/serfs/inkget ${CVAPPNAME} check
+if [ "$?" = 4 ]; then
+echo "Repo failed to retrieve the file."
+exit 4; fi
+if [ ! -f ${CVAPPNAME}.vtxz ]; then
+echo "Failed to retrieve from the repo."
+exit 4; fi
+
+/opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
+/opt/verb/serfs/setvapplinkon ${CVAPPNAME}; wait
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
+chown -R www-data:www-data /var/www/html/vip.net2ftp; wait
 
 # Settings
 cd net2ftp
@@ -40,7 +48,7 @@ sed -i "s/\/\/\$net2ftp_settings\[\"allowed_ftpserverport\"\] = \"21\";/\$net2ft
 # Finish
 echo "net2ftp is enabled and clipping along!
 
-After creating an FTP Guru (or FTP Filer for private file access also)
+After creating an FTP VIP (or FTP Filer for private file access also)
 
-Login at http://net2ftp.${guruURI}
+Login at http://net2ftp.${vipURI}
 "

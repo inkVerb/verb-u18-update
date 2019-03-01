@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This imports a MySQL database from a .sql file with the same name
 
@@ -10,5 +10,5 @@ set -e
 
 DBASE=$1
 
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf ${DBASE} < ${DBASE}.sql
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${DBASE} < ${DBASE}.sql
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This restores a backup .vbak file from an inkVerb app backed-up using backup
 
@@ -9,7 +9,7 @@ set -e
 
 # Instructions:
 ## The file can have any name, even if you changed it from the original, as long as it ends in .vbak
-## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+## The file MUST be uploaded to the "vip" folder, which can be done with vsftp installed and an ftpvip
 
 # How to use:
 ## ./backuprestore [app namespace] [filename]
@@ -27,36 +27,42 @@ APPNAME=$1
 FILENAME=$2
 
 # Include the site config
-. /var/local/verb/configs/sitenameip
+. /opt/verb/conf/sitenameip
 
 # Backup and remove whatever the original status is
-. /var/local/verb/configs/vapp.${APPNAME}
+if [ -e "/opt/verb/conf/vapp.${APPNAME}" ]; then
+. /opt/verb/conf/vapp.${APPNAME}
 cd /var/www/vapps/${APPNAME}/
-/var/local/verb/serfs/mysqlvappout vapp.${APPNAME}; wait
-mv /var/local/verb/configs/vapp.${APPNAME} .
+/opt/verb/serfs/mysqlvappout vapp.${APPNAME}; wait
+mv /opt/verb/conf/vapp.${APPNAME} .
 cd /var/www/vapps/
-/var/local/verb/serfs/vtxzin ${APPNAME}
+/opt/verb/serfs/vtxzin ${APPNAME}
 mv ${APPNAME}.vtxz verb.${APPNAME}.restore-originalbackedup.vbak
-mv verb.${APPNAME}.restore-originalbackedup.vbak /var/www/guru/
-/var/local/verb/serfs/mysqlkilldb ${APPDBASE}; wait
-/var/local/verb/serfs/mysqlkilluser ${APPDDBUSR}; wait
+mv verb.${APPNAME}.restore-originalbackedup.vbak /var/www/vip/
+/opt/verb/serfs/mysqlkilldb ${APPDBASE}; wait
+/opt/verb/serfs/mysqlkilluser ${APPDDBUSR}; wait
 rm -rf ${APPNAME}
+fi
 
 # Unpack the file
-cd /var/www/guru
+cd /var/www/vip
 mv ${FILENAME} ${APPNAME}.vtxz
-/var/local/verb/serfs/vtxzout ${APPNAME}
+/opt/verb/serfs/vtxzout ${APPNAME}
 mv ${APPNAME} /var/www/vapps/
 
+# Set up the vapp symlink
+/opt/verb/serfs/setvapplinkon ${APPNAME}
+
 # Restore and include the app config
-mv /var/www/vapps/${APPNAME}/vapp.${APPNAME} /var/local/verb/configs/
-. /var/local/verb/configs/vapp.${APPNAME}
+mv /var/www/vapps/${APPNAME}/vapp.${APPNAME} /opt/verb/conf/
+. /opt/verb/conf/vapp.${APPNAME}
 
 # Restore the database
-/var/local/verb/serfs/mysqlnewdb ${APPDBASE} ${APPDDBUSR} ${APPDDBPAS}
+/opt/verb/serfs/mysqlnewdb ${APPDBASE} ${APPDDBUSR} ${APPDDBPAS}
 cd  /var/www/vapps/${APPNAME}
-/var/local/verb/serfs/mysqlin ${APPDBASE}; wait
+/opt/verb/serfs/mysqlin ${APPDBASE}; wait
 rm -f ${APPDBASE}.sql
+rm -f sitenameip*
 
 # Own
 chown -R www-data:www-data /var/www/vapps/${APPNAME}
@@ -64,6 +70,6 @@ chown -R www-data:www-data /var/www/vapps/${APPNAME}
 # Finish
 echo "${APPNAME} has been restored and all its backup files removed from this server.
 
-A backup of the previous ${APPNAME} on this server has been saved in the guru folder just in case.
+A backup of the previous ${APPNAME} on this server has been saved in the vip folder just in case.
 "
 

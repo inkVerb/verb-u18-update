@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds the wildcard * subdomain alias non-SSL catch to a domain's Apache config.
 ## By definition of the web, this will conflict with the fixhttps

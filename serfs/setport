@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets a new SSH login port number and disallows the previous port
 ## This could kill the current connection and require the user to logon again using the new port.
@@ -21,20 +21,22 @@ set -e
 ### 2368 (Ghost default) - Extra Ghost installs will incrementally rise above this.
 ### 8069 (Odoo default)
 
-## This port will also be used by any FTP users, gurus, or filers in an FTP app such as FileZilla.
+## This port will also be used by any FTP users, vips, or filers in an FTP app such as FileZilla.
 
 # How to use:
 ## ./setport [port number]
 
 
 # Include the config file
-. /var/local/verb/configs/siteport
+. /opt/verb/conf/siteport
 
 NEWPORT=$1
 
 sed -i "s/Port.*/Port ${NEWPORT}/g" /etc/ssh/sshd_config
-sed -i "s/SITEPORT.*/SITEPORT=\"${NEWPORT}\"/g" /var/local/verb/configs/siteport
+sed -i "s/SITEPORT.*/SITEPORT=\"${NEWPORT}\"/" /opt/verb/conf/siteport
 ufw allow ${NEWPORT}
 # Deny the previous port from the config file which has been written, but not yet refreshed
 ufw deny ${SITEPORT}
 
+# Reload the settings
+systemctl reload ssh

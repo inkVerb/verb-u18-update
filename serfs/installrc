@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs roundcube
 ## Prerequisite: verbemail IF using a verb domain other than verb.email
@@ -18,18 +18,19 @@ set -e
 ## ./installrc easy mysecretpath
 
 
+CVAPPNAME=roundcube
 # Include the config files
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitemailpass
-. /var/local/verb/configs/sitemailpath
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpass
+. /opt/verb/conf/sitemailpath
 
 # Check dependencies and to see if already installed
 if [ ${SITEMAILSTATUS} != "VMAIL_SERVER" ]; then
 echo "
 The email server must be installed first. Run: installpostfix
 "
-exit 22; fi
+exit 8; fi
 if [ ${SITERCPATH} = "RC_NOT_ALLOWED" ]; then
 echo "
 This is a backup email server and Roundcube is not allowed.
@@ -44,26 +45,40 @@ if [ ${SITEMAILSTATUS} = "EMAIL_NOT_INSTALLED" ]; then
 echo "
 This is a backup email server and Roundcube is not allowed.
 "
-exit 22; fi
-if grep -Fq "Webmail Defaults" /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db; then
+exit 8; fi
+if grep -Fq "Webmail Defaults" /opt/verb/conf/inkdns/zones/db.${emailTLDURI}; then
 echo "Proceeding..."; else
 echo "
-Webmail Defaults already declared in the DNS zone file. This won't work.
+Webmail Defaults not declared in the DNS zone file. This won't work.
 "
-exit 22; fi
+exit 8; fi
 
+# Security & path
+if [ -n "$1" ]; then
 RCFOLDER=$1
+else
+RCFOLDER="$(pwgen -0 5 1)"
+fi
 RCPASSGEN=$(pwgen -s -1 5)
 DESSALTGEN=$(pwgen -s -1 24)
 
 # Get inkVerb's latest and install
 cd /var/www/email
-/var/local/verb/serfs/inkget roundcube; wait
-rm -rf roundcube
-/var/local/verb/serfs/vtxzout roundcube; wait
+/opt/verb/serfs/inkget ${CVAPPNAME}; wait
+### Check
+/opt/verb/serfs/inkget ${CVAPPNAME} check
+if [ "$?" = 4 ]; then
+echo "Repo failed to retrieve the file."
+exit 4; fi
+if [ ! -f ${CVAPPNAME}.vtxz ]; then
+echo "Failed to retrieve from the repo."
+exit 4; fi
+
+rm -rf ${CVAPPNAME}
+/opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
 
 # Create the MySQL database and user
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  rcmail;
 GRANT ALL PRIVILEGES ON rcmail.* TO 'rcmailusr'@'localhost' IDENTIFIED BY 'rcpass${RCPASSGEN}';
 FLUSH PRIVILEGES;"
@@ -72,14 +87,14 @@ FLUSH PRIVILEGES;"
 cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.rc
 ln -sfn /var/www/email/roundcube /var/www/html/${SITEEMAILTLD}.rc/${RCFOLDER}
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.rc
-sed -i "s/; Webmail Defaults/; Webmail Defaults\nrc\.${emailTLDURI}\.\tIN  A\t\t${SITEIP}\nrc\.${emailTLDURI}\.\tIN  AAAA\t${SITEIPV6}/" /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db
+sed -i "s/; Webmail Defaults/; Webmail Defaults\nrc\.${emailTLDURI}\.\tIN  A\t\t${SITEIP}\nrc\.${emailTLDURI}\.\tIN  AAAA\t${SITEIPV6}/" /opt/verb/conf/inkdns/zones/db.${emailTLDURI}
 a2ensite rc.${emailTLDURI}
 apache2ctl graceful
 
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, rc.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
+sed -i "/^domains =/ s/$/, rc.${emailTLDURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Roundcube system apps
 apt install -y \
@@ -87,8 +102,7 @@ apt install -y \
   php-mail-mimedecode \
   php-mime-type \
   php-mail-mime \
-  php7.0-intl \
-  php7.0-zip \
+  php-ldap \
   libpspell-dev
 ## The following dependencies often want to be installed after libpspell-dev, so do it differently
 wait
@@ -103,8 +117,8 @@ apache2ctl graceful
 wait
 
 # Settings
-cp /var/local/verb/configs/conflab/vmail/roundcube/config/roundcube286-config.inc.php /var/www/email/roundcube/config/config.inc.php
-cp /var/local/verb/configs/conflab/vmail/roundcube/config/roundcube286-defaults.inc.php /var/www/email/roundcube/config/defaults.inc.php
+cp /opt/verb/conf/lab/vmail/roundcube/config/roundcube286-config.inc.php /var/www/email/roundcube/config/config.inc.php
+cp /opt/verb/conf/lab/vmail/roundcube/config/roundcube286-defaults.inc.php /var/www/email/roundcube/config/defaults.inc.php
 sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/roundcube/config/config.inc.php
 sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/www/email/roundcube/config/defaults.inc.php
 sed -i "s/nameURI286/${nameURI}/g" /var/www/email/roundcube/config/config.inc.php
@@ -118,27 +132,27 @@ sed  -i "s/rcfolder286/${RCFOLDER}/g" /var/www/email/postfixadmin/config.inc.php
 fi
 
 # Copy the branding files
-cp /var/local/verb/configs/conflab/vmail/roundcube/roundcubepics/skins/larry/images/verbink_logo.png /var/www/email/roundcube/skins/larry/images/
-cp /var/local/verb/configs/conflab/vmail/roundcube/roundcubepics/verbink_logo.png /var/www/email/roundcube/
-cp /var/local/verb/configs/conflab/vmail/roundcube/roundcubepics/skins/larry/images/watermark.jpg /var/www/email/roundcube/skins/larry/images/
-cp /var/local/verb/configs/conflab/vmail/roundcube/roundcubepics/skins/larry/images/favicon.ico /var/www/email/roundcube/skins/larry/images/
-cp /var/local/verb/configs/conflab/vmail/roundcube/roundcubepics/favicon.ico /var/www/email/roundcube/
+cp /opt/verb/conf/lab/vmail/roundcube/roundcubepics/skins/larry/images/verbink_logo.png /var/www/email/roundcube/skins/larry/images/
+cp /opt/verb/conf/lab/vmail/roundcube/roundcubepics/verbink_logo.png /var/www/email/roundcube/
+cp /opt/verb/conf/lab/vmail/roundcube/roundcubepics/skins/larry/images/watermark.jpg /var/www/email/roundcube/skins/larry/images/
+cp /opt/verb/conf/lab/vmail/roundcube/roundcubepics/skins/larry/images/favicon.ico /var/www/email/roundcube/skins/larry/images/
+cp /opt/verb/conf/lab/vmail/roundcube/roundcubepics/favicon.ico /var/www/email/roundcube/
 
 # Own
 chown -R www-data:www-data /var/www/email/roundcube
 
 # Set the config for backup
-sed -i "s/SITERCPASSAPG.*/SITERCPASSAPG=\"${RCPASSGEN}\"/g" /var/local/verb/configs/sitemailpass
-sed -i "s/SITERCPATH.*/SITERCPATH=\"${RCFOLDER}\"/g" /var/local/verb/configs/sitemailpath
+sed -i "s/SITERCPASSAPG.*/SITERCPASSAPG=\"${RCPASSGEN}\"/g" /opt/verb/conf/sitemailpass
+sed -i "s/SITERCPATH.*/SITERCPATH=\"${RCFOLDER}\"/g" /opt/verb/conf/sitemailpath
 
 # Set up plugins that Composer broke
 cd /var/www/email/roundcube/plugins/
 if [ ! -d "/var/www/email/roundcube/plugins/authres_status" ]; then
-cp /var/local/verb/configs/conflab/vmail/roundcube/authres_status.vtxz .
-/var/local/verb/serfs/vtxzout authres_status; wait; fi
+cp /opt/verb/conf/lab/vmail/roundcube/authres_status.vtxz .
+/opt/verb/serfs/vtxzout authres_status; wait; fi
 if [ ! -d "/var/www/email/roundcube/plugins/contextmenu" ]; then
-cp /var/local/verb/configs/conflab/vmail/roundcube/contextmenu.vtxz .
-/var/local/verb/serfs/vtxzout contextmenu; wait; fi
+cp /opt/verb/conf/lab/vmail/roundcube/contextmenu.vtxz .
+/opt/verb/serfs/vtxzout contextmenu; wait; fi
 
 # Sledgehammertime (Composer Plugins)
 ## This is excerpted from installrcinkplugins
@@ -150,6 +164,12 @@ cp composer.json-dist composer.json
 # Causing problems, reactivate when they decide on a minimum version number that doesn't exist in the future
 #sed -i '/\"require\": {/ a\
 #        \"johndoh\/contextmenu\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"pear-pear.php.net\/net_ldap2\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"kolab\/Net_LDAP3\": \"dev-master\",' composer.json
+sed -i '/\"require\": {/ a\
+        \"angrychimp\/php-dkim\": \"dev-master\",' composer.json
 sed -i '/\"require\": {/ a\
         \"roundcube\/authres_status\": \"dev-master",' composer.json
 sed -i '/\"require\": {/ a\

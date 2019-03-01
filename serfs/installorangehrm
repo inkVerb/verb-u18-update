@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This downloads and installs OrangeHRM manually from inkisaverb.com/repo and linnks it to ....verb.blue
 
@@ -13,8 +13,8 @@ set -e
 CVAPPNAME=orangehrm
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 DBASE=$1
 DBUSER=$2
@@ -23,13 +23,33 @@ CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
-if [ -f /var/local/verb/configs/vapp.${CVAPPNAME} ]; then
+if [ -f /opt/verb/conf/vapp.${CVAPPNAME} ]; then
 echo "This is already installed."
 exit 0; fi
 ## Directory
 if [ -d /var/www/vapps/${CVAPPNAME} ]; then
 echo "OrangeHRM already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
-exit 22; fi
+exit 8; fi
+
+# Download and unpack the latest checked version from inkisaverb.com/repo
+cd /var/www/vapps
+/opt/verb/serfs/inkget ${CVAPPNAME}; wait
+### Check
+/opt/verb/serfs/inkget ${CVAPPNAME} check
+if [ "$?" = 4 ]; then
+echo "Repo failed to retrieve the file."
+exit 4; fi
+if [ ! -f ${CVAPPNAME}.vtxz ]; then
+echo "Failed to retrieve from the repo."
+exit 4; fi
+
+/opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
+mkdir -p /var/www/vapps/${CVAPPNAME}/lib/logs
+mkdir -p /var/www/vapps/${CVAPPNAME}/symfony/cache
+mkdir -p /var/www/vapps/${CVAPPNAME}/symfony/log
+/opt/verb/serfs/setvapplinkon ${CVAPPNAME}; wait
+chown -R www-data:www-data /var/www/html/red.hrm; wait
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
 
 # Auto database
 if [ -z ${3} ]; then
@@ -39,20 +59,8 @@ DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
 if [ -z ${2} ]; then
 DBUSER=${DBASE}; fi
 
-# Download and unpack the latest checked version from inkisaverb.com/repo
-cd /var/www/vapps
-/var/local/verb/serfs/inkget ${CVAPPNAME}; wait
-/var/local/verb/serfs/vtxzout ${CVAPPNAME}; wait
-mkdir /var/www/vapps/${CVAPPNAME}/lib/logs
-mkdir /var/www/vapps/${CVAPPNAME}/symfony/cache
-mkdir /var/www/vapps/${CVAPPNAME}/symfony/log
-rm -rf /var/www/html/red.hrm
-ln -s /var/www/vapps/${CVAPPNAME} /var/www/html/red.hrm
-chown -R www-data:www-data /var/www/html/red.hrm
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
-
 # Create the database and credentials
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
 FLUSH PRIVILEGES;"
@@ -71,7 +79,7 @@ ufw allow 3306
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}
+APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}
 
 echo "These are setup:
 

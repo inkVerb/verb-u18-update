@@ -1,13 +1,13 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This downloads and installs OctoberCMS as a vapp with www/html/DOMAIN.TLD link from newdomain
 ## October actually resides in www/vapps/october.DOMAIN.TLD
 ## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
-## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## This does not remove any files an ftpvip may have uploaded to the domain's folder
 ## Any files conflicting with OctoberCMS will be replaced by the new OctoberCMS installation created by this script
-## Because OctoberCMS is high-maintenance on the developer end, the domain becomes a guru domain and is linked for ftp access in guru/_domains
+## Because OctoberCMS is high-maintenance on the developer end, the domain becomes a vip domain and is linked for ftp access in vip/_domains
 
 # All options after the domain are optional, but are sequential
 
@@ -25,19 +25,29 @@ CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
-if [ -f /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN} ]; then
+if [ -f /opt/verb/conf/vapp.${CVAPPNAME}.${DOMAIN} ]; then
 echo "This is already installed."
 exit 0; fi
 ## Directory
 if [ -d /var/www/vapps/${CVAPPNAME}.${DOMAIN} ]; then
 echo "That October site already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
-exit 22; fi
+exit 8; fi
 
 
 # Options
 if [ -z ${1} ]; then
 echo "You must designate a domain."
-exit 22; fi
+exit 8; fi
+
+# Include the config file
+. /opt/verb/conf/sitenameip
+
+# Download and establish October in the server to pre-created domain
+cd /var/www/vapps
+git clone https://github.com/octobercms/install
+if [ ! -d install ]; then
+echo "Can't download OctoberCMS. I quit."
+exit 4; fi
 
 # Auto database
 if [ -z ${4} ]; then
@@ -47,15 +57,6 @@ DBASE=oct$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 6); fi
 if [ -z ${3} ]; then
 DBUSER=${DBASE}; fi
 
-# Include the config file
-. /var/local/verb/configs/sitenameip
-
-# Download and establish October in the server to pre-created domain
-cd /var/www/vapps
-git clone https://github.com/octobercms/install
-if [ ! -d install ]; then
-echo "Can't download OctoberCMS. I quit."
-exit 44; fi
 mv install ${CVAPPNAME}.${DOMAIN}
 
 ## Install main themes and plugins
@@ -136,14 +137,14 @@ wget https://github.com/jacoweb/AgencyTheme/archive/master.zip
 unzip master.zip
 rm -f master.zip
 ## Setup links
-rm -f /var/www/html/${DOMAIN}
-ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}
-ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/guru/_webapps/
-chown -R www-data:www-data /var/www/html/${DOMAIN}
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+rm -f /var/www/html/${DOMAIN}; wait
+ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}; wait
+ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/vip/_webapps/; wait
+chown -R www-data:www-data /var/www/html/${DOMAIN}; wait
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}; wait
 
 # Create the database and credentials
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
 FLUSH PRIVILEGES;"
@@ -154,7 +155,7 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}.${DOMAIN}
+APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Reset all permissions
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
@@ -169,7 +170,7 @@ Database Name: ${DBASE}
 MySQL Login: ${DBUSER}
 MySQL Password: ${DBPASSWORD}
 
-You also have ftp access to the folder in: guru/_domains/${DOMAIN}
+You also have ftp access to the folder in: vip/_domains/${DOMAIN}
 
 Go to http://${DOMAIN}/index.php to install.
 "

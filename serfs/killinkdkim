@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This removes all inkDKIM (OpenDKIM) records for a specific domain
 

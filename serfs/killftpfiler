@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This deletes an ftp filer and his vsftpd folder and home folder
 
@@ -14,6 +14,6 @@ DELFTPFILER=$1
 userdel ${DELFTPFILER}
 
 # Remove directories
-rm -rf /srv/guru/filers/${DELFTPFILER}
+rm -rf /srv/vip/filers/${DELFTPFILER}
 rm -rf /home/${DELFTPFILER}
-rm -rf /var/www/guru/files/${NEWFTPFILER}
+rm -rf /var/www/vip/files/${NEWFTPFILER}

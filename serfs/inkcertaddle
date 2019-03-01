@@ -1,6 +1,6 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs inkCert-Letsencrypt Apache credentials for a given domain, including inkVerb namespace domains
 ## Prerequesite: inkcertreqle
@@ -24,9 +24,9 @@ SITEDOMAIN=$1
 CERTDOMAIN=$2
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/inkcert/inkcertstatus
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/inkcert/inkcertstatus
 
 # Check variables
 if [ -z ${1} ]; then
@@ -49,37 +49,34 @@ inkCert-Letsencrypt certs were not installed for ${SITEDOMAIN} because the ${CER
   - DNS records can take about 4 hours to have effect
   - You need to first run: inkcertreqle
   - Do not run inkcertreqle for individual subdomains with a shared certificate, but only for: ${blueURI}, ${rocksURI}, inkisaverb.com, etc.
-  - The verb/configs/inkcert/cli-ini/ file for ${CERTDOMAIN} may not contain the subdomain you are using.
+  - The verb/conf/inkcert/cli-ini/ file for ${CERTDOMAIN} may not contain the subdomain you are using.
 "
-exit 22
+exit 8
 fi
 
 # Check Apache config status
 if grep -Fq "#INKVERB-INKCERT=INK_NO" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
-echo "Setting inkCert configs for ${SITEDOMAIN}..."
-else
- if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+ echo "Setting inkCert configs for ${SITEDOMAIN}..."
+elif grep -Fq "#INKVERB-INKCERT=DONE_CB" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+ echo "Already certified by inkCert-CB: ${SITEDOMAIN}. Moving on..."
+ exit 0
+elif grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
  echo "Already certified by inkCert-LE: ${SITEDOMAIN}. Moving on..."
  exit 0
- else
-  if grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
-  echo "Already certified by inkCert-IC: ${SITEDOMAIN}. Moving on..."
-  exit 0
-  else
-   if grep -Fq "#INKVERB-INKCERT=NA" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
-   echo "inkCert certs do not apply here: ${SITEDOMAIN}. Moving on..."
-   exit 0
-   else
-   echo "Something's really wrong with ${SITEDOMAIN}. No inkCert, no non-inkCert either. I quit here."
-   exit 66
-   fi
-  fi
- fi
+elif grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+ echo "Already certified by inkCert-IC: ${SITEDOMAIN}. Moving on..."
+ exit 0
+elif grep -Fq "#INKVERB-INKCERT=NA" /etc/apache2/sites-available/${SITEDOMAIN}.conf ; then
+ echo "inkCert certs do not apply here: ${SITEDOMAIN}. Moving on..."
+ exit 0
+else
+ echo "Something's really wrong with ${SITEDOMAIN}. No inkCert, no non-inkCert either. I quit here."
+ exit 6
 fi
 
 # Stop Apache
-apache2ctl graceful-stop
-systemctl stop apache2
+apache2ctl graceful-stop; wait
+systemctl stop apache2; wait
 
 # Comment the Snakeoil certs
 sed -i "s/SSLCertificateFile/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/g" /etc/apache2/sites-available/${SITEDOMAIN}.conf
@@ -91,22 +88,22 @@ apache2ctl start
 
 # Create the inkCert-DOMAIN config file
 echo "#!/bin/sh
-INKCERTED=DONE_LE" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${SITEDOMAIN}
+INKCERTED=DONE_LE" > /opt/verb/conf/inkcert/cli-ini/siteinkcert.${SITEDOMAIN}
 
 # inkCert status & exit
 if [ "${FIRSTINKCERTADDLE}" = "NOT_YET" ]; then
 ## Config status: first inkCert done
-sed -i "s/FIRSTINKCERTADDLE=\"NOT_YET\"/FIRSTINKCERTADDLE=\"DONE\"/g" /var/local/verb/configs/inkcert/inkcertstatus
+sed -i "s/FIRSTINKCERTADDLE=\"NOT_YET\"/FIRSTINKCERTADDLE=\"DONE\"/g" /opt/verb/conf/inkcert/inkcertstatus
 ## Create the cron job
 ### Add inkCertLE's auto updater to the cron
-echo "3 3 * * * root /var/local/verb/configs/inkcert/inkcertle-renew-all.sh" >> /var/local/verb/configs/verbcron
-cp -f /var/local/verb/configs/verbcron /etc/cron.d/verber
-#chmod 644 /etc/cron.d/verber
-chmod 755 /etc/cron.d/verber
+echo '3 3 * * * root /opt/verb/conf/inkcert/inkcertle-renew-all.sh > /dev/null 2>&1' > /etc/cron.d/inkcertrenewlecron
+chmod 0644 /etc/cron.d/inkcertrenewlecron
 fi
+
+# Start Apache
+systemctl start apache2; wait
 
 # Finish
 echo "
 ${SITEDOMAIN} certs installed.
 "
-

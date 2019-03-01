@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This redirects all http traffic to https
 ## This could conflict with fixalias, due to wildcard cert limits of Letsencrypt.
@@ -23,7 +23,7 @@ apache2ctl graceful
 else
  if [ -f "/etc/apache2/sites-available/${DOMAIN}.conf.verbhttpsfixed" ]; then
 echo "Something is wrong. The backup file for this https fix exists, but the config does not have the settings."
-exit 66
+exit 6
  fi
 
 ## Then set the new config if it doesn't.
@@ -34,7 +34,7 @@ sed -i '/##inkHTTPstart/d' /etc/apache2/sites-available/${DOMAIN}.conf
 sed -i 's/##inkHTTPstop/##inkHTTPremoved/' /etc/apache2/sites-available/${DOMAIN}.conf
 ### Add the new lines
 #### WordPress?
-if -d /var/www/vapps/wp.${DOMAIN}; then
+if [ -d "/var/www/vapps/wp.${DOMAIN}" ]; then
 sed -i "/WP_SITEURL/d" /var/www/vapps/wp.${DOMAIN}/wp-config.php
 sed -i "/WP_HOME/d" /var/www/vapps/wp.${DOMAIN}/wp-config.php
 echo "define( 'WP_SITEURL', 'https://${DOMAIN}' );
@@ -54,4 +54,3 @@ echo "
 apache2ctl graceful
 	echo "${DOMAIN} now redirects all http traffic to SSL-secure https."
 fi
-

@@ -1,6 +1,6 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs droids from a git repo.
 
@@ -19,12 +19,12 @@ CLNDROIDREPO1=$(echo $DROIDREPO | cut -d'/' -f5-)
 CLNDROIDREPO=$(echo $CLNDROIDREPO1 | sed 's/\.git//')
 
 # Clone it
-cd /var/local/verb/droids
+cd /opt/verb/droids
 git clone ${DROIDREPO}
 
 # Clean up and install
 cd ${CLNDROIDREPO}
-chmod +x vd*
+chmod 750 vd*
 mv vd* ../
 cd ..
 rm -rf ${CLNDROIDREPO}

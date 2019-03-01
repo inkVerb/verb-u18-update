@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This unsets up a WordPress vapp for multisite after it has been setup
 
@@ -18,13 +18,13 @@ WPDOMAIN=$1
 if grep -Fq "define( 'WP_ALLOW_MULTISITE', true );" /var/www/html/${WPDOMAIN}/wp-config.php; then
 echo "Proceeding..."; else
 echo "Multisite isn't even setup, dufis. Run: wpmuseton"
-exit 22; fi
+exit 8; fi
 
 # Check if already set
 if grep -Fq "define('MULTISITE', true);" /var/www/html/${WPDOMAIN}/wp-config.php; then
 echo "Proceeding..."; else
 echo "Multisite is ready to install, but hasn't been setup. To set it up use: wpmusetconfig"
-exit 22; fi
+exit 8; fi
 
 # Delete the settings
 ## Subdomain install

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This prepares core Verber config files for a domain, with OpenDKIM profiles and keys and inkCert and inkDNS configs, WITHOUT including the actual domain itself or its Apache configs and html folder.
 ## This is intended as a subscript to be used by adddomain or adddomaincgi
@@ -14,25 +14,26 @@ set -e
 
 
 # Include settings
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/inkcert/inkcertstatus
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/inkcert/inkcertstatus
 
 NEWDOMAIN=$1
 
 # inkCert
-cp /var/local/verb/configs/inkcert/cli-ini/cli.new.ini /var/local/verb/configs/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
-sed -i "s/inkcertemail589/${INKCERTEMAIL}/g" /var/local/verb/configs/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+cp /opt/verb/conf/inkcert/cli-ini/cli.new.ini /opt/verb/conf/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+sed -i "s/inkcertemail589/${INKCERTEMAIL}/g" /opt/verb/conf/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
+sed -i "s/newdomain589/${INKCERTEMAIL}/g" /opt/verb/conf/inkcert/cli-ini/cli.${NEWDOMAIN}.ini
 echo "#!/bin/sh
 INKCERTED=NOT_YET
-" > /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${NEWDOMAIN}
+" > /opt/verb/conf/inkcert/cli-ini/siteinkcert.${NEWDOMAIN}
 
 # inkDKIM
-/var/local/verb/serfs/addinkdkim ${NEWDOMAIN}; wait
+/opt/verb/serfs/addinkdkim ${NEWDOMAIN}; wait
 
 # inkDNS
-/var/local/verb/serfs/inkdnsadddomain ${NEWDOMAIN}; wait
-/var/local/verb/serfs/inkdnsaddmail ${NEWDOMAIN}; wait
-/var/local/verb/serfs/inkdnsaddinkdkim ${NEWDOMAIN}; wait
+/opt/verb/serfs/inkdnsadddomain ${NEWDOMAIN}; wait
+/opt/verb/serfs/inkdnsaddmail ${NEWDOMAIN}; wait
+/opt/verb/serfs/inkdnsaddinkdkim ${NEWDOMAIN}; wait
 
 # Finish
 echo "Great! With no error messages, ${NEWDOMAIN} is ready to be added on the Verber."

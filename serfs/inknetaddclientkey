@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds a Vrk/Verber Client's public SSH key to "authorized_hosts" on the CA Verber
 ## If the key is not included in the initial command, it will be read interactively.
@@ -36,24 +36,24 @@ VCURI="$(echo ${VCHOST} | rev | cut -d'.' -f-3 | rev)"
 fi
 
 if [ "${VTYPE}" != "vrk" ] && [ "${VTYPE}" != "verber" ] ; then
-echo "You need to specify \"vrk\" or \"verber\". Read the instructions."; exit 22; fi
+echo "You need to specify \"vrk\" or \"verber\". Read the instructions."; exit 8; fi
 
 # Check if the Client has been added
 if [ "${VTYPE}" = "vrk" ]; then
- if [ ! -e "/var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
- echo "You must add the Client first using: inknetaddvrkclient."; exit 22; fi
+ if [ ! -e "/opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
+ echo "You must add the Client first using: inknetaddvrkclient."; exit 8; fi
 fi
 if [ "${VTYPE}" = "verber" ]; then
- if [ ! -e "/var/local/verb/configs/inknet/verber/client.verber.${VCNAME}.cnf" ]; then
- echo "You must add the Client first using: inknetaddverberclient."; exit 22; fi
+ if [ ! -e "/opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf" ]; then
+ echo "You must add the Client first using: inknetaddverberclient."; exit 8; fi
 fi
 
 # Include the configs
 if [ "${VTYPE}" = "vrk" ]; then
-. /var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf; fi
+. /opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf; fi
 if [ "${VTYPE}" = "verber" ]; then
-. /var/local/verb/configs/inknet/verber/client.verber.${VCNAME}.cnf; fi
-. /var/local/verb/configs/inknet/ca.verber.cnf
+. /opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf; fi
+. /opt/verb/conf/inknet/ca.verber.cnf
 
 # Prompt for the copy-paste
 if [ -z "${VCKEY}" ]; then
@@ -81,16 +81,16 @@ read CPKEY
 VCKEY="${CPKEY}"
 fi
 if [ -z "${VCKEY}" ]; then
-echo "You aren't entering a key. I quit."; exit 55; fi
+echo "You aren't entering a key. I quit."; exit 5; fi
 
 # Add the key
 if [ "${VTYPE}" = "vrk" ]; then
-echo "${VCKEY}" >> /var/local/ivapp/inknet/vrker/${CLIENTUSERNAME}/.ssh/authorized_keys
+echo "${VCKEY}" >> /opt/ivapp/inknet/vrker/${CLIENTUSERNAME}/.ssh/authorized_keys
 fi
 if [ "${VTYPE}" = "verber" ]; then
-echo "${VCKEY}.${VCURI}" >> /var/local/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
+echo "${VCKEY}.${VCURI}" >> /opt/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
 ## Remove any duplication of the URI
-sed -i "s/${VCURI}\.${VCURI}/${VCURI}/" /var/local/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
+sed -i "s/${VCURI}\.${VCURI}/${VCURI}/" /opt/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
 fi
 
 # Finish

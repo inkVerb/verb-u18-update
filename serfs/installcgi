@@ -1,31 +1,31 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This turns on the www/cgi folder and links it to cgi....verb.guru
+# This turns on the www/cgi folder and links it to cgi....verb.vip
 
 # How to use:
 ## ./installcgi
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 # Prepare the directories
-mkdir /srv/guru/cgi
-rm -rf /var/www/html/guru.cgi
-ln -s /srv/cgi /var/www/html/guru.cgi
+mkdir /srv/vip/cgi
+rm -rf /var/www/html/vip.cgi
+ln -s /srv/cgi /var/www/html/vip.cgi
 chown -R www-data:www-data /var/www
-chown -R www-data:www-data /srv/guru/cgi
+chown -R www-data:www-data /srv/vip/cgi
 
 # Write the first file
-cp -f /var/local/verb/site-files/cgi-fossil/helloworld.cgi /var/www/guru/cgi/
-chmod +x /var/www/guru/cgi/helloworld.cgi
+cp -f /opt/verb/site-files/cgi-fossil/helloworld.cgi /var/www/vip/cgi/
+chmod 750 /var/www/vip/cgi/helloworld.cgi
 
 echo "
 All done. Access CGI files in the cgi folder via ftp.
 And check out your first script at:
 
-http://cgi.${guruURI}/helloworld.cgi
+http://cgi.${vipURI}/helloworld.cgi
 "

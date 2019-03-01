@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets new site-wide repo for Verber app installs, used primarily or solely by the inkget serf
 ## This should generally not be necessary unless new repos have been added and the current repo is distant or has high traffic.
@@ -14,5 +14,5 @@ set -e
 
 NEWINKREPO=$1
 
-sed -i "s/INKGET_REPO=.*/INKGET_REPO=\"${NEWINKREPO}\"/g" /var/local/verb/configs/siteinkget
+sed -i "s/INKGET_REPO=.*/INKGET_REPO=\"${NEWINKREPO}\"/g" /opt/verb/conf/siteinkget
 

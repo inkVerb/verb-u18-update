@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs ghost as an app to be connected to blog.your-name.verb.ink
 
@@ -17,8 +17,8 @@ set -e
 CVAPPNAME=ghost.inkblog
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 EMAILUSER=$1
 EMAILPASS=$2
@@ -26,11 +26,11 @@ EMAILPASS=$2
 # Basic credential check
 if [ -z ${2} ]; then
 echo "You need to set two variables (email and password) to install Ghost to a domain. See \"How to use\" in the serf."
-exit 55
+exit 5
 fi
 
 # Check for existing inkblog
-. /var/local/verb/configs/siteinstallstatus
+. /opt/verb/conf/siteinstallstatus
 if [ "${INKblog}" != "NOT_YET" ]; then
 echo "Awkward...
 Your blog at blog.${inkURI} already has ${INKblog} installed. This just isn't going to work."
@@ -42,17 +42,17 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 apt install -y nodejs
 
 # Install Ghost
-cd /var/local/ghost
+cd /var/www/ghost
 curl -L https://ghost.org/zip/ghost-latest.zip -o ghost.zip
 unzip -uo ghost.zip -d ghostblog
 rm -f ghost.zip
 
 ## Now install it with npm
-cd /var/local/ghost/ghostblog
+cd /var/www/ghost/ghostblog
 npm install --production
 
 # Set up the Ghost config
-cd /var/local/ghost/ghostblog
+cd /var/www/ghost/ghostblog
 cp config.example.js config.js
 sed -i "s/url: 'http:\/\/my-ghost-blog.com'/url: 'http:\/\/blog.${inkURI}'/g" config.js
 sed -i "s/host: '127.0.0.1'/host: '${SITEIP}'/g" config.js
@@ -66,51 +66,51 @@ ufw allow 2368
 rm -rf /var/www/html/ink.blog
 echo "Ghost" > /var/www/html/ink.blog
 ## Set the IP address in the Apache config file
-cp /var/local/verb/configs/site-files/conf/blog.${inkURI}.conf-ghost /etc/apache2/sites-available/blog.${inkURI}.conf
+cp /opt/verb/conf/site-files/conf/blog.${inkURI}.conf-ghost /etc/apache2/sites-available/blog.${inkURI}.conf
 sed -i "s/ip286/${SITEIP}/g" /etc/apache2/sites-available/blog.${inkURI}.conf
 apache2ctl graceful
 ## inkCert SSL certs
 ### Not setup
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+if grep -Fq "INKCERTED=NO" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "FYI: inkCert is not yet setup for ${inkURI}."
 fi
 ### inkCert-LE DONE
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+if grep -Fq "INKCERTED=DONE_LE" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-LE is already setup for ${inkURI}. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertaddallle ${inkURI}
+/opt/verb/serfs/inkcertaddallle ${inkURI}
 wait
 fi
 ### inkCert-IC DONE
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+if grep -Fq "INKCERTED=DONE_IC" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertadd blog.${inkURI}
+/opt/verb/serfs/inkcertadd blog.${inkURI}
 wait
 fi
 
 # Make it a service at startup
-cp /var/local/verb/configs/site-files/conf/ghost.conf /etc/init/ghost.conf
+cp /opt/verb/conf/site-files/conf/ghost.conf /etc/init/ghost.conf
 
 # Set the site-wide inkblog config
-sed -i "s/INKblog=.*/INKblog=\"Ghost\"/g" /var/local/verb/configs/siteinstallstatus
+sed -i "s/INKblog=.*/INKblog=\"Ghost\"/g" /opt/verb/conf/siteinstallstatus
 
 # Write the config for backup
 echo "#!/bin/sh
 GHOSTEMAIL=\"${EMAILUSER}\"
-GHOSTEMLPAS=\"${EMAILPASS}\"" > /var/local/verb/configs/vapp.${CVAPPNAME}
+GHOSTEMLPAS=\"${EMAILPASS}\"" > /opt/verb/conf/vapp.${CVAPPNAME}
 
 ### Below (Forever) is expirimental on inkVerb, but working, and should be replaced with a way to run Ghost as a proper service at startup
 # Run Ghost with Forever
 npm install -g forever
 ## Production forever
-cd /var/local/ghost/ghostblog && NODE_ENV=production forever start index.js
+cd /var/www/ghost/ghostblog && NODE_ENV=production forever start index.js
 ## Non-production / developer forever
 #forever start index.js
 ## If you want, stop Forever with:
-### cd /var/local/ghost/ghostblog && forever stop index.js
+### cd /var/www/ghost/ghostblog && forever stop index.js
 
 ##### Don't use this normally because it halts the current script and does not finish the rest of the jobs
 ## Start Ghost only for this server session
-#cd /var/local/ghost/ghostblog
+#cd /var/www/ghost/ghostblog
 #npm start --production
 #####
 
@@ -122,4 +122,3 @@ Go to http://blog.${inkURI}/ghost to install."
 #echo "But first, wait two minutes for the server to restart."
 #sleep 3
 #reboot
-

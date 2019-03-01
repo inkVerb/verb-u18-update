@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets the inkGet repo version list so that it will not automatically update when the Verber is updated
 
@@ -8,5 +8,5 @@ set -e
 ## ./setrepocust
 
 
-sed -i "s/INKGET_LIST=.*/INKGET_LIST=\"CUSTOM\"/g" /var/local/verb/configs/siteinkget
+sed -i "s/INKGET_LIST=.*/INKGET_LIST=\"CUSTOM\"/g" /opt/verb/conf/siteinkget
 

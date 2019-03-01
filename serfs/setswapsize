@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets or activates swap to a set size
 ## Options are 1, 2, 4, 8, 16, 32, 64 GB
@@ -106,5 +106,5 @@ free
 # Set to enable it at next startup
 echo "/var/swap.img    none    swap    sw    0    0" >> /etc/fstab
 ## And turn off this above echo so it doesn't add it for future changes.
-sed -i "s/echo \"\/var\/swap\.img    none    swap    sw    0    0\" >> \/etc\/fstab/#echo \"\/var\/swap\.img    none    swap    sw    0    0\" >> \/etc\/fstab/g" /var/local/verb/serfs/setswapsize
+sed -i "s/echo \"\/var\/swap\.img    none    swap    sw    0    0\" >> \/etc\/fstab/#echo \"\/var\/swap\.img    none    swap    sw    0    0\" >> \/etc\/fstab/g" /opt/verb/serfs/setswapsize
 

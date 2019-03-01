@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs the inkCert SSL certificate service
 ## Currently, inkCert uses letsencrypt for main websites with options for "inkCert proper", the non-standard inkVerb CA service.
@@ -11,31 +11,29 @@ set -e
 
 
 # Include and check the config
-. /var/local/verb/configs/inkcert/inkcertstatus
+. /opt/verb/conf/inkcert/inkcertstatus
 
-if [ "${INKCERTINSTALLED}" = "DONE" ]
-then
+if [ "${INKCERTINSTALLED}" = "DONE" ]; then
 echo "inkCert already installed."
-exit 0
-fi
+exit 0; fi
 
 # Install
 ## Letsencrypt - Currently, inkCert is largely powered by Letsencrypt, so it uses links. This will eventually change, but file paths won't.
-apt install -y python-letsencrypt-apache
+add-apt-repository -y ppa:certbot/certbot
+apt install -y python-certbot-apache
 ## inkCert proper
 apt install -y openssl
-mkdir /etc/inkcert
-mkdir /etc/inkcert/client
-mkdir /etc/inkcert/live
-mkdir /etc/inkcert/csr
-mkdir /etc/inkcert/req
+mkdir -p /etc/inkcert
+cd /etc/inkcert
+mkdir -p client live csr req
+cp /opt/verb/conf/inkcert/verber-openssl.cnf /etc/inkcert/client/openssl.cnf
+## Symlinks
 ln -sfn /etc/letsencrypt /etc/inkcert/le
-ln -sfn /etc/inkcert/req /var/local/verb/
-ln -sfn /etc/inkcert/req /var/www/guru/
-cp /var/local/verb/configs/inkcert/verber-openssl.cnf /etc/inkcert/client/openssl.cnf
+ln -sfn /etc/inkcert/req /opt/verb/
+ln -sfn /etc/inkcert/req /var/www/vip/
 
 # Set configs
-sed -i "s/INKCERTINSTALLED=\"NOT_YET\"/INKCERTINSTALLED=\"DONE\"/g" /var/local/verb/configs/inkcert/inkcertstatus
+sed -i "s/INKCERTINSTALLED=\"NOT_YET\"/INKCERTINSTALLED=\"DONE\"/g" /opt/verb/conf/inkcert/inkcertstatus
 
 # Finish
 echo "
@@ -43,4 +41,3 @@ inkCert is now installed and ready to make CSRs for SSL domains and SSH keys.
 
 The CA URLs have been set to defaults and can work now. But, if you want a different CA on the inkCert list, such as in a region closer to your Verber, run setinkcertsslca and setinkcertsshca before making any CSRs.
 "
-

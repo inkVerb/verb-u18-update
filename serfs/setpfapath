@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This changes the path of the PostfixAdmin web path
 ## This changes the path already set by installfpa
@@ -13,8 +13,8 @@ set -e
 
 
 # Include the config file
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/sitemailpath
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/sitemailpath
 
 PFAFOLDER=$1
 
@@ -22,6 +22,6 @@ rm -rf /var/www/html/${SITEEMAILTLD}.pfa
 cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.pfa
 ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.pfa/${PFAFOLDER}
 chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.pfa
-sed -i "s/SITEPFAPATH=.*/SITEPFAPATH=\"${PFAFOLDER}\"/g" /var/local/verb/configs/sitemailpass
+sed -i "s/SITEPFAPATH=.*/SITEPFAPATH=\"${PFAFOLDER}\"/g" /opt/verb/conf/sitemailpass
 sed -i "s/\$CONF\['postfix_admin_url'\] = 'https:\/\/.*/\$CONF\['postfix_admin_url'\] = 'https:\/\/pfa\.${SITENAME}\.verb\.${SITEEMAILTLD}\/${PFAFOLDER}';/g" /var/www/email/postfixadmin/config.inc.php
 

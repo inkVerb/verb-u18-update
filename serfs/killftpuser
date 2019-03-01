@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This deletes an ftp user and his vsftpd folder, home folder, web accessible folder, and all contents
 
@@ -16,4 +16,4 @@ userdel ${DELFTPUSER}
 # Remove directories and web symlink
 rm -rf /srv/vsftpd/${DELFTPUSER}
 rm -rf /home/${DELFTPUSER}
-rm -f /var/www/guru/files/${NEWFTPUSER}
+rm -f /var/www/vip/files/${NEWFTPUSER}

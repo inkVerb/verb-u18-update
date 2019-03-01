@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds a subdomain to an existing domain's inkCert certificate with OpenDKIM profiles and keys after everything in the inkVerb server is already setup via setupverb, and enables CGI.
 
@@ -12,9 +12,9 @@ SUBDOMAIN=$1
 OLDDOMAIN=$2
 
 # Check the domain shell
-if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN} ]; then
+if [ ! -f /opt/verb/conf/inkcert/cli-ini/siteinkcert.${OLDDOMAIN} ]; then
 echo "The shell for ${OLDDOMAIN} does not exist yet. Creating it..."
-/var/local/verb/serfs/newdomainshell ${OLDDOMAIN}
+/opt/verb/serfs/newdomainshell ${OLDDOMAIN}
 wait
 fi
 
@@ -22,40 +22,40 @@ fi
 if [ -f /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf ]; then
  if [ -f /etc/apache2/sites-enabled/${SUBDOMAIN}.${OLDDOMAIN}.conf ]; then
  echo "That subdomain already exists."
- exit 11
+ exit 7
  else
  echo "That site's config exists, but it doesn't seem to be active on Apache. Something's not right."
- exit 22
+ exit 8
  fi
 fi
 
 # Copy and prepare Apache server config files
-cp /var/local/verb/configs/site-files/conf/newdomaincgi.tld.conf /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
+cp /opt/verb/conf/site-files/conf/newdomaincgi.tld.conf /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
 sed -i "s/newdomain.tld/${SUBDOMAIN}.${OLDDOMAIN}/g" /etc/apache2/sites-available/${SUBDOMAIN}.${OLDDOMAIN}.conf
-cp -rf /var/local/verb/configs/site-files/newdomain.tld /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
+cp -rf /opt/verb/conf/site-files/newdomain.tld /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
 ln -s /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN} /var/www/html/
 chown -R www-data:www-data /var/www/html/${SUBDOMAIN}.${OLDDOMAIN}
 chown -R www-data:www-data /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
-chmod -R 755 /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
+chmod -R 750 /var/www/domains/${SUBDOMAIN}.${OLDDOMAIN}
 a2ensite ${SUBDOMAIN}.${OLDDOMAIN}
 apache2ctl graceful
 
 # inkDNS
-/var/local/verb/serfs/inkdnsaddsub ${SUBDOMAIN} ${OLDDOMAIN}
+/opt/verb/serfs/inkdnsaddsub ${SUBDOMAIN} ${OLDDOMAIN}
 wait
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, ${SUBDOMAIN}.${OLDDOMAIN}/" /var/local/verb/configs/inkcert/cli-ini/cli.${OLDDOMAIN}.ini
+sed -i "/^domains =/ s/$/, ${SUBDOMAIN}.${OLDDOMAIN}/" /opt/verb/conf/inkcert/cli-ini/cli.${OLDDOMAIN}.ini
 
 # inkCert status
 ## Not setup
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
+if grep -Fq "INKCERTED=NO" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
 echo "FYI: inkCert hasn't been setup for this domain.
 You are ready to run inkCert for ${OLDDOMAIN}, if you haven't already or unless you want to add more subdomains first."
 fi
 ## inkCert-LE DONE
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
+if grep -Fq "INKCERTED=DONE_LE" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
 echo "FYI: inkCert has already been setup for this domain with Letsencrypt. So, your other certs will need inkCert-LE certs also.
 The Letsencrypt certs will include this subdomain next time your Letsencrypt certs renew. But, that hasn't happened yet.
 To refresh and thus get certs for this subdomain, run inkcertreqle for ${OLDDOMAIN} with the \"r\" option, unless you want to add more subdomains first.
@@ -66,7 +66,7 @@ In summary: ${SUBDOMAIN}.${OLDDOMAIN} will not have SSL certs until you run:
 "
 fi
 ## inkCert-IC DONE
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
+if grep -Fq "INKCERTED=DONE_IC" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${OLDDOMAIN}; then
 echo "FYI: inkCert has already been setup for this domain from inkCert Proper. So, your other certs will need inkCert Proper certs also.
 To refresh and thus get certs for this subdomain, run inkcertreq for ${OLDDOMAIN} with the \"r\" option, unless you want to add more subdomains first.
 Note: Don't get inkCert certs for the same core domain.tld too often or inkCert will make you wait to get more.

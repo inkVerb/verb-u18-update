@@ -1,13 +1,13 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This downloads and installs OctoberCMS to blog.NAME.verb.ink 
 ## October actually resides in www/vapps/october.inkblog
 ## This progression is necessary to: 1. keep track of domain contents in www/domains and 2. use standard structure for backups
-## This does not remove any files an ftpguru may have uploaded to the domain's folder
+## This does not remove any files an ftpvip may have uploaded to the domain's folder
 ## Any files conflicting with OctoberCMS will be replaced by the new OctoberCMS installation created by this script
-## Because OctoberCMS is high-maintenance on the developer end, the domain becomes a guru domain and is linked for ftp access in guru/_domains
+## Because OctoberCMS is high-maintenance on the developer end, the domain becomes a vip domain and is linked for ftp access in vip/_domains
 
 # All options are optional, but must are sequential, omit last options first.
 
@@ -18,7 +18,7 @@ set -e
 CVAPPNAME=october.inkblog
 
 # Include the configs
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/siteurilist
 
 DBASE=$1
 DBUSER=$2
@@ -26,7 +26,7 @@ DBPASSWORD=$3
 CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
 
 # Check for existing inkblog
-. /var/local/verb/configs/siteinstallstatus
+. /opt/verb/conf/siteinstallstatus
 if [ "${INKblog}" != "NOT_YET" ]; then
 echo "Um... How do I say this...
 Your blog at blog.${inkURI} already has ${INKblog} installed. This just isn't going to work.
@@ -47,7 +47,7 @@ cd /var/www/vapps
 git clone https://github.com/octobercms/install
 if [ ! -d install ]; then
 echo "Can't download OctoberCMS. I quit."
-exit 44; fi
+exit 4; fi
 mv install ${CVAPPNAME}
 ## Install main themes and plugins
 ### Plugins
@@ -127,14 +127,13 @@ wget https://github.com/jacoweb/AgencyTheme/archive/master.zip
 unzip master.zip
 rm -f master.zip
 ## Setup links
-rm -rf /var/www/html/ink.blog
-ln -sfn /var/www/vapps/${CVAPPNAME} /var/www/html/ink.blog
-ln -sfn /var/www/html/ink.blog /srv/guru/_webapps/
-chown -R www-data:www-data /var/www/html/ink.blog
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
+/opt/verb/serfs/setvapplinkon ${CVAPPNAME}; wait
+ln -sfn /var/www/html/ink.blog /srv/vip/_webapps/; wait
+chown -R www-data:www-data /var/www/html/ink.blog; wait
+chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
 
 # Create the database and credentials
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
 FLUSH PRIVILEGES;"
@@ -145,34 +144,34 @@ FLUSH PRIVILEGES;"
 echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
-APPDDBPAS=${DBPASSWORD}" > /var/local/verb/configs/vapp.${CVAPPNAME}
+APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}
 
 # Reset all permissions
 chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}
 
 # Set up the Apache config
-cp /var/local/verb/configs/site-files/conf/blog.${inkURI}.conf-october /etc/apache2/sites-available/blog.${inkURI}.conf
+cp /opt/verb/conf/site-files/conf/blog.${inkURI}.conf-october /etc/apache2/sites-available/blog.${inkURI}.conf
 apache2ctl graceful
 ## inkCert SSL certs
 ### Not setup
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+if grep -Fq "INKCERTED=NO" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "FYI: inkCert is not yet setup for ${inkURI}."
 fi
 ### inkCert-LE DONE
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+if grep -Fq "INKCERTED=DONE_LE" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-LE is already setup for ${inkURI}. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertaddallle ${inkURI}
+/opt/verb/serfs/inkcertaddallle ${inkURI}
 wait
 fi
 ### inkCert-IC DONE
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${inkURI}; then
+if grep -Fq "INKCERTED=DONE_IC" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${inkURI}; then
 echo "inkCert-IC is already setup for ${inkURI}. Updating the Apache configs..."
-/var/local/verb/serfs/inkcertadd blog.${inkURI}
+/opt/verb/serfs/inkcertadd blog.${inkURI}
 wait
 fi
 
 # Set the site-wide inkblog config
-sed -i "s/INKblog=.*/INKblog=\"OctoberCMS\"/g" /var/local/verb/configs/siteinstallstatus
+sed -i "s/INKblog=.*/INKblog=\"OctoberCMS\"/g" /opt/verb/conf/siteinstallstatus
 
 echo "These are setup for OctoberCMS:
 
@@ -184,7 +183,7 @@ Database Name: ${DBASE}
 MySQL Login: ${DBUSER}
 MySQL Password: ${DBPASSWORD}
 
-You also have ftp access to the folder in: guru/_domains/ink.blog
+You also have ftp access to the folder in: vip/_domains/ink.blog
 
 Go to http://blog.${inkURI}/index.php to install.
 "

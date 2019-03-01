@@ -1,0 +1,59 @@
+#!/bin/sh
+#inkVerbSerf! verb.ink
+#set -e
+
+# This installs the inkCert Self-Cert (SC) SSL certificate service
+## This is a Prerequesite of inkcertsc
+## DEV: This has not been tested and is useful in theory only, such as for private networks
+## DEV: This has not been tested and may still need inkcertdosc to be written
+
+# How to use:
+## ./inkcertinstallsc
+
+
+# Include and check the config
+. /opt/verb/conf/inkcert/inkcertstatus
+
+if [ "${INKCERTSCINSTALLED}" = "DONE" ]; then
+echo "inkCert-SC already installed."
+exit 0; fi
+
+# Install
+## inkCert proper
+apt install -y openssl
+mkdir -p /etc/inkcert
+cd /etc/inkcert
+mkdir -p client live csr req
+cp /opt/verb/conf/inkcert/verber-openssl.cnf /etc/inkcert/client/openssl.cnf
+## inkCertSC
+mkdir -p /etc/inkcert/sc
+cd /etc/inkcert/sc
+mkdir -p ca intrm cli pub keys rcinst live
+chmod 444 pub
+chmod 400 keys
+chmod 444 rcinst
+cd /etc/inkcert/sc/ca
+mkdir -p priv newcerts certs crl
+chmod -R 700 /etc/inkcert/sc/ca/priv
+touch /etc/inkcert/sc/ca/index.txt
+echo 1000 > /etc/inkcert/sc/ca/serial
+cd /etc/inkcert/sc/intrm/
+mkdir -p priv newcerts certs crl csr
+chmod -R 700 /etc/inkcert/sc/intrm/priv
+touch /etc/inkcert/sc/intrm/index.txt
+echo 1000 > /etc/inkcert/sc/intrm/serial
+cd /etc/inkcert/sc/cli
+mkdir -p priv certs csr
+chmod -R 700 /etc/inkcert/sc/cli/priv
+
+## Symlinks
+ln -sfn /etc/inkcert/req /opt/verb/
+ln -sfn /etc/inkcert/req /var/www/vip/
+
+# Set configs
+echo "INKCERTSCINSTALLED=\"DONE\"" >> /opt/verb/conf/inkcert/inkcertstatus
+
+# Finish
+echo "
+inkCert Self-Cert is now installed and ready to make self-signed & root cert sets for SSL.
+"

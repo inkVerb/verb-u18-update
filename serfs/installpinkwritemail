@@ -1,7 +1,7 @@
 #
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs the PinkWrite email system
 ## THIS IS A SHELL IN BETA and does not work!
@@ -11,9 +11,9 @@ set -e
 
 
 # Include the config files
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitemailpath
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpath
 
 # Check to see if already installed
 if [ ${SITEMAILSTATUS} = "pmail_SERVER" ]; then
@@ -74,12 +74,12 @@ apt install -y \
   zip \
   zoo
 # Create the MySQL database and user
-mysql --defaults-extra-file=/var/local/verb/configs/mysqlboss.cnf -e "
+mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE mail;
 GRANT ALL PRIVILEGES ON mail.* TO 'mail'@'localhost' IDENTIFIED BY 'mailpass${MAILPASSGEN}';
 FLUSH PRIVILEGES;"
 # OR try:
-#/var/local/verb/serfs/newmysqldb mail mail mailpass${MAILPASSGEN}
+#/opt/verb/serfs/newmysqldb mail mail mailpass${MAILPASSGEN}
 
 # Add the virtual user to handle mail
 useradd -r -u 150 -g mail -d /var/pmail -s /sbin/nologin -c "Virtual maildir handler" pmail
@@ -89,17 +89,17 @@ chown pmail:mail /var/pmail
 
 # Dovecot
 ## Copy config files
-cp /var/local/verb/configs/conflab/pmail/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/
-cp /var/local/verb/configs/conflab/pmail/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/
-cp /var/local/verb/configs/conflab/pmail/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/
-cp /var/local/verb/configs/conflab/pmail/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/
-cp /var/local/verb/configs/conflab/pmail/dovecot/conf.d/15-lda.conf /etc/dovecot/conf.d/
-cp /var/local/verb/configs/conflab/pmail/dovecot/conf.d/15-mailboxes.conf /etc/dovecot/conf.d/
-cp /var/local/verb/configs/conflab/pmail/dovecot/dovecot-sql.conf.ext /etc/dovecot/
+cp /opt/verb/conf/lab/pmail/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/
+cp /opt/verb/conf/lab/pmail/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/
+cp /opt/verb/conf/lab/pmail/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/
+cp /opt/verb/conf/lab/pmail/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/
+cp /opt/verb/conf/lab/pmail/dovecot/conf.d/15-lda.conf /etc/dovecot/conf.d/
+cp /opt/verb/conf/lab/pmail/dovecot/conf.d/15-mailboxes.conf /etc/dovecot/conf.d/
+cp /opt/verb/conf/lab/pmail/dovecot/dovecot-sql.conf.ext /etc/dovecot/
 ## Replace configs
 sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /etc/dovecot/conf.d/10-ssl.conf
-sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/pmail/dovecot/conf.d/10-ssl-SNAKEOIL.conf
-sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/pmail/dovecot/conf.d/10-ssl-INKCERT.conf
+sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /opt/verb/conf/lab/pmail/dovecot/conf.d/10-ssl-SNAKEOIL.conf
+sed  -i "s/emailTLDURI286/${emailTLDURI}/g" /opt/verb/conf/lab/pmail/dovecot/conf.d/10-ssl-INKCERT.conf
 sed  -i "s/nameURI286/${nameURI}/g" /etc/dovecot/conf.d/15-lda.conf
 sed  -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/dovecot/dovecot-sql.conf.ext
 ## Own
@@ -110,10 +110,10 @@ chmod -R o-rwx /etc/dovecot
 adduser clamav amavis
 adduser amavis clamav
 ## Copy config files
-cp -R /var/local/verb/configs/conflab/pmail/amavis/conf.d/15-content_filter_mode /etc/amavis/conf.d/
-cp -R /var/local/verb/configs/conflab/pmail/amavis/conf.d/50-user /etc/amavis/conf.d/
-cp -R /var/local/verb/configs/conflab/pmail/clamav/clamd.conf /etc/clamav/
-cp /var/local/verb/configs/conflab/pmail/default/spamassassin /etc/default/
+cp -R /opt/verb/conf/lab/pmail/amavis/conf.d/15-content_filter_mode /etc/amavis/conf.d/
+cp -R /opt/verb/conf/lab/pmail/amavis/conf.d/50-user /etc/amavis/conf.d/
+cp -R /opt/verb/conf/lab/pmail/clamav/clamd.conf /etc/clamav/
+cp /opt/verb/conf/lab/pmail/default/spamassassin /etc/default/
 ## Replace configs
 sed  -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/amavis/conf.d/50-user
 ## Restart and stuff
@@ -126,16 +126,16 @@ freshclam
 
 # Postfix
 ## Copy configs
-cp /var/local/verb/configs/conflab/pmail/postfix/mysql_virtual_alias_domainaliases_maps.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/mysql_virtual_alias_maps.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/mysql_virtual_domains_maps.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/mysql_virtual_mailbox_domainaliases_maps.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/mysql_virtual_mailbox_maps.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/mysql_virtual_sender_login_maps.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/main.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/master.cf /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/header_checks /etc/postfix/
-cp /var/local/verb/configs/conflab/pmail/postfix/main_orig.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/mysql_virtual_alias_domainaliases_maps.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/mysql_virtual_alias_maps.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/mysql_virtual_domains_maps.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/mysql_virtual_mailbox_domainaliases_maps.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/mysql_virtual_mailbox_maps.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/mysql_virtual_sender_login_maps.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/main.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/master.cf /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/header_checks /etc/postfix/
+cp /opt/verb/conf/lab/pmail/postfix/main_orig.cf /etc/postfix/
 ## Replace configs
 sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_alias_domainaliases_maps.cf
 sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_alias_maps.cf
@@ -145,11 +145,11 @@ sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_mail
 sed -i "s/mailpassword/mailpass${MAILPASSGEN}/g" /etc/postfix/mysql_virtual_sender_login_maps.cf
 sed -i "s/hostURI286/${hostURI}/g" /etc/postfix/main.cf
 sed -i "s/emailTLDURI286/${emailTLDURI}/g" /etc/postfix/main.cf
-sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/pmail/postfix/main-SNAKEOIL.cf
-sed -i "s/emailTLDURI286/${emailTLDURI}/g" /var/local/verb/configs/conflab/pmail/postfix/main-INKCERT.cf
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /opt/verb/conf/lab/pmail/postfix/main-SNAKEOIL.cf
+sed -i "s/emailTLDURI286/${emailTLDURI}/g" /opt/verb/conf/lab/pmail/postfix/main-INKCERT.cf
 sed -i "s/nameURI286/${nameURI}/g" /etc/postfix/main.cf
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/configs/conflab/pmail/postfix/main-SNAKEOIL.cf
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/configs/conflab/pmail/postfix/main-INKCERT.cf
+sed -i "s/nameURI286/${nameURI}/g" /opt/verb/conf/lab/pmail/postfix/main-SNAKEOIL.cf
+sed -i "s/nameURI286/${nameURI}/g" /opt/verb/conf/lab/pmail/postfix/main-INKCERT.cf
 
 # Grand Restart
 systemctl reload postfix
@@ -160,7 +160,7 @@ systemctl restart amavis
 systemctl reload dovecot
 
 # Set the config for backup
-sed -i "s/SITEMAILPASSAPG.*/SITEMAILPASSAPG=\"${MAILPASSGEN}\"/g" /var/local/verb/configs/sitemailpass
+sed -i "s/SITEMAILPASSAPG.*/SITEMAILPASSAPG=\"${MAILPASSGEN}\"/g" /opt/verb/conf/sitemailpass
 
 # UFW (services and ports below them if known)
 ufw allow postfix
@@ -186,8 +186,8 @@ ufw allow 12301
 # OpenDKIM
 ## Create/reset OpenDKIM files
 apt install -y opendkim opendkim-tools
-cp /var/local/verb/configs/conflab/pmail/default/opendkim /etc/default/
-cp /var/local/verb/configs/conflab/pmail/opendkim.conf /etc/
+cp /opt/verb/conf/lab/pmail/default/opendkim /etc/default/
+cp /opt/verb/conf/lab/pmail/opendkim.conf /etc/
 mkdir /etc/opendkim
 mkdir /etc/opendkim/keys
 echo "127.0.0.1
@@ -215,31 +215,31 @@ chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.boxes
 echo "; Webmail Defaults
 boxes.${DNSDOMAIN}.	IN  A		${SITEIP}
 boxes.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-" >> /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db
+" >> /opt/verb/conf/inkdns/zones/db.${emailTLDURI}
 a2ensite boxes.${emailTLDURI}
 apache2ctl graceful
 
 # DNS MX and TXT mail records for this server
-/var/local/verb/serfs/inkdnsaddmail ${nameURI}
+/opt/verb/serfs/inkdnsaddmail ${nameURI}
 ## Keep the zone file clean & let the server know "I was here."
-echo ";" >> /var/local/verb/configs/inkdns/zones/${nameURI}.db
-/var/local/verb/serfs/addinkdkim ${nameURI}
-/var/local/verb/serfs/inkdnsaddinkdkim ${nameURI}
+echo ";" >> /opt/verb/conf/inkdns/zones/db.${nameURI}
+/opt/verb/serfs/addinkdkim ${nameURI}
+/opt/verb/serfs/inkdnsaddinkdkim ${nameURI}
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, boxes.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
+sed -i "/^domains =/ s/$/, boxes.${emailTLDURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Monit
-cp /var/local/verb/configs/conflab/pmail/monit/monitrc.d/amavis /etc/monit/monitrc.d/
-cp /var/local/verb/configs/conflab/pmail/monit/monitrc.d/dovecot /etc/monit/monitrc.d/
-cp /var/local/verb/configs/conflab/pmail/monit/monitrc.d/opendkim /etc/monit/monitrc.d/
-cp /var/local/verb/configs/conflab/pmail/monit/monitrc.d/postfix /etc/monit/monitrc.d/
-cp /var/local/verb/configs/conflab/pmail/monit/monitrc.d/spamassassin /etc/monit/monitrc.d/
+cp /opt/verb/conf/lab/pmail/monit/monitrc.d/amavis /etc/monit/monitrc.d/
+cp /opt/verb/conf/lab/pmail/monit/monitrc.d/dovecot /etc/monit/monitrc.d/
+cp /opt/verb/conf/lab/pmail/monit/monitrc.d/opendkim /etc/monit/monitrc.d/
+cp /opt/verb/conf/lab/pmail/monit/monitrc.d/postfix /etc/monit/monitrc.d/
+cp /opt/verb/conf/lab/pmail/monit/monitrc.d/spamassassin /etc/monit/monitrc.d/
 systemctl reload monit
 
 # Config settings to "EMAIL_INSTALLED"
-sed -i "s/SITEMAILSTATUS=.*/SITEMAILSTATUS=\"pmail_SERVER\"/g" /var/local/verb/configs/sitemailpath
+sed -i "s/SITEMAILSTATUS=.*/SITEMAILSTATUS=\"pmail_SERVER\"/g" /opt/verb/conf/sitemailpath
 
 # Finish
 echo "Postfix and friends for inkVerb has been installed.

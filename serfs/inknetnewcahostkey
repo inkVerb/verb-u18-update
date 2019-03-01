@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This creates and signs the host key for this CA Verber
 ## This is used by inknetinstallca (Run by itselt, this only refreshes from when inknetinstallca first used this)
@@ -14,15 +14,15 @@ set -e
 
 
 # Check if CA
-if [ ! -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
+if [ ! -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
 echo "Out of order. This is not a CA Verber yet.
 
 First run inknetinstallca
 "
-exit 22; fi
+exit 8; fi
 
 # Include the config
-. /var/local/verb/configs/inknet/ca.verber.cnf
+. /opt/verb/conf/inknet/ca.verber.cnf
 
 # Verber Keys (on the same CA server)
 ## Create the inkNet host keys for Verber

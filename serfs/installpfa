@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs postfix admin
 ## Prerequisite: verbemail IF using a verb domain other than verb.email
@@ -15,18 +15,19 @@ set -e
 ## ./installpfa mysecretpath secure
 
 
+CVAPPNAME=postfixadmin
 # Include the config files
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitemailpass
-. /var/local/verb/configs/sitemailpath
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpass
+. /opt/verb/conf/sitemailpath
 
 # Check dependencies and to see if already installed
 if [ ${SITEMAILSTATUS} != "VMAIL_SERVER" ]; then
 echo "
 The email server must be installed first. Run: installpostfix
 "
-exit 22; fi
+exit 8; fi
 if [ ${SITEPFAPATH} = "PFA_NOT_ALLOWED" ]; then
 echo "
 This is a backup email server and PostfixAdmin is not allowed.
@@ -37,35 +38,47 @@ echo "
 PostfixAdmin is already installed.
 "
 exit 0; fi
-if grep -Fq "Webmail Defaults" /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db; then
+if grep -Fq "Webmail Defaults" /opt/verb/conf/inkdns/zones/db.${emailTLDURI}; then
 echo "Proceeding..."; else
 echo "
-Webmail Defaults already declared in the DNS zone file. This won't work.
+Webmail Defaults not declared in the DNS zone file. This won't work.
 "
-exit 22; fi
+exit 8; fi
 
+# Options & secure path
+if [ -n "$1" ]; then
 PFAFOLDER=$1
+else
+PFAFOLDER="$(pwgen -0 5 1)"
+fi
 PFAPASS=$2
 
 # Download from repo
 cd /var/www/email
-/var/local/verb/serfs/inkget postfixadmin; wait
-rm -rf postfixadmin
-/var/local/verb/serfs/vtxzout postfixadmin; wait
+/opt/verb/serfs/inkget ${CVAPPNAME}; wait
+### Check
+/opt/verb/serfs/inkget ${CVAPPNAME} check
+if [ "$?" = 4 ]; then
+echo "Repo failed to retrieve the file."
+exit 4; fi
+if [ ! -f ${CVAPPNAME}.vtxz ]; then
+echo "Failed to retrieve from the repo."
+exit 4; fi
+
+rm -rf ${CVAPPNAME}
+/opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
 ## Fix a bug
 mkdir -p /var/www/email/postfixadmin/templates_c
 
 # Settings
 ## Whether secure or standard password
 ### If using 'secure', you must set the hash via pfapass
-if [ "${PFAPASS}" != "secure" ]
-then
-    cp /var/local/verb/configs/conflab/vmail/postfixadmin/postfixadmin286-config.inc.php /var/www/email/postfixadmin/config.local.php
+if [ "${PFAPASS}" != "secure" ]; then
+    cp /opt/verb/conf/lab/vmail/postfixadmin/postfixadmin286-config.inc.php /var/www/email/postfixadmin/config.local.php
 fi
 
-if [ "${PFAPASS}" = "secure" ]
-then
-    cp /var/local/verb/configs/conflab/vmail/postfixadmin/postfixadmin286-secure-config.inc.php /var/www/email/postfixadmin/config.local.php
+if [ "${PFAPASS}" = "secure" ]; then
+    cp /opt/verb/conf/lab/vmail/postfixadmin/postfixadmin286-secure-config.inc.php /var/www/email/postfixadmin/config.local.php
 fi
 
 # Settings
@@ -76,27 +89,23 @@ sed -i "s/rcfolder286/${SITERCPATH}/g" /var/www/email/postfixadmin/config.local.
 sed -i "s/pfafolder286/${PFAFOLDER}/g" /var/www/email/postfixadmin/config.local.php
 
 # Copy the branding files
-cp /var/local/verb/configs/conflab/vmail/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/images/
-
-### Should be depreciated after fixed in source
-# Fix the bad password message
-sed -i "s/Your password must contain at least %s character(s)/Your password must contain at least %s letters (A-Z, a-z)/g" /var/www/email/postfixadmin/languages/*
+cp /opt/verb/conf/lab/vmail/postfixadmin/pfapics/images/logo-ink.png /var/www/email/postfixadmin/public/images/
 
 # Set Apache
-cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.pfa
-ln -s /var/www/email/postfixadmin /var/www/html/${SITEEMAILTLD}.pfa/${PFAFOLDER}
-chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.pfa
-chown -R www-data:www-data /var/www/email/postfixadmin
-sed -i "s/; Webmail Defaults/; Webmail Defaults\npfa\.${emailTLDURI}\.\tIN  A\t\t${SITEIP}\npfa\.${emailTLDURI}\.\tIN  AAAA\t${SITEIPV6}/" /var/local/verb/configs/inkdns/zones/${emailTLDURI}.db
+cp -R /var/www/html/0ne /var/www/html/${SITEEMAILTLD}.pfa; wait
+ln -sfn /var/www/email/postfixadmin/public /var/www/html/${SITEEMAILTLD}.pfa/${PFAFOLDER}; wait
+chown -R www-data:www-data /var/www/html/${SITEEMAILTLD}.pfa; wait
+chown -R www-data:www-data /var/www/email/postfixadmin; wait
+sed -i "s/; Webmail Defaults/; Webmail Defaults\npfa\.${emailTLDURI}\.\tIN  A\t\t${SITEIP}\npfa\.${emailTLDURI}\.\tIN  AAAA\t${SITEIPV6}/" /opt/verb/conf/inkdns/zones/db.${emailTLDURI}
 a2ensite pfa.${emailTLDURI}
 apache2ctl graceful
 
 # Write the config
-sed -i "s/SITEPFAPATH.*/SITEPFAPATH=\"${PFAFOLDER}\"/g" /var/local/verb/configs/sitemailpath
+sed -i "s/SITEPFAPATH.*/SITEPFAPATH=\"${PFAFOLDER}\"/g" /opt/verb/conf/sitemailpath
 
 # inkCert
 ## This adds the declared domain to the end of the "domains =" line
-sed -i "/^domains =/ s/$/, pfa.${emailTLDURI}/" /var/local/verb/configs/inkcert/cli-ini/cli.${emailTLDURI}.ini
+sed -i "/^domains =/ s/$/, pfa.${emailTLDURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${emailTLDURI}.ini
 
 # Finished
 if [ "${PFAPASS}" = "secure" ]

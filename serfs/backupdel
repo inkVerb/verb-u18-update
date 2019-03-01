@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This delets all backups from the server and their web-accessible symlinks
 
@@ -9,8 +9,8 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
+. /opt/verb/conf/sitenameip
 
-rm -f /var/www/guru/*.vbak
+rm -f /var/www/vip/*.vbak
 rm -f /var/www/html/${SITETLD}/*.vbak -f
 

@@ -1,11 +1,11 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This backs up a database for a specific app
 
 # How to use:
-## ./backupappdb [app namespace] [securename 0-9, a-z, and A-Z only] [-nl for no link, optional]
+## ./backupappdb [app namespace] [securename 0-9, a-z, and A-Z only, optional] [-nl for no link, optional dep]
 
 ## This uses the same app namespace as installAPPNAME and vapp.APPNAME configs
 ## This does not work for ghost sites
@@ -18,32 +18,36 @@ set -e
 
 
 APPNAME=$1
+if [ -z "$2" ]; then
+SECNAME=$(pwgen -s -1 12)
+else
 SECNAME=$2
+fi
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/vapp.${APPNAME}
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/vapp.${APPNAME}
 
 # Export the database
-cd /var/www/guru
-/var/local/verb/serfs/mysqlex ${APPDBASE}; wait
-mv /var/www/guru/${APPDBASE}.sql /var/www/guru/verb.${APPDBASE}.${SECNAME}.vbak.sql
+cd /var/www/vip
+/opt/verb/serfs/mysqlex ${APPDBASE}; wait
+mv /var/www/vip/${APPDBASE}.sql /var/www/vip/verb.${APPDBASE}.${SECNAME}.vbak.sql
 
 # Finish
-if [ "$3" = "-nl" ]
-then
-echo "The database for ${APPNAME} has been backed up to the 'guru' folder.
+if [ "$3" = "-nl" ]; then
+echo "The database for ${APPNAME} has been backed up to the 'vip' folder.
 
 Note that the app remains live.
 "
 exit 0
 fi
 
-ln -s /var/www/html/${SITETLD}/verb.${APPDBASE}.${SECNAME}.vbak.sql /var/www/html/${SITETLD}/
-chown -R www-data:www-data /var/www/html/${SITETLD}/verb.${APPDBASE}.${SECNAME}.vbak.sql
+ln -s /var/www/vip/verb.${APPDBASE}.${SECNAME}.vbak.sql /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
+chown -R www-data:www-data /var/www/html/${SITESERVE}.serve/${SERVEDIR}/verb.${APPDBASE}.${SECNAME}.vbak.sql
 echo "The database for ${APPNAME} has been backed up and can be downloaded at:
 
-https://${nameURI}/verb.${APPDBASE}.${SECNAME}.vbak.sql
+https://${SERVEPATH}/verb.${APPDBASE}.${SECNAME}.vbak.sql
 
 Note that the app remains live.
 "

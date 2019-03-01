@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This reinstall MySQL with new bosses and passwords after it has been removed via mysqluninstall
 
@@ -12,7 +12,7 @@ MYSQLPASS=$(pwgen -0 -1 -A -B 11)
 MYSQLBOSSPASS=$(pwgen -s -1 10)
 
 # Record the MySQL root password
-echo "${MYSQLPASS}" > /var/local/verb/inst/mysqlrootpassword
+echo "${MYSQLPASS}" > /opt/verb/inst/mysqlrootpassword
 echo "mysql-server mysql-server/root_password password ${MYSQLPASS}" | debconf-set-selections
 echo "mysql-server mysql-server/root_password_again password ${MYSQLPASS}" | debconf-set-selections
 
@@ -29,5 +29,5 @@ FLUSH PRIVILEGES;"
 echo "[client]
 user = mysqlboss
 password = ${MYSQLBOSSPASS}
-host = localhost" > /var/local/verb/configs/mysqlboss.cnf
+host = localhost" > /opt/verb/conf/mysqlboss.cnf
 

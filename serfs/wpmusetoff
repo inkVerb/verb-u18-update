@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This turns off a WordPress vapp from being able to use multisite
 ## Specifically, this adds the multisite settings in wp-config.php necessary to begin the installation from the WordPress dashboard
@@ -19,7 +19,7 @@ WPDOMAIN=$1
 if grep -Fq "define( 'WP_ALLOW_MULTISITE', true );" /var/www/html/${WPDOMAIN}/wp-config.php; then
 echo "Proceeding..."; else
 echo "Multisite isn't even set, dufis. Set it on with: wpmuseton"
-exit 22; fi
+exit 8; fi
 
 # Delete the lines
 sed -i "/* Multisite via inkVerb */d" /var/www/html/${WPDOMAIN}/wp-config.php

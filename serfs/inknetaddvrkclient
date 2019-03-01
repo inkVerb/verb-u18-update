@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds a Vrk Client for this inkNet CA Verber to host
 ## This can be run to update an existing config
@@ -19,8 +19,8 @@ set -e
 
 
 # Prerequesites
-if [ -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
-. /var/local/verb/configs/inknet/ca.verber.cnf
+if [ -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
+. /opt/verb/conf/inknet/ca.verber.cnf
  if [ "${INKNETSTATUS}" != "INSTALLED" ]; then
 echo "inkNet not quite installed. First, run inknetinstallca"
 exit 0
@@ -48,7 +48,7 @@ ADDUSERNAME=$(echo $FULLUSERNAME | cut -c1-32)
 ADDPASSWORD=$(pwgen -1 -s 15)
 
 # Just in case user already exists
-if [ -f /var/local/verb/configs/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf ]; then
+if [ -f /opt/verb/conf/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf ]; then
 echo "Umm... How do I say this...
 
 A config already exists for that Vrk Station name.
@@ -62,7 +62,7 @@ exit 0
 fi
 
 # Create the config
-. /var/local/verb/configs/siteport
+. /opt/verb/conf/siteport
 ADDLOGINPORT=${SITEPORT}
 echo "#!/bin/sh
 # inkNet config, verb.ink
@@ -76,14 +76,14 @@ CLIENTIP=\"${ADDIP}\"
 CLIENTUSERNAME=\"${ADDUSERNAME}\"
 CLIENTPASSWORD=\"${ADDPASSWORD}\"
 CLIENTPORT=\"${ADDLOGINPORT}\"
-" > /var/local/verb/configs/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf
+" > /opt/verb/conf/inknet/vrk/client.vrk.${ADDCLIENTNAME}.cnf
 
 # Create the IVapp user
-/var/local/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrk
+/opt/verb/serfs/inknetivappadduser ${ADDUSERNAME} ${ADDPASSWORD} vrk
 wait
 
 # Create the inkNet Client tool links
-ln -sfn /var/local/verb/tools/vrker /var/local/ivapp/inknet/vrker/${ADDUSERNAME}/tools
+ln -sfn /opt/verb/tools/vrker /opt/ivapp/inknet/vrker/${ADDUSERNAME}/tools
 
 # FInish
 echo "All set. Your Vrk Station has been added as a Client to this Verber.

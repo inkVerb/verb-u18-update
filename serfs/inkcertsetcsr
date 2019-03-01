@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This sets inkCert csr information in a named file
 
@@ -35,7 +35,7 @@ ORGANIZATIONALUNIT=\"${ORGANIZATIONALUNIT}\"
 EMAIL=\"${EMAIL}\"
 CHALLENGEPASSWORD=\"NOT_USED\"
 COMPANYNAME=\"${COMPANYNAME}\"
-" > /var/local/verb/configs/inkcert/csr-inf/csr.${INFPROFILE}.inf
+" > /opt/verb/conf/inkcert/csr-inf/csr.${INFPROFILE}.inf
 
 # Finish
 echo "

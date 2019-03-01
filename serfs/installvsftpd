@@ -1,9 +1,9 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This installs vsftpd and prepares it for use according to newftpguru, delftpguru, newftpfiler, and delftpfiler scripts
-# This is a prereqisite for ftpgurus and ftpfilers and net2ftp
+# This installs vsftpd and prepares it for use according to newftpvip, delftpvip, newftpfiler, and delftpfiler scripts
+# This is a prereqisite for ftpvips and ftpfilers and net2ftp
 
 ## THIS HAS EXPIRIMENTAL LINES. Remove commented lines if it works.
 
@@ -12,8 +12,8 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 apt install vsftpd
 
@@ -62,6 +62,6 @@ systemctl reload vsftpd
 #restart vsftpd
 
 # Set the firewall to allow the site port
-. /var/local/verb/configs/siteport
+. /opt/verb/conf/siteport
 ufw allow from any to any port ${SITEPORT}
 

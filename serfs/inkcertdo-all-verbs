@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This script runs doinkcert for all native Verber domains... verb.ink, verb.blue, etc.
 
@@ -11,37 +11,37 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitetldstatus
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitetldstatus
 
 if [ $VERBemail=true ]; then
-/var/local/verb/serfs/inkcertdo ${emailURI}; fi
+/opt/verb/serfs/inkcertdo ${emailURI}; fi
+wait
+if [ $VERBcity=true ]; then
+/opt/verb/serfs/inkcertdole ${cityURI}; fi
 wait
 if [ $VERBone=true ]; then
-/var/local/verb/serfs/inkcertdo ${oneURI}; fi
+/opt/verb/serfs/inkcertdo ${oneURI}; fi
 wait
 if [ $VERBink=true ]; then
-/var/local/verb/serfs/inkcertdo ${inkURI}; fi
+/opt/verb/serfs/inkcertdo ${inkURI}; fi
 wait
 if [ $VERBblue=true ]; then
-/var/local/verb/serfs/inkcertdo ${blueURI}; fi
+/opt/verb/serfs/inkcertdo ${blueURI}; fi
 wait
-if [ $VERBguru=true ]; then
-/var/local/verb/serfs/inkcertdo ${guruURI}; fi
+if [ $VERBvip=true ]; then
+/opt/verb/serfs/inkcertdo ${vipURI}; fi
 wait
 if [ $VERBkiwi=true ]; then
-/var/local/verb/serfs/inkcertdo ${kiwiURI}; fi
+/opt/verb/serfs/inkcertdo ${kiwiURI}; fi
 wait
 if [ $VERBpink=true ]; then
-/var/local/verb/serfs/inkcertdo ${pinkURI}; fi
+/opt/verb/serfs/inkcertdo ${pinkURI}; fi
 wait
 if [ $VERBred=true ]; then
-/var/local/verb/serfs/inkcertdo ${redURI}; fi
+/opt/verb/serfs/inkcertdo ${redURI}; fi
 wait
 if [ $VERBrocks=true ]; then
-/var/local/verb/serfs/inkcertdo ${rocksURI}; fi
-wait
-if [ $VERBuno=true ]; then
-/var/local/verb/serfs/inkcertdo ${unoURI}; fi
+/opt/verb/serfs/inkcertdo ${rocksURI}; fi
 

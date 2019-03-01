@@ -1,6 +1,6 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This runs inkcertaddle for all domains and subdomains
 ## Prerequesite: inkcertreq
@@ -31,7 +31,7 @@ CERTDOMAIN=$1
 fi
 
 # For the main domain first
-/var/local/verb/serfs/inkcertadd ${SITEDOMAIN}
+/opt/verb/serfs/inkcertadd ${SITEDOMAIN}
 wait
 
 # For any/all sub-domains
@@ -41,7 +41,7 @@ find . -name "*.${SITEDOMAIN}.conf"|while read findsitesubdomain; do
 ## Strip the .conf extension
  sitesubdomain=$(basename ${findsitesubdomain} .conf)
 ## Run inkCertAddLE per site config
- /var/local/verb/serfs/inkcertadd ${sitesubdomain} ${CERTDOMAIN}
+ /opt/verb/serfs/inkcertadd ${sitesubdomain} ${CERTDOMAIN}
 wait
 done
 

@@ -1,13 +1,13 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This runs installpostfix, installrc, and installpfa as one job
 ## Prerequisite: setupverb of course, and verbemail if you wish an email tld other than .email
 ## Check prerequisites for those
 
 # OPTIONAL Prerequesite:
-## If restoring from a backupvmail backup, the .vbak file must be in guru
+## If restoring from a backupvmail backup, the .vbak file must be in vip
 
 # How to use:
 ## ./installvmail [RoundCube webmail path] [PostfixAdmin email pfa path] [PostfixAdmin setup secure option: "secure" otherwise use any other] [backup filename IF restoring from backupvmail backup, optional]
@@ -21,38 +21,31 @@ set -e
 
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitemailpass
-. /var/local/verb/configs/sitemailpath
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpass
+. /opt/verb/conf/sitemailpath
 
 RC=$1
 PFA=$2
 EASYSECURE=$3
 BACKUPRESTORE=$4
 
-/var/local/verb/serfs/installpostfixvmail; wait
-/var/local/verb/serfs/installpfa ${PFA} ${EASYSECURE}; wait
-/var/local/verb/serfs/installrc ${RC}; wait
+/opt/verb/serfs/installpostfixvmail; wait
+/opt/verb/serfs/installinksplat; wait
+/opt/verb/serfs/installpfa ${PFA} ${EASYSECURE}; wait
+/opt/verb/serfs/installrc ${RC}; wait
 
 # Backup
 if [ -n "$4"]; then
-/var/local/verb/serfs/backupvmailrestore ${BACKUPRESTORE}; wait
+/opt/verb/serfs/backupvmailrestore ${BACKUPRESTORE}; wait
 fi
 
-# inkCert
-if grep -Fq "INKCERTED=NO" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
+# inkCert check and FYI
+if grep -Fq "INKCERTED=NO" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
 echo "Note: ${emailTLDURI} still doesn't have proper SSL certs. You can install, but will get SSL warnings due to \"self-signed\" or \"snakeoil\" certs.
 You may ignore these warnings if you choose. If you want proper SSL certs, you still need to run inkCert for them.
 "
-fi
-if grep -Fq "INKCERTED=DONE_LE" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
-/var/local/verb/serfs/inkcertreqle ${emailURI} r; wait
-/var/local/verb/serfs/inkcertaddallle ${emailURI}; wait
-fi
-if grep -Fq "INKCERTED=DONE_IC" /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${emailTLDURI}; then
-/var/local/verb/serfs/inkcertreq ${emailURI} r; wait
-/var/local/verb/serfs/inkcertaddall ${emailURI}; wait
 fi
 
 # Finished
@@ -77,6 +70,8 @@ Roundcube is ready to be installed at:
  https://rc.${emailTLDURI}/${RC}/installer
 
 - Then run ./postinstallrc
+
+Once all is set, you must restart the server in order for email boxes to send and receive.
 "
 fi
 
@@ -102,6 +97,7 @@ Roundcube is also ready to be installed at:
  https://rc.${emailTLDURI}/${RC}/installer
 
 - Then run ./postinstallrc
+
+Once all is set, you must restart the server in order for email boxes to send and receive.
 "
 fi
-

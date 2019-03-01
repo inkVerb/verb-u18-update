@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This displays the Inker information that this Verber is connected to.
 ## This could be useful to retrieve names for setting up this Verber as a Client to the CA Inker
@@ -10,13 +10,13 @@ set -e
 
 
 # Check the config
-if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+if [ ! -f /opt/verb/conf/inknet/inker.client.cnf ]; then
 echo "This is not yet connected to an Inker via inkNet."
 exit 0
 fi
 
 # Include the config
-. /var/local/verb/configs/inknet/inker.client.cnf
+. /opt/verb/conf/inknet/inker.client.cnf
 
 # Display info
 echo "Here you go. This Verber's Inker info...

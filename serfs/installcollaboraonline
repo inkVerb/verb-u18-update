@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This Collabora Online to be used with Nextcloud
 ## Thanks for the awesome instructions from: https://nextcloud.com/collaboraonline/
@@ -12,8 +12,8 @@ set -e
 CVAPPNAME=collaboraonline
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 ## Set the port
 if [ -z ${1} ]; then
@@ -23,17 +23,17 @@ PORT=$1
 fi
 
 # Check if already installed
-if [ -f /var/local/verb/configs/vapp.${CVAPPNAME} ]; then
+if [ -f /opt/verb/conf/vapp.${CVAPPNAME} ]; then
 echo "This is already installed. I quit."
 exit 0; fi
 
 # Make sure Docker is installed
-/var/local/verb/serfs/installdocker
+/opt/verb/serfs/installdocker
 wait
 
 # Install it
 docker pull collabora/code
-docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e "domain=nextcloud.${blueURI}" --restart always --cap-add MKNOD collabora/code
+docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e "domain=nc.${blueURI}" --restart always --cap-add MKNOD collabora/code
 
 # Firewall
 ufw allow ${PORT}
@@ -51,12 +51,12 @@ apache2ctl graceful
 echo "#!/bin/sh
 COVAPPSTATUS=\"INSTALLED\"
 COPORT=${PORT}
-COHOST=\"nextcloud.${blueURI}\"" > /var/local/verb/configs/vapp.${CVAPPNAME}
+COHOST=\"nc.${blueURI}\"" > /opt/verb/conf/vapp.${CVAPPNAME}
 
 echo "Collabora Online is now installed...
 
 Next:
-1. Login as an admin to https://nextcloud.${blueURI} to enable the Collabora Online office app.
-2. Finish the settings: Admin > Collabora Online > Collabora Online server: https://collabora.${blueURI}
+1. Login as an admin to https://nc.${blueURI} to enable the Collabora Online office app.
+2. Finish the settings: Settings > Administration > Collabora Online > Collabora Online server: https://collabora.${blueURI}:${PORT}
 "
 

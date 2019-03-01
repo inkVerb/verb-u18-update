@@ -1,8 +1,8 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
-# This installs fossil to be available at fossil.your-name.verb.guru/...
+# This installs fossil to be available at fossil.your-name.verb.vip/...
 
 # How to use:
 ## ./installfossil [username] [user-email] [userpassword]
@@ -11,43 +11,62 @@ set -e
 ## ./installfossil adam adam@verb.ink Adamp4$$w0RD
 
 
+CVAPPNAME=fossil
+
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 NEWUSER=$1
 NEWEMAIL=$2
 NEWPASS=$3
 
+
+cd /var/www/vapps
+/opt/verb/serfs/inkget ${CVAPPNAME}; wait
+### Check
+/opt/verb/serfs/inkget ${CVAPPNAME} check
+if [ "$?" = 4 ]; then
+echo "Repo failed to retrieve the file."
+exit 4; fi
+if [ ! -f ${CVAPPNAME}.vtxz ]; then
+echo "Failed to retrieve from the repo."
+exit 4; fi
+
+rm -f ${CVAPPNAME}
+/opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
+
+rm -f /usr/bin/fossil
+mv /var/www/vapps/fossil /usr/bin
+fossil all rebuild
+
 # Install and set up directories
-apt install -y fossil
-mkdir /var/www/guru/fossil
-rm -rf /var/www/html/guru.fossil
-ln -s /var/www/guru/fossil /var/www/html/guru.fossil
-chown -R www-data:www-data  /var/www/html
-chown -R www-data:www-data /var/www/guru
+mkdir -p /var/www/vip/fossil
+/opt/verb/serfs/setvapplinkon ${CVAPPNAME}
+chown -R www-data:www-data  /var/www/html/vip.fossil
+chown -R www-data:www-data /var/www/vip
 
 # Create the first default fossil
-cd /var/www/guru/fossil
-fossil new index.fossil
-chown www-data:www-data index.fossil
+cd /var/www/vip/fossil
+fossil new index.fossil; wait
+chown www-data:www-data index.fossil; wait
 echo "#!/usr/bin/fossil
 repository: /fossil/index.fossil
 
 # If you didn't figure it out, your first fossil is called index.fossil.
 # Change the .fossil file name on line 2 of this file to have the default url point to any .fossil file you want.
 # dinosaur.fossil is an example of another .fossil file." > index.cgi
-chmod +x index.cgi
+chmod 750 index.cgi
 
 # Create a second demo fossil, dinosaur
-cd /var/www/guru/fossil
+cd /var/www/vip/fossil
 fossil new dinosaur.fossil
 echo "#!/usr/bin/fossil
 repository: /fossil/dinosaur.fossil" > dinosaur.cgi
-chmod +x dinosaur.cgi
+chmod 750 dinosaur.cgi
 
 # Final chown to allow database to be writable
-chown -R www-data:www-data /var/www/guru/fossil
+chown -R www-data:www-data /var/www/vip/fossil; wait
 
 # Add the user
 fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository index.fossil
@@ -56,10 +75,10 @@ fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository dinosaur.fossil
 # Ending message
 echo "
 Fossil installed. The first, default fossil will be available at:
-fossil.${guruURI}
+fossil.${vipURI}
 
 The another demo fossil, dinosaur.fossil, is available at:
-fossil.${guruURI}/dinosaur.cgi
+fossil.${vipURI}/dinosaur.cgi
 
-All relevant files appear via ftp in the \"guru/fossil\" folder.
+All relevant files appear via ftp in the \"vip/fossil\" folder.
 "

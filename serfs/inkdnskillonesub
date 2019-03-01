@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This removes a subdomain A & AAAA records from an existing ONE DNS record in the inkDNS zone file on this Verber
 
@@ -11,20 +11,26 @@ set -e
 DNSSUBDOM=$1
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
 
 # Check if already added
-if ! grep -Fq "${DNSSUBDOM}.${oneURI}" /var/local/verb/configs/inkdns/zones/${oneURI}.db; then
+if ! grep -Fq "${DNSSUBDOM}.${oneURI}" /opt/verb/conf/inkdns/zones/db.${oneURI}; then
 echo "The subdomain ${DNSSUBDOM} has not been added to ${oneURI}. Use inkdnsaddsub to add it."
 exit 0; fi
 
-# Remove the record
-sed -i "/; Subdomain Records Added by inkDNS ${DNSSUBDOM}\.${oneURI}/,+2d" /var/local/verb/configs/inkdns/zones/${oneURI}.db
+# Remove the records
+sed -i "/; Subdomain Records Added by inkDNS ${DNSSUBDOM}\.${oneURI}/,+2d" /opt/verb/conf/inkdns/zones/db.${oneURI}
+sed -i "/; PTR Subdomain Records Added by inkDNS ${DNSSUBDOM}\.${oneURI}/,+2d" /opt/verb/conf/inkdns/zones/nv.${oneURI}
 
 # Set the Serial No
-/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+/opt/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Refresh zones
+if [ -f "/opt/verb/conf/inkdns/inkdnsstatus" ]; then
+  . /opt/verb/conf/inkdns/inkdnsstatus
+  if [ "${INKDNSSTAT}" = "INSTALLED" ]; then
+/opt/verb/serfs/inkdnsrefreshbind; fi; fi
 
 # Finish
 echo "The ONE subdomain ${DNSSUBDOM} has been removed from the DNS zone file."
-

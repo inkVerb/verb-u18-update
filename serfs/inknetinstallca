@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This installs inkNet onto the Verber and...
 ## sets it up as a CA Verber for Vrk Station Clients and
@@ -16,7 +16,7 @@ set -e
 
 
 # Verify that this CA Verber candidate is already a Client Verber itself
-if [ ! -f /var/local/verb/configs/inknet/inker.client.cnf ]; then
+if [ ! -f /opt/verb/conf/inknet/inker.client.cnf ]; then
 echo "Not bad, Bucko. But, this must be a Verber Client, even to itself if need be, before it can become a CA to anything else.
 
 First run, according to instructions: inknetmakeverberclient
@@ -24,14 +24,14 @@ First run, according to instructions: inknetmakeverberclient
 exit 0; fi
 
 # inkNet/inkCert prerequisites
-if [ ! -f /var/local/verb/configs/inknet/ca.verber.cnf ]; then
+if [ ! -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
 echo "...installing CA now..."
-/var/local/verb/serfs/inknetmakeca
+/opt/verb/serfs/inknetmakeca
 wait
 fi
 
 # Include the config
-. /var/local/verb/configs/inknet/ca.verber.cnf
+. /opt/verb/conf/inknet/ca.verber.cnf
 
 # Check if already installed or correctly ready
 if [ "${INKNETSTATUS}" = "INSTALLED" ]; then
@@ -44,19 +44,19 @@ Look at ca.verber.cnf to see what's up.
 exit 0; fi
 
 # Create the first CA Verber/Inker self-signing master keys for the settings added in inknetmakeca
-/var/local/verb/serfs/inknetnewcaselfauthpubkey
+/opt/verb/serfs/inknetnewcaselfauthpubkey
 wait
 
 # Create the first host key on this CA Verber, for the settings added in inknetmakeca
-/var/local/verb/serfs/inknetnewcahostkey
+/opt/verb/serfs/inknetnewcahostkey
 wait
 
 # Install ivApp
-/var/local/verb/serfs/inknetinstallivapp
+/opt/verb/serfs/inknetinstallivapp
 wait
 
 # Set the inkNet config
-sed -i "s/INKNETSTATUS=\"MADE_INSTALL_READY\"/INKNETSTATUS=\"INSTALLED\"/g" /var/local/verb/configs/inknet/ca.verber.cnf
+sed -i "s/INKNETSTATUS=\"MADE_INSTALL_READY\"/INKNETSTATUS=\"INSTALLED\"/g" /opt/verb/conf/inknet/ca.verber.cnf
 
 # Finish
 echo "

@@ -1,17 +1,14 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This restores a RoundCube backup .vbak file backed-up using backuprcmail
 ## You may run installemail prior to this, however this will completely overwrite the old roundcube
 ## and the old roundcube, settings, and database will be backed up in www/email
 
-# Prereq: Either rcmail must already be installed (and will be totally replaced)
-## or you must create the symlink from the html/email.roundcube folder to the email/roundcube folder
-
 # Instructions:
 ## The file can have any name, even if you changed it from the original, as long as it ends in .vbak
-## The file MUST be uploaded to the "guru" folder, which can be done with vsftp installed and an ftpguru
+## The file MUST be uploaded to the "vip" folder, which can be done with vsftp installed and an ftpvip
 
 # NOTE:
 ## This is relatively benign and arguably unnecessary because it only affects SOME user settings only within the RoundCube app itself, and only for identical email inpfa created or imported in PostfixAdmin
@@ -28,42 +25,74 @@ set -e
 FILENAME=$1
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/sitemailpath
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/sitemailpath
+
+# Check allowed status
+if [ ${SITERCPATH} = "RC_NOT_ALLOWED" ]; then
+echo "
+This is a backup email server and Roundcube is not allowed, including restore.
+"
+exit 0
 
 # Backup and remove whatever the original status is
-cd /var/local/verb/serfs
-/var/local/verb/serfs/mysqlex rcmail; wait
-mv /var/local/verb/serfs/rcmail.sql /var/www/email/roundcube/verb.rcmail.restore-originalbackedup.vbak.sql
-cp /var/local/verb/configs/sitemail /var/www/email/roundcube/sitemail-restore-originalbackedup
+elif [ ${SITERCPATH} = "RC_NOT_INSTALLED" ]; then
+echo "
+Roundcube is not installed, no backups will be made in this restore.
+"
+RCFRESH="YES"
+else
+cd /opt/verb/serfs
+/opt/verb/serfs/mysqlex rcmail; wait
+mv /opt/verb/serfs/rcmail.sql /var/www/email/roundcube/verb.rcmail.restore-originalbackedup.vbak.sql
+cp -f /opt/verb/conf/sitemailpass /var/www/email/roundcube/sitemailpass-old
+cp -f /opt/verb/conf/sitemailpath /var/www/email/roundcube/sitemailpath-old
 cd /var/www/email
-/var/local/verb/serfs/vtxzin roundcube
+/opt/verb/serfs/vtxzin roundcube
 mv roundcube.vtxz verb.roundcube.restore-originalbackedup.vbak
-mv /var/www/email/verb.roundcube.restore-originalbackedup.vbak /var/www/guru/
-/var/local/verb/serfs/mysqlkilldb rcmail; wait
-/var/local/verb/serfs/mysqlkilluser rcmailusr; wait
+mv /var/www/email/verb.roundcube.restore-originalbackedup.vbak /var/www/vip/
+/opt/verb/serfs/mysqlkilldb rcmail; wait
+/opt/verb/serfs/mysqlkilluser rcmailusr; wait
 rm -rf roundcube
+fi
 
 # Unpack the file
-cd /var/www/guru
+cd /var/www/vip
 mv ${FILENAME} roundcube.vtxz
-/var/local/verb/serfs/vtxzout roundcube
+/opt/verb/serfs/vtxzout roundcube
 mv roundcube /var/www/email/
 
+# Activate the rc web server config settings
+if [ ${RCFRESH} = "YES" ]; then
+##DNS
+ if grep -Fq "Webmail Defaults" /opt/verb/conf/inkdns/zones/db.${emailTLDURI}; then
+ sed -i "s/; Webmail Defaults/; Webmail Defaults\nrc\.${emailTLDURI}\.\tIN  A\t\t${SITEIP}\nrc\.${emailTLDURI}\.\tIN  AAAA\t${SITEIPV6}/" /opt/verb/conf/inkdns/zones/db.${emailTLDURI}
+ fi
+a2ensite rc.${emailTLDURI}
+apache2ctl graceful
+ if grep -Fq "rc.${emailTLDURI}" /opt/verb/conf/inkcert/cli-ini/cli.${emailTLDURI}.ini; then
+ echo "rc.${emailTLDURI} already declared for inkCert, moving on..."; else
+ sed -i "/^domains =/ s/$/, rc.${emailTLDURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${emailTLDURI}.ini
+ fi
+fi 
+
 # Restore and include RC settings in the sitemail config
-. /var/email/roundcube/sitemailpass-oldrc
-. /var/email/roundcube/sitemailpath-oldrc
-sed -i "s/SITERCPASSAPG.*/SITERCPASSAPG=${SITERCPASSAPG}/g" /var/local/verb/configs/sitemailpass
-sed -i "s/SITERCPATH.*/SITERCPATH=${SITERCPATH}/g" /var/local/verb/configs/sitemailpath
-. /var/local/verb/configs/sitemailpass
-. /var/local/verb/configs/sitemailpath
+. /var/www/email/roundcube/sitemailpass-old
+. /var/www/email/roundcube/sitemailpath-old
+sed -i "s/SITERCPASSAPG.*/SITERCPASSAPG=\"${SITERCPASSAPG}\"/g" /opt/verb/conf/sitemailpass
+sed -i "s/SITERCPATH.*/SITERCPATH=\"${SITERCPATH}\"/g" /opt/verb/conf/sitemailpath
+. /opt/verb/conf/sitemailpass
+. /opt/verb/conf/sitemailpath
 
 # Restore the database
-/var/local/verb/serfs/mysqlnewdb rcmail rcmailusr rcpass${SITERCPASSAPG}
+/opt/verb/serfs/mysqlnewdb rcmail rcmailusr rcpass${SITERCPASSAPG}; wait
 cd /var/www/email/roundcube
-/var/local/verb/serfs/mysqlin rcmail; wait
+/opt/verb/serfs/mysqlin rcmail; wait
 rm -f rcmail.sql
+rm -f sitenameip*
+rm -f sitemailpass*
+rm -f sitemailpath*
 
 # Own
 chown -R www-data:www-data /var/www/email/roundcube
@@ -78,7 +107,7 @@ echo "Roundcube has been restored and all its backup files removed from this ser
 
 It should be currently live at rc.${emailTLDURI}/${SITERCPATH}.
 
-A backup of the previous Roundcube on this server has been saved in the guru folder just in case.
+A backup of the previous Roundcube on this server has been saved in the vip folder just in case.
 "
 
 

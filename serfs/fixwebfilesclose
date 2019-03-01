@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds the necessary minimal .htaccess file to a web folder so none of its files can be read
 ## The "URI web path" is relative to the www/html/ folder; it must already exist.
@@ -10,7 +10,7 @@ set -e
 
 # Eg:
 ## ./fixwebfilesclose inkisaverb.com/myfiles
-## ./fixwebfilesclose newfiles.ink.verb.guru
+## ./fixwebfilesclose newfiles.ink.verb.vip
 
 
 WEBPATH=$1
@@ -18,7 +18,7 @@ WEBPATH=$1
 # If it doesn't exist
 if [ ! -d "/var/www/html/${WEBPATH}" ]; then
 echo "This web folder does not exist. Doing nothing."
-exit 22
+exit 8
 fi
 
 # If another .htaccess already exists
@@ -28,7 +28,7 @@ Type \"yes\" to continue, anything else to quit."
 read YESANSWER
  if [ "${YESANSWER}" != "yes" ]; then
 echo "Quitting."
-exit 33
+exit 3
  fi
 fi
 

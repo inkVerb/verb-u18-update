@@ -1,6 +1,6 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This requests and gets certs via inkCert Proper for a given domain, including inkVerb namespace domains
 ## It applies only to one domain/subdomain at a time
@@ -28,9 +28,9 @@ set -e
 DOMAIN=$1
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
-. /var/local/verb/configs/siteurilist
-. /var/local/verb/configs/inkcert/inkcertstatus
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/inkcert/inkcertstatus
 
 # Check inkCert installed
 if [ "${INKCERTINSTALLED}" = "NOT_YET" ]; then
@@ -42,7 +42,7 @@ exit 0
 fi
 
 # Verify that the domain is installed
-if [ ! -f /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN} ]; then
+if [ ! -f /opt/verb/conf/inkcert/cli-ini/siteinkcert.${DOMAIN} ]; then
 echo "Sorry, Bucko. ${DOMAIN} is not installed yet.
 
 Do that first, then get back to me.
@@ -50,25 +50,25 @@ Do that first, then get back to me.
 fi
 
 # Include and check the inkCert domain config
-. /var/local/verb/configs/inkcert/cli-ini/siteinkcert.${DOMAIN}
+. /opt/verb/conf/inkcert/cli-ini/siteinkcert.${DOMAIN}
 if [ "${INKCERTED}" = "DONE_IC" ]; then
- if [ "$2" = "r" ]; then
-echo "Refreshing inkCert Proper certs to include any subdomains of ${DOMAIN} since the last renewal. Don't do this too often."
- else
-
 echo "inkCert proper is already setup for ${DOMAIN}.
 
-To set up certs via Letsencrypt, first run: inkcertrevoke ${DOMAIN}, then run this again.
-
-If you wish to refresh the certificate, such as to include a newly added subdomain, run with \"r\" at the end of the command. See instructions for this Serf."
+To set up certs via Certbot or Letsencrypt, first run: inkcertrevoke ${DOMAIN}, then run this again.
+"
 exit 0
- fi
 fi
-
 if [ "${INKCERTED}" = "DONE_LE" ]; then
-echo "inkCert is already setup for ${DOMAIN} with Letsencrypt.
+echo "inkCert proper is already setup for ${DOMAIN}.
 
-To set up certs for inkCert proper, first fun inkcertrevokele ${DOMAIN}, then run this again.
+To set up certs via Certbot or inkCert Proper, first run: inkcertrevoke ${DOMAIN}, then run this again.
+"
+exit 0
+fi
+if [ "${INKCERTED}" = "DONE_CB" ]; then
+echo "inkCert proper is already setup for ${DOMAIN}.
+
+To set up certs via Letsencrypt or inkCert Proper, first run: inkcertrevoke ${DOMAIN}, then run this again.
 "
 exit 0
 fi
@@ -76,7 +76,7 @@ fi
 
 # Check for verb domain and status
 ## If verb domain was spelled correctly
-if [[ "${DOMAIN}" =~ ".verb.email" ]] || [[ "${DOMAIN}" =~ ".verb.one" ]] || [[ "${DOMAIN}" =~ ".verb.ink" ]] || [[ "${DOMAIN}" =~ ".verb.blue" ]] || [[ "${DOMAIN}" =~ ".verb.guru" ]] || [[ "${DOMAIN}" =~ ".verb.kiwi" ]] || [[ "${DOMAIN}" =~ ".verb.red" ]] || [[ "${DOMAIN}" =~ ".verb.rocks" ]]; then
+if [[ "${DOMAIN}" =~ ".verb.email" ]] || [[ "${DOMAIN}" =~ ".verb.one" ]] || [[ "${DOMAIN}" =~ ".verb.ink" ]] || [[ "${DOMAIN}" =~ ".verb.blue" ]] || [[ "${DOMAIN}" =~ ".verb.vip" ]] || [[ "${DOMAIN}" =~ ".verb.kiwi" ]] || [[ "${DOMAIN}" =~ ".verb.red" ]] || [[ "${DOMAIN}" =~ ".verb.rocks" ]]; then
  if [[ "${DOMAIN}" != *"${SITENAME}"* ]]; then
 echo "
 Problem: You might have spelled ${DOMAIN} wrong.
@@ -97,9 +97,14 @@ Problem: ${DOMAIN} is not active on this server...
 "; exit 0;
 }
 ### Do the checks per each verb tld
-. /var/local/verb/configs/sitetldstatus
+. /opt/verb/conf/sitetldstatus
 if [ "${DOMAIN}" = "${emailURI}" ]; then
  if [[ "${VERBemail}" != true ]]; then
+  verbtld_is_off
+ fi
+fi
+if [ "${DOMAIN}" = "${cityURI}" ]; then
+ if [[ "${VERBcity}" != true ]]; then
   verbtld_is_off
  fi
 fi
@@ -118,8 +123,8 @@ if [ "${DOMAIN}" = "${blueURI}" ]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${guruURI}" ]; then
- if [[ "${VERBguru}" != true ]]; then
+if [ "${DOMAIN}" = "${vipURI}" ]; then
+ if [[ "${VERBvip}" != true ]]; then
   verbtld_is_off
  fi
 fi
@@ -143,11 +148,6 @@ if [ "${DOMAIN}" = "${rocksURI}" ]; then
   verbtld_is_off
  fi
 fi
-if [ "${DOMAIN}" = "${unoURI}" ]; then
- if [[ "${VERBuno}" != true ]]; then
-  verbtld_is_off
- fi
-fi
 
 # Get the certs
 ## This is the place to request and/or install the certs with the automated inkCert Proper script.
@@ -158,11 +158,10 @@ fi
 
 # Verify the certs
 if [ ! -d /etc/inkcert/live/${DOMAIN} ]; then
-echo "Big error! Unable to get the certs from the cert authority. Can't continue."; exit 44
+echo "Big error! Unable to get the certs from the cert authority. Can't continue."; exit 4
 fi
 
 # Finish
 echo "
 Finished getting certs. Now to install them with inkcertadd...
 "
-

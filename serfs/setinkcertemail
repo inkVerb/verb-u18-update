@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This changes the inkCert email used by SSL and SSH CAs after it has already been set by setupverb
 ## It only affects future certificates and does NOT affect renewals
@@ -11,5 +11,5 @@ set -e
 
 NEWEMAIL=$1
 
-sed -i "s/INKCERTEMAIL=.*/INKCERTEMAIL=${NEWEMAIL}/g" /var/local/verb/configs/inkcert/inkcertstatus
+sed -i "s/INKCERTEMAIL=.*/INKCERTEMAIL=${NEWEMAIL}/g" /opt/verb/conf/inkcert/inkcertstatus
 

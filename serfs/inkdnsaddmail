@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This adds the mail subdomain A & AAAA records in the inkDNS zone file on this Verber
 
@@ -11,34 +11,55 @@ set -e
 DNSDOMAIN=$1
 
 # Include the configs
-. /var/local/verb/configs/sitenameip
+. /opt/verb/conf/sitenameip
 
 # Check if already added
-if grep -Fq "; Hostname Mail Record Defaults" /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db; then
+if grep -Fq "; Hostname Mail Record Defaults" /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}; then
 echo "Mail Record Defaults already added to . Use inkdnskillmail to remove them."
 exit 0; fi
 
 # Echo the records
+## db.DOM
 echo "; Hostname Mail Record Defaults
-email.${DNSDOMAIN}.	IN  CNAME	mail.${DNSDOMAIN}.
-${DNSDOMAIN}.		IN  MX  50	mail.${DNSDOMAIN}.
-mail.${DNSDOMAIN}.	IN  A		${SITEIP}
-smtp.${DNSDOMAIN}.	IN  A		${SITEIP}
-imap.${DNSDOMAIN}.	IN  A		${SITEIP}
-pop3.${DNSDOMAIN}.	IN  A		${SITEIP}
-pop2.${DNSDOMAIN}.	IN  A		${SITEIP}
-pop.${DNSDOMAIN}.	IN  A		${SITEIP}
-mail.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-smtp.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-imap.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-pop3.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-pop2.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-pop.${DNSDOMAIN}.	IN  AAAA	${SITEIPV6}
-;; End Mail Defaults" >> /var/local/verb/configs/inkdns/zones/${DNSDOMAIN}.db
+email.${DNSDOMAIN}.	  IN  CNAME	mail.${DNSDOMAIN}.
+${DNSDOMAIN}.		 IN  MX  50	mail.${DNSDOMAIN}.
+mail.${DNSDOMAIN}.	 IN  A		${SITEIP}
+smtp.${DNSDOMAIN}.	 IN  A		${SITEIP}
+imap.${DNSDOMAIN}.	 IN  A		${SITEIP}
+pop3.${DNSDOMAIN}.	 IN  A		${SITEIP}
+pop2.${DNSDOMAIN}.	 IN  A		${SITEIP}
+pop.${DNSDOMAIN}.	  IN  A		${SITEIP}
+mail.${DNSDOMAIN}.	 IN  AAAA	${SITEIPV6}
+smtp.${DNSDOMAIN}.	 IN  AAAA	${SITEIPV6}
+imap.${DNSDOMAIN}.	 IN  AAAA	${SITEIPV6}
+pop3.${DNSDOMAIN}.	 IN  AAAA	${SITEIPV6}
+pop2.${DNSDOMAIN}.	 IN  AAAA	${SITEIPV6}
+pop.${DNSDOMAIN}.	  IN  AAAA	${SITEIPV6}
+;; End Mail Defaults" >> /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}
+## nv.DOM
+echo "; PTR Hostname Mail Record Defaults
+${SITEARPAIP4}		IN  PTR  mail.${DNSDOMAIN}.
+${SITEARPAIP4}		IN  PTR  smtp.${DNSDOMAIN}.
+${SITEARPAIP4}		IN  PTR  imap.${DNSDOMAIN}.
+${SITEARPAIP4}		IN  PTR  pop3.${DNSDOMAIN}.
+${SITEARPAIP4}		IN  PTR  pop2.${DNSDOMAIN}.
+${SITEARPAIP4}		IN  PTR  pop.${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  mail.${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  smtp.${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  imap.${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  pop3.${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  pop2.${DNSDOMAIN}.
+${SITEARPAIP6}		IN  PTR  pop.${DNSDOMAIN}.
+;; End Mail Defaults" >> /opt/verb/conf/inkdns/zones/nv.${DNSDOMAIN}
 
 # Set the Serial No
-/var/local/verb/serfs/inkdnsserial ${DNSDOMAIN}
+/opt/verb/serfs/inkdnsserial ${DNSDOMAIN}
+
+# Refresh zones
+if [ -f "/opt/verb/conf/inkdns/inkdnsstatus" ]; then
+  . /opt/verb/conf/inkdns/inkdnsstatus
+  if [ "${INKDNSSTAT}" = "INSTALLED" ]; then
+/opt/verb/serfs/inkdnsrefreshbind; fi; fi
 
 # Finish
 echo "The Mail Record Defaults have been added to the ${DNSDOMAIN} DNS zone file."
-

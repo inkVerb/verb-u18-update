@@ -1,10 +1,10 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This creates the package with username and password for the Client to download and install.
 ## Prerequisite: inknetaddverberclient/inknetaddvrkclient (the requesting client must already exist on this serveer as an inkNet jailed user)
-## FYI, the client name refers to the file at verb/configs/inknet/v.../...
+## FYI, the client name refers to the file at verb/conf/inknet/v.../...
 
 # DEV NOTE:
 ## This uses some variables interchangeably. This is for compatability since CLIENTNAME comes from the config file retrieved using VCNAME and VTYPE. Altering this could break the script later because of coterminous but separate jargon dependencies.
@@ -31,30 +31,30 @@ VCNAME="$(echo ${ICNAME} | sed 's/\./_/g' | sed 's/@/_/g' )"
 
 # Check variables
 if [ -z ${2} ]; then
-echo "You must enter a name. Check the instructions."; exit 55; fi
+echo "You must enter a name. Check the instructions."; exit 5; fi
 
 # Check if the Client has been added
 if [ "${VTYPE}" = "vrk" ]; then
- if [ ! -e "/var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
+ if [ ! -e "/opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
  echo "You must add the Client first using: inknetaddvrkclient."
- exit 22
+ exit 8
  fi
 fi
 if [ "${VTYPE}" = "verber" ]; then
- if [ ! -e "/var/local/verb/configs/inknet/verber/client.verber.${VCNAME}.cnf" ]; then
+ if [ ! -e "/opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf" ]; then
  echo "You must add the Client first using: inknetaddverberclient."
- exit 22
+ exit 8
  fi
 fi
 if [ "${VTYPE}" != "verber" ] && [ "${VTYPE}" != "vrk" ]; then
-echo "You must properly specify verber or vrk."; exit 55; fi
+echo "You must properly specify verber or vrk."; exit 5; fi
 
 # Include the configs
 if [ "${VTYPE}" = "vrk" ]; then
-. /var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf; fi
+. /opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf; fi
 if [ "${VTYPE}" = "verber" ]; then
-. /var/local/verb/configs/inknet/verber/client.verber.${VCNAME}.cnf; fi
-. /var/local/verb/configs/inknet/ca.verber.cnf
+. /opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf; fi
+. /opt/verb/conf/inknet/ca.verber.cnf
 
 # Create the working directory
 if [ ! -f ~/.ssh/inknet/${VCNAME} ]; then
@@ -65,17 +65,17 @@ fi
 SECPATH=$(pwgen -1 -s 10)
 ## Add the Client username configs
 if [ "${VTYPE}" = "vrk" ]; then
-cp /var/local/verb/configs/inknet/vrk/client.vrk.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
+cp /opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
 echo "#!/bin/sh
 VERBERNAME=${IAMCANAME}" > ~/.ssh/inknet/${VCNAME}/verbername
 fi
 if [ "${VTYPE}" = "verber" ]; then
-cp /var/local/verb/configs/inknet/verber/client.verber.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
+cp /opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
 echo "#!/bin/sh
 VERBERNAME=${IAMCANAME}" > ~/.ssh/inknet/${VCNAME}/verbername
 fi
 cd ~/.ssh/inknet/
-/var/local/verb/serfs/vtxzin ${VCNAME}
+/opt/verb/serfs/vtxzin ${VCNAME}
 rm -rf ${VCNAME}
 mkdir /var/www/html/${IAMCAHOST}/inknet/${SECPATH}
 mv ${VCNAME}.vtxz ${VCNAME}.ink

@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This script points your-name.verb.one to custom-made subdomains, 
 
@@ -14,7 +14,7 @@ set -e
 
 
 # Include the config
-. /var/local/verb/configs/siteurilist
+. /opt/verb/conf/siteurilist
 
 if [ "$1" = "-h" ]; then
     echo "Usage: ./pointone [subdomain only]

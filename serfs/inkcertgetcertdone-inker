@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This tells the Verber that the cert is ready, should be or has been downloaded, and to install it
 ## This is run remotely by the Inker server

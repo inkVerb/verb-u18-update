@@ -1,6 +1,6 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-set -e
+#set -e
 
 # This runs the auto updater for LE inkCert.
 ## The script is already written, this merely runs it via Serf
@@ -9,5 +9,5 @@ set -e
 ## ./inkcertupdatele-all
 
 
-/var/local/verb/configs/inkcert/inkcertle-renew-all.sh
+/opt/verb/conf/inkcert/inkcertle-renew-all.sh
 
