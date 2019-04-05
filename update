@@ -541,6 +541,12 @@ ln -sfn /opt/verb/conf/php.${SITENAME}.ini /etc/php/7.2/apache2/php.ini
 mv /opt/verb/conf/conflab /opt/verb/conf/lab
 ln -sfn /opt/verb/conf/lab /opt/verb/conf/conflab
 
+# PHP time city
+newtime="${SITETIMEREGION}/${SITETIMECITY}"
+sed -i "s/SITETIMECITY=.*/SITETIMECITY=\"${newtime}\"/" /var/local/verb/conf/sitenameip
+sed -i "/SITETIMEREGION=.*/d" /var/local/verb/conf/sitenameip
+. /var/local/verb/conf/sitenameip
+
 ##### END SCRIPTS #########
 # Set and refresh the current version into inklists
 sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
