@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This runs installpostfix and some extra scripts to setup a backup email server on this Verber
 ## Prerequisite: setupverb of course, and verbemail if you wish an email tld other than .email
@@ -20,12 +19,12 @@ SERVER=$1
 /opt/verb/serfs/installpostfixvmail
 
 # Config settings
-sed -i "s/RC_NOT_INSTALLED/RC_NOT_ALLOWED/g" /opt/verb/conf/sitemailpath
-sed -i "s/RC_NOT_INSTALLED/RC_NOT_ALLOWED/g" /opt/verb/conf/sitemailpass
-sed -i "s/PFA_NOT_INSTALLED/PFA_NOT_ALLOWED/g" /opt/verb/conf/sitemailpath
-sed -i "s/VMAIL_SERVER/EMAIL_BACKUP_MX/g" /opt/verb/conf/sitemailpath
+/bin/sed -i "s/RC_NOT_INSTALLED/RC_NOT_ALLOWED/g" /opt/verb/conf/sitemailpath
+/bin/sed -i "s/RC_NOT_INSTALLED/RC_NOT_ALLOWED/g" /opt/verb/conf/sitemailpass
+/bin/sed -i "s/PFA_NOT_INSTALLED/PFA_NOT_ALLOWED/g" /opt/verb/conf/sitemailpath
+/bin/sed -i "s/VMAIL_SERVER/EMAIL_BACKUP_MX/g" /opt/verb/conf/sitemailpath
 
 # Finished
-echo "
+/bin/echo "
 All set. This is now a backup email server for $SERVER.
 "

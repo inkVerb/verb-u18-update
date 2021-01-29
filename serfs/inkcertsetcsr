@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets inkCert csr information in a named file
 
@@ -24,7 +23,7 @@ EMAIL=$7
 COMPANYNAME=$8
 
 # Write the csr info file
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 ## inkVerb's inkCert SSL csr information profile file
 
 COUNTRY=\"${COUNTRY}\"
@@ -38,7 +37,7 @@ COMPANYNAME=\"${COMPANYNAME}\"
 " > /opt/verb/conf/inkcert/csr-inf/csr.${INFPROFILE}.inf
 
 # Finish
-echo "
+/bin/echo "
 Ready to go. Run newinkcertcsr ${INFPROFILE}... to use this profile.
 "
 

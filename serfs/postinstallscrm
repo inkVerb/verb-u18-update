@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This should be run after SuiteCRM has successfully been installed at crm.your-name.verb.red
 
@@ -9,9 +8,9 @@
 
 
 # Set installer to false
-echo '*    *    *    *    *     cd /var/www/vapps/suitecrm; php -f cron.php > /dev/null 2>&1' > /etc/cron.d/suitecrm
-chmod 0644 /etc/cron.d/suitecrm
+/bin/echo '*    *    *    *    *     cd /var/www/vapps/suitecrm; php -f cron.php > /dev/null 2>&1' > /etc/cron.d/suitecrm
+/bin/chmod 0644 /etc/cron.d/suitecrm
 
 # Finish
-echo "SuiteCRM cron job has been added to the system."
+/bin/echo "SuiteCRM cron job has been added to the system."
 

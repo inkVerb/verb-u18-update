@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This unlinks a domain to it's wp location in vapps
 ## It is useful to return a domain to its www/domains space when turning off or no longer using a wordpress installation
@@ -12,7 +11,7 @@
 
 DOMAIN=$1
 
-rm -f /var/www/html/${DOMAIN}
-ln -s /var/www/domains/${DOMAIN} /var/www/html/${DOMAIN}
-chown -R www-data:www-data /var/www/html/${DOMAIN}
+/bin/rm -f /var/www/html/${DOMAIN}
+/bin/ln -s /var/www/domains/${DOMAIN} /var/www/html/${DOMAIN}
+/bin/chown -R www-data:www-data /var/www/html/${DOMAIN}
 

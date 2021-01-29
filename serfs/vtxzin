@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This compresses a directory into a .tar.xz file, renamed as a .vtxz file, all in the PWD
 ## The resulting .vtxz file can simply be renamed to .tar.xz and be used accordingly
@@ -18,6 +17,5 @@
 
 DIR=$1
 
-tar -cf - ${DIR}/ | xz -9 -c - > ${DIR}.tar.xz
-mv ${DIR}.tar.xz ${DIR}.vtxz
-
+/bin/tar -cf - ${DIR}/ | /usr/bin/xz -9 -c - > ${DIR}.tar.xz
+/bin/mv ${DIR}.tar.xz ${DIR}.vtxz

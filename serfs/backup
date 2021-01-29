@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This backs up an installed webapp by exporting the database, app folder, and siteconfig file into one downloadable vbak file in the "vip" folder and symlinked to the main site domain.
 
@@ -20,14 +19,14 @@
 
 APPNAME=$1
 if [ -z "$2" ]; then
-SECNAME=$(pwgen -s -1 12)
+SECNAME=$(/usr/bin/pwgen -s -1 12)
 else
 SECNAME=$2
 fi
 
 # Check if installed
 if [ -z "/opt/verb/conf/vapp.${APPNAME}" ]; then
-echo "${APPNAME} not installed. Nothing to backup."
+/bin/echo "${APPNAME} not installed. Nothing to backup."
 exit 0; fi
 
 # Include the configs
@@ -40,29 +39,28 @@ cd /var/www/vapps/${APPNAME}/
 /opt/verb/serfs/mysqlvappout vapp.${APPNAME}; wait
 
 # Backup the config
-cp /opt/verb/conf/vapp.${APPNAME} /var/www/vapps/${APPNAME}/
+/bin/cp /opt/verb/conf/vapp.${APPNAME} /var/www/vapps/${APPNAME}/
 
 # Pack the directory
 cd /var/www/vapps
 /opt/verb/serfs/vtxzin ${APPNAME}
-mv ${APPNAME}.vtxz verb.${APPNAME}.${SECNAME}.vbak
-mv verb.${APPNAME}.${SECNAME}.vbak /var/www/vip/
+/bin/mv ${APPNAME}.vtxz verb.${APPNAME}.${SECNAME}.vbak
+/bin/mv verb.${APPNAME}.${SECNAME}.vbak /var/www/vip/
 
 # Finish
 if [ "$3" = "-nl" ]; then
-echo "${APPNAME} has been backed up to the 'vip' folder.
+/bin/echo "${APPNAME} has been backed up to the 'vip' folder.
 
 Note that the app remains live.
 "
 exit 0
 fi
 
-ln -s /var/www/vip/verb.${APPNAME}.${SECNAME}.vbak /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
-chown -R www-data:www-data /var/www/html/${SITESERVE}.serve/${SERVEDIR}/verb.${APPNAME}.${SECNAME}.vbak
-echo "${APPNAME} has been backed up to the 'vip' folder and can also be downloaded at:
+/bin/ln -sfn /var/www/vip/verb.${APPNAME}.${SECNAME}.vbak /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
+/bin/chown -R www-data:www-data /var/www/html/${SITESERVE}.serve/${SERVEDIR}/verb.${APPNAME}.${SECNAME}.vbak
+/bin/echo "${APPNAME} has been backed up to the 'vip' folder and can also be downloaded at:
 
 http://${SERVEPATH}/verb.${APPNAME}.${SECNAME}.vbak
 
 Note that the app remains live.
 "
-

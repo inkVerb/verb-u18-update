@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets the settings for this Verber to be an inkNet Verber Client to a Inker CA Verber
 ## This can be run to update an existing config
@@ -27,13 +26,13 @@
 
 # Set variables
 NEWCLIENTURI="${nameURI}"
-NEWCLIENTNAME="$(echo ${hostURI} | sed 's/\./_/g')"
+NEWCLIENTNAME="$(/bin/echo ${hostURI} | sed 's/\./_/g')"
 ## Check that URI matches host
 if [ "${hostURI}" = "$(hostname -f)" ];
 then
 NEWCLIENTHOST="${hostURI}"
 else
-echo "The full hostname doesn't match the inkVerb namespace URI and host settings. Fix that before proceeding.
+/bin/echo "The full hostname doesn't match the inkVerb namespace URI and host settings. Fix that before proceeding.
 The info is in: /etc/hosts
 ...which is sometimes over-written at startup by:
 /etc/cloud/templates/hosts.debian.tmpl ...so try changing that.
@@ -50,7 +49,7 @@ exit 8; fi
 if [ "${1}" = "I_AM_INKER" ]; then
 ### Make sure it really is an Inker
  if [ ! -d /opt/ink/conf ]; then
- echo "No, you're not. Don't even pose."
+ /bin/echo "No, you're not. Don't even pose."
  exit 8
  fi
 ### Set special Inker settings
@@ -71,14 +70,14 @@ wait
 wait
 /opt/verb/serfs/setinknetrepo "I_AM_INKER"
 wait
-sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /opt/verb/conf/siteinkget
+/bin/sed -i "s/INKGET_METHOD=.*/INKGET_METHOD=\"INKER_CP\"/g" /opt/verb/conf/siteinkget
 else
 
 ## To make this a standard CA Verber
 ### Variables
 NEWCAVERBERHOST=$1
-NEWCAVERBERURI="$(echo ${NEWCAVERBERHOST} | rev | cut -d'.' -f-3 | rev)"
-NEWCAVERBERNAME="$(echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
+NEWCAVERBERURI="$(/bin/echo ${NEWCAVERBERHOST} | rev | cut -d'.' -f-3 | rev)"
+NEWCAVERBERNAME="$(/bin/echo ${NEWCAVERBERHOST} | sed 's/\./_/g')"
 NEWCAVERBERIP=$2
 ### Settings
 /opt/verb/serfs/setinkcertsslca ${NEWCAVERBERHOST}
@@ -97,7 +96,7 @@ fi
 
 # Set configs
 ## For the Client and primary CA Verber
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 # inkNet config, verb.ink
 ## This contains information about this Client Verber's credentials used in signing SSH keys for inkNet on another CA Verber
 
@@ -113,8 +112,8 @@ CLIENTSAILOR=\"NOT_SET\"
 ## For the system
 ### Prepare /etc/ssh/ssh_config
 if [ ! -d /etc/ssh/inknet ]; then
-mkdir /etc/ssh/inknet; fi
-echo "
+/bin/mkdir /etc/ssh/inknet; fi
+/bin/echo "
 ## Added by inkNet ##
 Host *
  IdentityFile ~/.ssh/in_cli_${NEWCLIENTNAME}_key
@@ -131,19 +130,19 @@ wait
 fi
 
 # Reload SSH services
-systemctl reload ssh
-systemctl reload sshd
+/bin/systemctl reload ssh
+/bin/systemctl reload sshd
 
 # Don't get CA Inker keys if this is an Inker
 if [ "${1}" = "I_AM_INKER" ]; then
-echo "
+/bin/echo "
 I am Inker!
 Now, run inknetinstallca
 "
 exit 0; fi
 
 # Finish
-echo "Done. This Verber is now ready to connect as a Client to a CA Inker.
+/bin/echo "Done. This Verber is now ready to connect as a Client to a CA Inker.
 
 If you wish to connect Vrk Stations to this Verber (perhaps), run inknetinstallca
 

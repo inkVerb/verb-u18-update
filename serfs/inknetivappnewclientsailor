@@ -12,7 +12,7 @@
 
 
 CA2URICFG=$1
-SECONDARYCACFG="$(echo ${CA2URICFG} | sed 's/\./_/g')"
+SECONDARYCACFG="$(/bin/echo ${CA2URICFG} | sed 's/\./_/g')"
 
 # Set the Client config
 if [ -z ${1} ]; then
@@ -25,14 +25,14 @@ fi
 . ${CLIENTCFG}
 
 # Generate Sailor name
-NEWINIVSAILORNAME=sail$(pwgen -s -1 -A 14)
+NEWINIVSAILORNAME=sail$(/usr/bin/pwgen -s -1 -A 14)
 
 # Add the Sailor
 /opt/verb/serfs/inknetivappaddsailor ${NEWINIVSAILORNAME}
 wait
 
 # Set Sailor name in the config
-sed -i "s/CLIENTSAILOR=.*/CLIENTSAILOR=\"${NEWINIVSAILORNAME}\"/g" ${CLIENTCFG}
+/bin/sed -i "s/CLIENTSAILOR=.*/CLIENTSAILOR=\"${NEWINIVSAILORNAME}\"/g" ${CLIENTCFG}
 
 # Get the CA Public key for this Client
 ## Based on primary or secondary

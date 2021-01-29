@@ -15,11 +15,11 @@
 
 
 ICASEC=$1
-CA2NAME="$(echo ${ICASEC} | sed 's/\./_/g')"
+CA2NAME="$(/bin/echo ${ICASEC} | sed 's/\./_/g')"
 
 # Check the config
 if [ ! -f /opt/verb/conf/inknet/2cav.${CA2NAME}.cnf ]; then
-echo "Out of order. This is not a Client yet.
+/bin/echo "Out of order. This is not a Client yet.
 
 First run inknetaddsecondarycaverber
 "
@@ -32,7 +32,7 @@ exit 8; fi
 runuser -l ${CLIENTSAILOR} -c "ssh-keygen -t rsa -N '' -f /opt/ivapp/inknet/sailor/${CLIENTSAILOR}/.ssh/in_cli_${CLIENTNAME}_key"
 
 # Finish
-echo "Ready for the next step...
+/bin/echo "Ready for the next step...
 "
 /opt/verb/serfs/showinknetclientinfo
 wait

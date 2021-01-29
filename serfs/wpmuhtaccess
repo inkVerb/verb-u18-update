@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets up a WordPress vapp .htaccess file for use with multisite
 ## Prerequisites: wpmuseton, install the "Network" from the dashboard
@@ -24,13 +23,13 @@ if [ "${INSTTYPE}" != "dir" ]; then
 INSTTYPE="sub"; fi
 
 # Remove the old WordPress declarations
-sed -i '/^# BEGIN WordPress*/,/^# END WordPress/d' /var/www/vapps/wp.${WPDOMAIN}/.htaccess
+/bin/sed -i '/^# BEGIN WordPress*/,/^# END WordPress/d' /var/www/vapps/wp.${WPDOMAIN}/.htaccess
 
 # Add the settings
 ## Subdomain install
 if [ "${INSTTYPE}" = "sub" ]; then
 # Put in the new .htaccess settings
-echo '# BEGIN WordPress ##inkVerb
+/bin/echo '# BEGIN WordPress ##inkVerb
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
@@ -47,13 +46,13 @@ RewriteRule . index.php [L]
 # END WordPress' >> /var/www/vapps/wp.${WPDOMAIN}/.htaccess
 
 ## Finish
-echo ".htaccess file is set for http://${WPDOMAIN} multisite."
+/bin/echo ".htaccess file is set for http://${WPDOMAIN} multisite."
 fi
 
 ## Directory install
 if [ "${INSTTYPE}" = "dir" ]; then
 # Put in the new .htaccess settings
-echo '# BEGIN WordPress ##inkVerb
+/bin/echo '# BEGIN WordPress ##inkVerb
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
@@ -70,6 +69,6 @@ RewriteRule . index.php [L]
 # END WordPress' >> /var/www/vapps/wp.${WPDOMAIN}/.htaccess
 
 ## Finish
-echo ".htaccess file is set for http://${WPDOMAIN} multisite."
+/bin/echo ".htaccess file is set for http://${WPDOMAIN} multisite."
 fi
 

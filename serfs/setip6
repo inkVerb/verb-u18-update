@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets a new IPv6 address on the server
 
@@ -11,7 +10,7 @@
 # Include the config file
 . /opt/verb/conf/sitenameip
 
-NEWIP6=$1
+NEWIP6="$1"
 
 # Expand/Compress
 ## THANKS https://stackoverflow.com/a/50208987/10343144
@@ -26,17 +25,17 @@ expand_ipv6() {
     ip=$1
 
     # prepend 0 if we start with :
-    echo $ip | grep -qs "^:" && ip="0${ip}"
+    /bin/echo $ip | /bin/grep -qs "^:" && ip="0${ip}"
 
     # expand ::
-    if echo $ip | grep -qs "::"; then
-        colons=$(echo $ip | sed 's/[^:]//g')
-        missing=$(echo ":::::::::" | sed "s/$colons//")
-        expanded=$(echo $missing | sed 's/:/:0/g')
-        ip=$(echo $ip | sed "s/::/$expanded/")
+    if /bin/echo $ip | /bin/grep -qs "::"; then
+        colons=$(/bin/echo $ip | sed 's/[^:]//g')
+        missing=$(/bin/echo ":::::::::" | sed "s/$colons//")
+        expanded=$(/bin/echo $missing | sed 's/:/:0/g')
+        ip=$(/bin/echo $ip | sed "s/::/$expanded/")
     fi
 
-    blocks=$(echo $ip | grep -o "[0-9a-f]\+")
+    blocks=$(/bin/echo $ip | /bin/grep -o "[0-9a-f]\+")
     set $blocks
 
     printf "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x\n" \
@@ -54,7 +53,7 @@ expand_ipv6() {
 compress_ipv6() {
     ip=$1
 
-    blocks=$(echo $ip | grep -o "[0-9a-f]\+")
+    blocks=$(/bin/echo $ip | /bin/grep -o "[0-9a-f]\+")
     set $blocks
 
     # compress leading zeros
@@ -79,18 +78,18 @@ compress_ipv6() {
             :0:0:0:0:0 \
             :0:0:0:0 \
             :0:0; do
-        if echo $ip | grep -qs $pattern; then
-            ip=$(echo $ip | sed "s/$pattern/::/")
+        if /bin/echo $ip | /bin/grep -qs $pattern; then
+            ip=$(/bin/echo $ip | sed "s/$pattern/::/")
             # if the substitution occured before the end, we have :::
-            ip=$(echo $ip | sed 's/:::/::/')
+            ip=$(/bin/echo $ip | sed 's/:::/::/')
             break # only one substitution
         fi
     done
 
     # remove prepending : if necessary
-    echo $ip | grep -qs "^:[^:]" && ip=$(echo $ip | sed 's/://')
+    /bin/echo $ip | /bin/grep -qs "^:[^:]" && ip=$(echo $ip | sed 's/://')
 
-    echo $ip
+    /bin/echo $ip
 }
 
 ### reverse expanded IPv6 for ARPA
@@ -110,13 +109,13 @@ NEWCMPIP6=$(compress_ipv6 ${NEWIP6})
 NEWRARPA6=$(rarpa_ipv6 ${NEWEXPIP6})
 
 # Normal IP
-sed -i "s/SITEIPV6.*/SITEIPV6=\"${NEWCMPIP6}\"/" /opt/verb/conf/sitenameip
-sed -i "s/SITEEXPIPV6.*/SITEEXPIPV6=\"${NEWEXPIP6}\"/" /opt/verb/conf/sitenameip
-sed -i "s/${SITEIPV6}/${NEWCMPIP6}/" /etc/hosts
-echo "IPv6 now set to: ${NEWCMPIP6}"
+/bin/sed -i "s/SITEIPV6=.*/SITEIPV6=\"${NEWCMPIP6}\"/" /opt/verb/conf/sitenameip
+/bin/sed -i "s/SITEEXPIPV6.*/SITEEXPIPV6=\"${NEWEXPIP6}\"/" /opt/verb/conf/sitenameip
+/bin/sed -i "s/${SITEIPV6}/${NEWCMPIP6}/" /etc/hosts
+/bin/echo "IPv6 now set to: ${NEWCMPIP6}"
 
 ### Config again
 . /opt/verb/conf/sitenameip
 
 # ARPA & inverse IP
-sed -i "s/SITEARPAIP6.*/SITEARPAIP6=\"${NEWRARPA6}\"/" /opt/verb/conf/sitenameip
+/bin/sed -i "s/SITEARPAIP6.*/SITEARPAIP6=\"${NEWRARPA6}\"/" /opt/verb/conf/sitenameip

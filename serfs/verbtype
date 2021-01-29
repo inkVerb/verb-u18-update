@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbKnight! verb.ink
-#set -e
 
 # This displays the current Verber type
 
@@ -8,5 +7,5 @@
 ## ./inkver
 
 . /opt/verb/conf/inklists/verberverno
-echo "${VTYPE}"
+/bin/echo "${VTYPE}"
 

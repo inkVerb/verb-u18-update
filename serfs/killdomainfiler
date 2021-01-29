@@ -1,6 +1,5 @@
 z#!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This removes an existing domain link from an existing ftpfiler's home ~/domains folder
 
@@ -11,5 +10,5 @@ z#!/bin/sh
 OLDDOMAIN=$1
 FILER=$2
 
-rm -f /srv/vip/filers/${FILER}/domains/${OLDDOMAIN}
+/bin/rm -f /srv/vip/filers/${FILER}/domains/${OLDDOMAIN}
 

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This installs Ampache from inkisaverb.com/repo and links it to ampache....verb.kiwi
 
@@ -26,27 +25,27 @@ cd /var/www/vapps
 ### Check
 /opt/verb/serfs/inkget ${CVAPPNAME} check
 if [ "$?" = 4 ]; then
-echo "Repo failed to retrieve the file."
+/bin/echo "Repo failed to retrieve the file."
 exit 4; fi
 if [ ! -f ${CVAPPNAME}.vtxz ]; then
-echo "Failed to retrieve from the repo."
+/bin/echo "Failed to retrieve from the repo."
 exit 4; fi
 
 /opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
 /opt/verb/serfs/setvapplinkon ${CVAPPNAME}; wait
-chown -R www-data:www-data /var/www/html/kiwi.ampache; wait
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
+/bin/chown -R www-data:www-data /var/www/html/kiwi.ampache; wait
+/bin/chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
 
 # Auto database
 if [ -z ${3} ]; then
-DBPASSWORD=$(pwgen -s -1 10); fi
+DBPASSWORD=$(/usr/bin/pwgen -s -1 10); fi
 if [ -z ${1} ]; then
-DBASE=${CVAPPNAME}$(pwgen -s -1 6); fi
+DBASE=${CVAPPNAME}$(/usr/bin/pwgen -s -1 6); fi
 if [ -z ${2} ]; then
 DBUSER=${DBASE}; fi
 
 # Create the database user and credentials
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON *.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}' WITH GRANT OPTION;
 FLUSH PRIVILEGES;"
@@ -61,12 +60,12 @@ FLUSH PRIVILEGES;"
 #mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${DBASE} < /var/www/vapps/ampache/sql/ampache.sql
 
 # Write the config for backup
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
 APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}
 
-echo "These are setup:
+/bin/echo "These are setup:
 
 Database Name: ${DBASE}
 MySQL Hostname: localhost

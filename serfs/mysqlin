@@ -1,8 +1,8 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This imports a MySQL database from a .sql file with the same name
+## The .sql file to import must be in the vip/sql/ directory
 
 # How to use:
 ## ./mysqlin [dbase]
@@ -10,5 +10,5 @@
 
 DBASE=$1
 
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${DBASE} < ${DBASE}.sql
-
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${DBASE} < /srv/vip/sql/${DBASE}.sql
+echo "${DBASE} database restored."

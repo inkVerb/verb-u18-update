@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This downloads and installs additional useful pluings for a preinstalled WordPress domain in the .../html/ folder
 ## You can use this for blog.NAME.verb.ink by using "ink.blog" as the domain
@@ -18,11 +17,11 @@ DOMAIN=$2
 
 # Check domain
 if [ ! -d /var/www/html/${DOMAIN} ]; then
-echo "That domain isn't even installed. I quit."
+/bin/echo "That domain isn't even installed. I quit."
 exit 8
 fi
 if [ ! -d /var/www/html/${DOMAIN}/wp-content ]; then
-echo "That domain doesn't have WordPress. I quit."
+/bin/echo "That domain doesn't have WordPress. I quit."
 exit 8
 fi
 
@@ -31,12 +30,12 @@ cd /var/www/html/${DOMAIN}/wp-content
 # Download and establish wordpress in the server to pre-created domain
 /opt/verb/serfs/inkget wp.${WPADDNAME}
 if [ ! -f wp.${WPADDNAME}.zip ]; then
-echo "Can't download wp.${WPADDNAME}.zip. But, not quitting."
+/bin/echo "Can't download wp.${WPADDNAME}.zip. But, not quitting."
 exit 0; fi
-unzip -o wp.${WPADDNAME}.zip
-rm -f wp.${WPADDNAME}.zip
-chown -R www-data:www-data /var/www/html/${DOMAIN}/wp-content
+/usr/bin/unzip -o wp.${WPADDNAME}.zip
+/bin/rm -f wp.${WPADDNAME}.zip
+/bin/chown -R www-data:www-data /var/www/html/${DOMAIN}/wp-content
 
-echo "
+/bin/echo "
 ${DOMAIN} now has the ${WPADDNAME} pack."
 

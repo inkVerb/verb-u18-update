@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This communicates with the inkCert CA Inker to send the csr and retrieve the cert package
 ## This runs a file remotely on the Inker server
@@ -17,8 +16,8 @@ INFPROFILE=$1
 DOMAIN=$2
 
 # Verify that the domain is installed
-if [ ! -f /opt/verb/conf/inkcert/csr-inf/siteinkcert-${DOMAIN} ]; then
-echo "Sorry, Bucko. ${DOMAIN} is not installed yet.
+if [ ! -f /opt/verb/conf/inkcert/cli-ini/siteinkcert-${DOMAIN} ]; then
+/bin/echo "Sorry, Bucko. ${DOMAIN} is not installed yet.
 
 Do that first, then get back to me.
 "; exit 0

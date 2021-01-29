@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets a new SSH login port number and disallows the previous port
 ## This could kill the current connection and require the user to logon again using the new port.
@@ -32,11 +31,11 @@
 
 NEWPORT=$1
 
-sed -i "s/Port.*/Port ${NEWPORT}/g" /etc/ssh/sshd_config
-sed -i "s/SITEPORT.*/SITEPORT=\"${NEWPORT}\"/" /opt/verb/conf/siteport
-ufw allow ${NEWPORT}
+/bin/sed -i "s/Port.*/Port ${NEWPORT}/g" /etc/ssh/sshd_config
+/bin/sed -i "s/SITEPORT.*/SITEPORT=\"${NEWPORT}\"/" /opt/verb/conf/siteport
+/usr/sbin/ufw allow ${NEWPORT}
 # Deny the previous port from the config file which has been written, but not yet refreshed
-ufw deny ${SITEPORT}
+/usr/sbin/ufw deny ${SITEPORT}
 
 # Reload the settings
-systemctl reload ssh
+/bin/systemctl reload ssh

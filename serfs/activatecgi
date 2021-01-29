@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This activates the cgi....verb.vip folder so the web will provide an index
 
@@ -15,33 +14,18 @@
 # Include the config
 . /opt/verb/conf/siteurilist
 
-if [ "$1" = "-h" ]
-then
-    echo "Usage: ./activatecgi [on/off]
-
-Examples:
- ./activatecgi on
- ./activatecgi off
-
- allowed arguments:
- on	(cgi.${vipURI} becomes a web-accessible folder)
- off	(cgi.${vipURI} returns to a redirect to ${inkURI})"
-exit 0
-fi
-
 if [ "$1" = "on" ]
 then
-    rm -rf /var/www/html/vip.cgi
-    ln -sfn /var/www/vip/cgi /var/www/html/vip.cgi
-    echo "cgi on."
+    /bin/rm -rf /var/www/html/vip.cgi
+    /bin/ln -sfn /var/www/vip/cgi /var/www/html/vip.cgi
+    /bin/echo "cgi on."
 exit 0
 fi
 
 if [ "$1" = "off" ]
 then
-    rm -f /var/www/html/vip.cgi
-    cp -R /var/www/html/0ne /var/www/html/vip.cgi
-    echo "cgi off."
+    /bin/rm -f /var/www/html/vip.cgi
+    /bin/cp -R /var/www/html/0ne /var/www/html/vip.cgi
+    /bin/echo "cgi off."
 exit 0
 fi
-

@@ -6,32 +6,34 @@
 # This "updates" the serfs and "upgrades" Verber
 ## serfs are updated every time. Upgrades only relate to Verber framework which has verber version numbers related to each patch/release.
 ## This contains many version patches for a Verber™ sequentially, one version at a time.
-## This is run at the path: /var/local/verb/${VUPDATE_REPO}/update
+## This is run at the path: /opt/verb/${VUPDATE_REPO}/update
 
-# To call a changelog for a specific version, use: `echo "$vCLEANVERNO"` Eg: `echo "$v08502"` for v0.85.02
+# To call a changelog for a specific version, use: `/bin/echo "$vCLEANVERNO"` Eg: `echo "$v08702"` for v0.87.02
+
+# DEV NOTE: A directory, even empty, must exist in the same directory as this "update" file named by by each update version ie: 0.87.01/
 
 # DEV NOTE: Larger versions must be at the bottom, smaller versions at the top, so "descending"
 
-# DEV INSTRUCTIONS: Put all related files for each patch in a folder named by the version number, ie 0.805
+# DEV INSTRUCTIONS: Put all related files for each patch in a folder named by the version number, ie: 0.87.01/
 
 # DEV NOTE: Serfs are automatically copied & updated from ${VUPDATE_REPO}/serfs to the Verber before any patches run, after the verno check.
 
 
-MIN_VERNO=0.85.02
-VUPDATE_REPO="verb-dev-update"
+MIN_VERNO=0.86.05
+VUPDATE_REPO="verb-u18-update"
 
 ## Sample version updater:
-#UPGRADE_PATCH_VERNO=0.85.08
-#if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-#CLEAN_PATCH_VERNO=$(echo $UPGRADE_PATCH_VERNO | sed -e "s/\.//g")
-#PCLdoc="$(cat <<UPCL
+#UPGRADE_PATCH_VERNO=0.87.0
+#if [ $(/bin/echo ${UPGRADE_PATCH_VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") -gt $(/bin/echo ${VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") ] ; then
+#CLEAN_PATCH_VERNO=$(/bin/echo $UPGRADE_PATCH_VERNO | /bin/sed -e "s/\.//g")
+#PCLdoc="$(/bin/cat <<UPCL
 #Patch ${UPGRADE_PATCH_VERNO} Changelog:
 ### Patch Notes Here...
 #UPCL
 #)"
-#echo "$PCLdoc"
+#/bin/echo "$PCLdoc"
 ## So we can call a specific version later if needed
-#eval "v$CLEAN_PATCH_VERNO='$(echo "$PCLdoc")'"
+#eval "v$CLEAN_PATCH_VERNO='$(/bin/echo "$PCLdoc")'"
 #
 ## Move to working directory of the patch
 #if [ -d "/opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
@@ -42,17 +44,17 @@ VUPDATE_REPO="verb-dev-update"
 ###### SCRIPTS GO HERE #####
 ## NOTE: PWD is /opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
 #
-## eg: echo "I would update the serfs here, but that happens automatically."
+## eg: /bin/echo "I would update the serfs here, but that happens automatically."
 #
 #
 #
 ###### END SCRIPTS #########
 ## Set and refresh the current version into inklists
-#sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
+#/bin/sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
 #. /opt/verb/conf/inklists/verberverno
-#echo "Verber upgraded to v${VERNO}"
+#/bin/echo "Verber upgraded to v${VERNO}"
 #else
-#echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
+#/bin/echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
 #fi
 ###############END#UPGRADE#PATCH#
 
@@ -60,495 +62,220 @@ VUPDATE_REPO="verb-dev-update"
 ## Version Check ##
 ### The minimum version that can use this updater
 ## Include the configs
-. /var/local/verb/conf/sitenameip
-. /var/local/verb/conf/siteurilist
-. /var/local/verb/conf/inklists/verberverno
+. /opt/verb/conf/sitenameip
+. /opt/verb/conf/siteurilist
+. /opt/verb/conf/inklists/verberverno
 ## Check minimal updateable version
-if [ $(echo ${MIN_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-echo "Current Verber™ version is ${VERNO}, minimum ${MIN_VERNO} to use this updater.
+if [ $(/bin/echo ${MIN_VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") -gt $(/bin/echo ${VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") ] ; then
+/bin/echo "Current Verber™ version is ${VERNO}, minimum ${MIN_VERNO} to use this updater.
 Run updateverberlegacy for older versions."
 exit 0
 fi
 
 # Update Serfs
-rm -f /var/local/verb/serfs/*
-cp /var/local/verb/${VUPDATE_REPO}/serfs/* /var/local/verb/serfs/
-chmod 750 /var/local/verb/serfs/*
-cd /var/local/verb
-wget wget https://raw.githubusercontent.com/inkVerb/verb-dev/master/README.md
-echo "Serfs have been updated."
+/bin/rm -f /opt/verb/serfs/*
+/bin/cp /opt/verb/${VUPDATE_REPO}/serfs/* /opt/verb/serfs/
+/bin/chmod 750 /opt/verb/serfs/*
+/bin/chmod 750 /opt/verb/donjon/*.sh
+cd /opt/verb
+/bin/rm -f README.md
+/usr/bin/wget https://raw.githubusercontent.com/inkVerb/verb-u18/master/README.md
+/bin/echo "Serfs have been updated."
 
 # Update inkLists
 ## inkGet
-. /var/local/verb/conf/siteinkget
+. /opt/verb/conf/siteinkget
 if [ "${INKGET_LIST}" = "AUTO_UPDATE" ]; then
-cp /var/local/verb/${VUPDATE_REPO}/inklists/repoverlist /var/local/verb/conf/inklists/
-cp /var/local/verb/${VUPDATE_REPO}/inklists/repolinks /var/local/verb/conf/inklists/
-echo "Repo version list is up-to-date."
+/bin/cp /opt/verb/${VUPDATE_REPO}/inklists/repoverlist /opt/verb/conf/inklists/
+/bin/cp /opt/verb/${VUPDATE_REPO}/inklists/repolinks /opt/verb/conf/inklists/
+/bin/echo "Repo version list is up-to-date."
 else
-echo "Repo version list unchanged because this is a custom Verber."
+/bin/echo "Repo version list unchanged because this is a custom Verber."
 fi
 
 # Run version-by-version updates
 
 
-UPGRADE_PATCH_VERNO=0.85.03
-if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-CLEAN_PATCH_VERNO=$(echo $UPGRADE_PATCH_VERNO | sed -e "s/\.//g")
-PCLdoc="$(cat <<UPCL
+UPGRADE_PATCH_VERNO=0.87.00
+if [ $(/bin/echo ${UPGRADE_PATCH_VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") -gt $(/bin/echo ${VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") ] ; then
+CLEAN_PATCH_VERNO=$(/bin/echo $UPGRADE_PATCH_VERNO | /bin/sed -e "s/\.//g")
+PCLdoc="$(/bin/cat <<UPCL
 Patch ${UPGRADE_PATCH_VERNO} Changelog:
-## Patch Notes Here...
+- New spinup framework
 UPCL
 )"
-echo "$PCLdoc"
-eval "v$CLEAN_PATCH_VERNO='$(echo "$PCLdoc")'"
-
-# Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
-
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-
-# Stop Bind
-systemctl stop bind9
-
-# Hostname issue
-echo "${hostURI}" > /etc/hostname
-
-# verb.cash
-if [ ! -f "/etc/apache2/sites-available/${cashURI}.conf" ]; then
-echo "cashURI=\"${SITENAME}.verb.cash\"" >> /var/local/verb/conf/siteurilist
-. /var/local/verb/conf/siteurilist
-echo "VERBcash=true" >> /var/local/verb/conf/sitetldstatus
-/var/local/verb/serfs/updatehtmlverbs
-mv *.conf /etc/apache2/sites-available/
-sed -i "s/cashURI286/${cashURI}/g" /etc/apache2/sites-available/*.conf
-rename "s/cashURI286/${cashURI}/" /etc/apache2/sites-available/*.conf
-a2ensite ${cashURI} cash.${cashURI}
-fi
-
-# IP updates
-/var/local/verb/serfs/setip4 ${SITEIP}
-/var/local/verb/serfs/setip6 ${SITEIPV6}
-. /var/local/verb/conf/sitenameip
-
-# New DNS files
-## Set the FQDN host
-echo "; FQDN Host A Records
-${hostURI}.	IN  A		hostip286
-${hostURI}.	IN  AAAA	hostipv6286
-" >> /var/local/verb/conf/inkdns/zones/db.${SITETLD}
-
-# Copy new files
-cp -rf /var/local/verb/conf/inkdns/zones /var/local/verb/conf/inkdns/zones-backup
-cp rmserial.sh /var/local/verb/conf/inkdns/
-chmod 750 /var/local/verb/conf/inkdns/*.sh
-mv named.conf.options /var/local/verb/conf/inkdns/
-mv db.dnsdomain /var/local/verb/conf/inkdns/
-mv nv.dnsdomain /var/local/verb/conf/inkdns/
-mv rmserial.sh /var/local/verb/conf/inkdns/
-mv /var/local/verb/conf/inkdns/zones /var/local/verb/conf/inkdns/zones-list
-mv zones /var/local/verb/conf/inkdns/
-mv /var/local/verb/conf/inkdns/zones/db.pink /var/local/verb/conf/inkdns/zones/db.${pinkURI}
-mv /var/local/verb/conf/inkdns/zones/db.email /var/local/verb/conf/inkdns/zones/db.${emailURI}
-mv /var/local/verb/conf/inkdns/zones/db.city /var/local/verb/conf/inkdns/zones/db.${cityURI}
-mv /var/local/verb/conf/inkdns/zones/db.one /var/local/verb/conf/inkdns/zones/db.${oneURI}
-mv /var/local/verb/conf/inkdns/zones/db.ink /var/local/verb/conf/inkdns/zones/db.${inkURI}
-mv /var/local/verb/conf/inkdns/zones/db.blue /var/local/verb/conf/inkdns/zones/db.${blueURI}
-mv /var/local/verb/conf/inkdns/zones/db.vip /var/local/verb/conf/inkdns/zones/db.${vipURI}
-mv /var/local/verb/conf/inkdns/zones/db.kiwi /var/local/verb/conf/inkdns/zones/db.${kiwiURI}
-mv /var/local/verb/conf/inkdns/zones/db.cash /var/local/verb/conf/inkdns/zones/db.${cashURI}
-mv /var/local/verb/conf/inkdns/zones/db.red /var/local/verb/conf/inkdns/zones/db.${redURI}
-mv /var/local/verb/conf/inkdns/zones/db.rocks /var/local/verb/conf/inkdns/zones/db.${rocksURI}
-mv /var/local/verb/conf/inkdns/zones/nv.pink /var/local/verb/conf/inkdns/zones/nv.${pinkURI}
-mv /var/local/verb/conf/inkdns/zones/nv.email /var/local/verb/conf/inkdns/zones/nv.${emailURI}
-mv /var/local/verb/conf/inkdns/zones/nv.city /var/local/verb/conf/inkdns/zones/nv.${cityURI}
-mv /var/local/verb/conf/inkdns/zones/nv.one /var/local/verb/conf/inkdns/zones/nv.${oneURI}
-mv /var/local/verb/conf/inkdns/zones/nv.ink /var/local/verb/conf/inkdns/zones/nv.${inkURI}
-mv /var/local/verb/conf/inkdns/zones/nv.blue /var/local/verb/conf/inkdns/zones/nv.${blueURI}
-mv /var/local/verb/conf/inkdns/zones/nv.vip /var/local/verb/conf/inkdns/zones/nv.${vipURI}
-mv /var/local/verb/conf/inkdns/zones/nv.kiwi /var/local/verb/conf/inkdns/zones/nv.${kiwiURI}
-mv /var/local/verb/conf/inkdns/zones/nv.cash /var/local/verb/conf/inkdns/zones/nv.${cashURI}
-mv /var/local/verb/conf/inkdns/zones/nv.red /var/local/verb/conf/inkdns/zones/nv.${redURI}
-mv /var/local/verb/conf/inkdns/zones/nv.rocks /var/local/verb/conf/inkdns/zones/nv.${rocksURI}
-sed -i "s/hostdomain286/${pinkURI}/g" /var/local/verb/conf/inkdns/zones/db.${pinkURI}
-sed -i "s/hostdomain286/${emailURI}/g" /var/local/verb/conf/inkdns/zones/db.${emailURI}
-sed -i "s/hostdomain286/${cityURI}/g" /var/local/verb/conf/inkdns/zones/db.${cityURI}
-sed -i "s/hostdomain286/${oneURI}/g" /var/local/verb/conf/inkdns/zones/db.${oneURI}
-sed -i "s/hostdomain286/${inkURI}/g" /var/local/verb/conf/inkdns/zones/db.${inkURI}
-sed -i "s/hostdomain286/${blueURI}/g" /var/local/verb/conf/inkdns/zones/db.${blueURI}
-sed -i "s/hostdomain286/${vipURI}/g" /var/local/verb/conf/inkdns/zones/db.${vipURI}
-sed -i "s/hostdomain286/${kiwiURI}/g" /var/local/verb/conf/inkdns/zones/db.${kiwiURI}
-sed -i "s/hostdomain286/${cashURI}/g" /var/local/verb/conf/inkdns/zones/db.${cashURI}
-sed -i "s/hostdomain286/${redURI}/g" /var/local/verb/conf/inkdns/zones/db.${redURI}
-sed -i "s/hostdomain286/${rocksURI}/g" /var/local/verb/conf/inkdns/zones/db.${rocksURI}
-sed -i "s/hostdomain286/${pinkURI}/g" /var/local/verb/conf/inkdns/zones/nv.${pinkURI}
-sed -i "s/hostdomain286/${emailURI}/g" /var/local/verb/conf/inkdns/zones/nv.${emailURI}
-sed -i "s/hostdomain286/${cityURI}/g" /var/local/verb/conf/inkdns/zones/nv.${cityURI}
-sed -i "s/hostdomain286/${oneURI}/g" /var/local/verb/conf/inkdns/zones/nv.${oneURI}
-sed -i "s/hostdomain286/${inkURI}/g" /var/local/verb/conf/inkdns/zones/nv.${inkURI}
-sed -i "s/hostdomain286/${blueURI}/g" /var/local/verb/conf/inkdns/zones/nv.${blueURI}
-sed -i "s/hostdomain286/${vipURI}/g" /var/local/verb/conf/inkdns/zones/nv.${vipURI}
-sed -i "s/hostdomain286/${kiwiURI}/g" /var/local/verb/conf/inkdns/zones/nv.${kiwiURI}
-sed -i "s/hostdomain286/${cashURI}/g" /var/local/verb/conf/inkdns/zones/nv.${cashURI}
-sed -i "s/hostdomain286/${redURI}/g" /var/local/verb/conf/inkdns/zones/nv.${redURI}
-sed -i "s/hostdomain286/${rocksURI}/g" /var/local/verb/conf/inkdns/zones/nv.${rocksURI}
-
-# Setings for new zones
-## Set the namespace, TLD, and IP values
-### db.*
-sed -i "s/hostip286/${SITEIP}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/hostip286/${SITEIP}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/hostipv6286/${SITEIPV6}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/hostipv6286/${SITEIPV6}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/sitename286/${SITENAME}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/sitename286/${SITENAME}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/sitetld286/${SITETLD}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/sitetld286/${SITETLD}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/mailURI286/${hostURI}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/mailURI286/${hostURI}/g" /var/local/verb/conf/inkdns/db.*
-### nv.*
-sed -i "s/hostarpaip286/${SITEARPAIP4}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/hostarpaip286/${SITEARPAIP4}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/hostarpaipv6286/${SITEARPAIP6}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/hostarpaipv6286/${SITEARPAIP6}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/sitename286/${SITENAME}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/sitename286/${SITENAME}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/sitetld286/${SITETLD}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/sitetld286/${SITETLD}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/mailURI286/${hostURI}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/mailURI286/${hostURI}/g" /var/local/verb/conf/inkdns/nv.*
-
-# inkDNS installed y/n
-if [ -f "/var/local/verb/conf/inkdns/inkdnsstatus" ]; then
-## Already installed
-### Config
-cp /var/local/verb/conf/inkdns/named.conf.options /etc/bind/
-### Set the NS domains
-sed -i "s/nameURI286/${nameURI}/g" /var/local/verb/conf/inkdns/nv.verber
-sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/ns3\.DNSDOMAIN286/${SITESECONDDNS}/g" /var/local/verb/conf/inkdns/zones/nv.*
-sed -i "s/ns3\.DNSDOMAIN286/${SITESECONDDNS}/g" /var/local/verb/conf/inkdns/nv.*
-sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /var/local/verb/conf/inkdns/db.*
-sed -i "s/ns3\.DNSDOMAIN286/${SITESECONDDNS}/g" /var/local/verb/conf/inkdns/zones/db.*
-sed -i "s/ns3\.DNSDOMAIN286/${SITESECONDDNS}/g" /var/local/verb/conf/inkdns/db.*
-## Not installed
-else
-echo "
-## inkVerb IPv6 ##
-${SITEIPV6} ${hostURI} ${SITEHOST}" >> /etc/hosts
-echo "SITEEXPIPV6=\"expip6286\"
-SITEARPAIP4=\"arpaip286\"
-SITEARPAIP6=\"arpaipv6286\"" >> /var/local/verb/conf/sitenameip
-. /var/local/verb/conf/sitenameip
-### Reconfigure inkDNS filenames
-echo "SITEINKERDNS=\"ns0.inkisaverb.com\"
-SITEINKERIP4=\"NOT_SET\"
-SITEINKERIP6=\"NOT_SET\"
-SITE2INKERDNS=\"ns1.inkisaverb.com\"
-SITE2INKERIP4=\"NOT_SET\"
-SITE2INKERIP6=\"NOT_SET\"" >> /var/local/verb/conf/sitenameip
-## Old Zones
-cd /var/local/verb/conf/inkdns/zones
-for dbfile in *.db; do
-mv ${dbfile} db.${dbfile%.db}; done
-fi
-
-# Set new zone files
-cd /var/local/verb/conf/inkdns/zones-list
-rm *${SITENAME}.verb*
-rm nv.*
-for inkZoneDB in db.*; do
-      inkZone="$(echo ${inkZoneDB} | sed 's/db\.//' )"
-/var/local/verb/serfs/inkdnsadddomain ${inkZone}
-/var/local/verb/serfs/inkdnsaddmail ${inkZone}
-/var/local/verb/serfs/inkdnsaddinkdkim ${inkZone}
-done
-## Cleanup
-rm -rf /var/local/verb/conf/inkdns/zones-list
-
-## Update the FQDN
-/var/local/verb/serfs/inkdnsadddomain ${nameURI}
-/var/local/verb/serfs/inkdnsaddmail ${nameURI}
-/var/local/verb/serfs/inkdnsaddinkdkim ${nameURI}
-
-# Start Bind
-sleep 1
-systemctl start bind9
-
-# Refresh Bind
-sleep 1
-/var/local/verb/serfs/inkdnsrefreshbind
-
-
-# Return to the update directory
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
-
-
-##### END SCRIPTS #########
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /var/local/verb/conf/inklists/verberverno
-. /var/local/verb/conf/inklists/verberverno
-echo "Verber upgraded to v${VERNO}"
-else
-echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPGRADE#PATCH#
-
-
-UPGRADE_PATCH_VERNO=0.85.04
-if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-CLEAN_PATCH_VERNO=$(echo $UPGRADE_PATCH_VERNO | sed -e "s/\.//g")
-PCLdoc="$(cat <<UPCL
-Patch ${UPGRADE_PATCH_VERNO} Changelog:
-- IP updates
-- inkDNS cleanup
-UPCL
-)"
-echo "$PCLdoc"
-eval "v$CLEAN_PATCH_VERNO='$(echo "$PCLdoc")'"
-
-# Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
-
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
-
-# IP updates
-. /var/local/verb/conf/sitenameip
-/var/local/verb/serfs/setip4 ${SITEIP}
-/var/local/verb/serfs/setip6 ${SITEIPV6}
-. /var/local/verb/conf/sitenameip
-
-# Inverse base
-echo "; PTR Domain
-${SITEARPAIP4}		IN  PTR  hostdomain286.
-${SITEARPAIP6}		IN  PTR  hostdomain286." > /var/local/verb/conf/inkdns/nv.dnsdomain
-
-# inkDNS nv standard domain file no longer needed because inkdnsrefreshbind will create it anew on each run
-rm -f /var/local/verb/conf/inkdns/nv.verber
-
-# Serial numbers
-cd /var/local/verb/conf/inkdns/zones
-for inkZoneDB in db.*; do
-      inkZone="$(echo ${inkZoneDB} | sed 's/db\.//' )"
-/var/local/verb/serfs/inkdnsserial ${inkZone}
-done
-
-##### END SCRIPTS #########
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /var/local/verb/conf/inklists/verberverno
-. /var/local/verb/conf/inklists/verberverno
-echo "Verber upgraded to v${VERNO}"
-else
-echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPGRADE#PATCH#
-
-
-UPGRADE_PATCH_VERNO=0.85.05
-if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-
-# Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
-
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
-
-cp -r inkvpn /var/local/verb/conf/
-chmod -R 750 /var/local/verb/conf/inkvpn
-
-
-##### END SCRIPTS #########
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /var/local/verb/conf/inklists/verberverno
-. /var/local/verb/conf/inklists/verberverno
-echo "Verber upgraded to v${VERNO}"
-else
-echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPGRADE#PATCH#
-
-UPGRADE_PATCH_VERNO=0.85.06
-if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-CLEAN_PATCH_VERNO=$(echo $UPGRADE_PATCH_VERNO | sed -e "s/\.//g")
-PCLdoc="$(cat <<UPCL
-Patch ${UPGRADE_PATCH_VERNO} Changelog:
-- Fixed Apache config for the .cash TLD
-- Added the inkSplat utility for Dovecot
-- Removed SSLv2 from Dovecot
-UPCL
-)"
-echo "$PCLdoc"
+/bin/echo "$PCLdoc"
 # So we can call a specific version later if needed
-eval "v$CLEAN_PATCH_VERNO='$(echo "$PCLdoc")'"
+eval "v$CLEAN_PATCH_VERNO='$(/bin/echo "$PCLdoc")'"
 
 # Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
+if [ -d "/opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
+cd /opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
 
 # Run the update scripts for this patch
 
 ##### SCRIPTS GO HERE #####
-# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
-# Apache file bugs
-cp cash.cashURI286.conf /var/local/verb/inst/root-config/etc/apache2/sites-available/
-cp cash.cashURI286.conf /etc/apache2/sites-available/cash.${cashURI}.conf
-sed -i "s/cashURI286/${cashURI}/g" /etc/apache2/sites-available/cash.${cashURI}.conf
-sed -i "s/inkURI286/${inkURI}/g" /etc/apache2/sites-available/cash.${cashURI}.conf
-sed -i "s/inkURI286/${inkURI}/g" /etc/apache2/sites-available/${cashURI}.conf
-
-# inkSplat
-cp -r inksplat /var/local/verb/conf/conflab/
-chmod -R 750 /var/local/verb/conf/conflab/inksplat
-echo "INKSPLAT=\"NOT_INSTALLED\"" >> /var/local/verb/conf/sitemailpath
-
-# Dovecot to SSLv3 only
-sed -i 's/ssl_protocols = !SSLv2 !SSLv3/ssl_protocols = !SSLv3/' /var/local/verb/conf/conflab/vmail/dovecot/conf.d/10-ssl*
-sed -i 's/ssl_protocols = !SSLv2 !SSLv3/ssl_protocols = !SSLv3/' /etc/dovecot/conf.d/10-ssl.conf
-systemctl restart dovecot
-
-##### END SCRIPTS #########
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /var/local/verb/conf/inklists/verberverno
-. /var/local/verb/conf/inklists/verberverno
-echo "Verber upgraded to v${VERNO}"
-else
-echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPGRADE#PATCH#
-
-UPGRADE_PATCH_VERNO=0.85.07
-if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-CLEAN_PATCH_VERNO=$(echo $UPGRADE_PATCH_VERNO | sed -e "s/\.//g")
-PCLdoc="$(cat <<UPCL
-Patch ${UPGRADE_PATCH_VERNO} Changelog:
-Change of Ghost directory structure:
-- Ghost to /var/wwww/
-UPCL
-)"
-echo "$PCLdoc"
-# So we can call a specific version later if needed
-eval "v$CLEAN_PATCH_VERNO='$(echo "$PCLdoc")'"
-
-# Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
-
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
-
-# Ghost
-mv /var/local/ghost /var/www/
-cp ghost.conf /var/local/verb/conf/site-files/conf/
-cp ghostsite.conf /var/local/verb/conf/site-files/conf/
+# NOTE: PWD is /opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
 
 
 ##### END SCRIPTS #########
 # Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /var/local/verb/conf/inklists/verberverno
-. /var/local/verb/conf/inklists/verberverno
-echo "Verber upgraded to v${VERNO}"
-else
-echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
-fi
-##############END#UPGRADE#PATCH#
-
-UPGRADE_PATCH_VERNO=0.85.08
-if [ $(echo ${UPGRADE_PATCH_VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") -gt $(echo ${VERNO} | sed -e "s/\.//g" | sed -e "s/^0*//g") ] ; then
-CLEAN_PATCH_VERNO=$(echo $UPGRADE_PATCH_VERNO | sed -e "s/\.//g")
-PCLdoc="$(cat <<UPCL
-Patch ${UPGRADE_PATCH_VERNO} Changelog:
-## Patch Notes Here...
-UPCL
-)"
-echo "$PCLdoc"
-# So we can call a specific version later if needed
-eval "v$CLEAN_PATCH_VERNO='$(echo "$PCLdoc")'"
-
-# Move to working directory of the patch
-if [ -d "/var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
-cd /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
-
-# Run the update scripts for this patch
-
-##### SCRIPTS GO HERE #####
-# NOTE: PWD is /var/local/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/
-# Replace
-cd /var/local/verb
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/inst
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/conf/inkdns
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/conf/inkcert
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/conf
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/donjon
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/donjon/wpaddsites
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/donjon/repoupdate
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb/donjon/ivapp
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /etc/cron.d
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" *
-cd /var/local/verb
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" donjon/owncloudprep.sh
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" donjon/owncloudprep.sh
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" donjon/vapp.mysql.vbak.sh
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" donjon/nextcloudprep.sh
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g" README.md
-sed -i "s/\/var\/local\/verb/\/opt\/verb/g"
-
-# Move
-cd ~/
-mv /var/local/verb /opt/
-ln -sfn /opt/verb /root/
-ln -sfn /opt/verb /var/local/
-ln -sfn /opt/verb /home/vik/
-
-# PHP
-ln -sfn /opt/verb/conf/php.${SITENAME}.ini /etc/php/7.2/apache2/php.ini
-
-# Conflab
-mv /opt/verb/conf/conflab /opt/verb/conf/lab
-ln -sfn /opt/verb/conf/lab /opt/verb/conf/conflab
-
-##### END SCRIPTS #########
-# Set and refresh the current version into inklists
-sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
+/bin/sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
 . /opt/verb/conf/inklists/verberverno
-echo "Verber upgraded to v${VERNO}"
+/bin/echo "Verber upgraded to v${VERNO}"
 else
-echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
+/bin/echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
 fi
+
+##############END#UPGRADE#PATCH#
+
+UPGRADE_PATCH_VERNO=0.87.01
+if [ $(/bin/echo ${UPGRADE_PATCH_VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") -gt $(/bin/echo ${VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") ] ; then
+CLEAN_PATCH_VERNO=$(/bin/echo $UPGRADE_PATCH_VERNO | /bin/sed -e "s/\.//g")
+PCLdoc="$(/bin/cat <<UPCL
+Patch ${UPGRADE_PATCH_VERNO} Changelog:
+- inkCert tweaks & bug fixes
+UPCL
+)"
+/bin/echo "$PCLdoc"
+# So we can call a specific version later if needed
+eval "v$CLEAN_PATCH_VERNO='$(/bin/echo "$PCLdoc")'"
+
+# Move to working directory of the patch
+if [ -d "/opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
+cd /opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
+
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# inkCert cron updates
+/bin/cp inkcertcb-renew-all.sh /opt/verb/donjon/
+/bin/cp inkcertle-renew-all.sh /opt/verb/donjon/
+/bin/cp inkcert-renew-all.sh /opt/verb/donjon/
+/bin/rm /etc/cron.d/inkcertrenewcbcron
+/bin/rm /etc/cron.d/inkcertrenewlecron.v
+/bin/echo '3 3 * * * root /opt/verb/donjon/inkcertcb-renew-all.sh' > /etc/cron.d/inkcertrenewcbcron
+/bin/echo '3 3 * * * root /opt/verb/donjon/inkcertle-renew-all.sh' > /etc/cron.d/inkcertrenewlecron
+/bin/chmod 0644 /etc/cron.d/inkcertrenewcbcron
+/bin/chmod 0644 /etc/cron.d/inkcertrenewlecron
+/bin/mkdir -p /var/log/inkcert/
+/usr/bin/touch /var/log/inkcert/inkcertle.log
+
+
+##### END SCRIPTS #########
+# Set and refresh the current version into inklists
+/bin/sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
+. /opt/verb/conf/inklists/verberverno
+/bin/echo "Verber upgraded to v${VERNO}"
+else
+/bin/echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
+fi
+
+##############END#UPGRADE#PATCH#
+
+UPGRADE_PATCH_VERNO=0.87.02
+if [ $(/bin/echo ${UPGRADE_PATCH_VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") -gt $(/bin/echo ${VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") ] ; then
+CLEAN_PATCH_VERNO=$(/bin/echo $UPGRADE_PATCH_VERNO | /bin/sed -e "s/\.//g")
+PCLdoc="$(/bin/cat <<UPCL
+Patch ${UPGRADE_PATCH_VERNO} Changelog:
+- Full paths, adding secapache
+UPCL
+)"
+/bin/echo "$PCLdoc"
+# So we can call a specific version later if needed
+eval "v$CLEAN_PATCH_VERNO='$(/bin/echo "$PCLdoc")'"
+
+# Move to working directory of the patch
+if [ -d "/opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
+cd /opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
+
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# donjon updates
+/bin/cp repoupdate/* /opt/verb/donjon/repoupdate/
+/bin/cp wpaddsites/* /opt/verb/donjon/wpaddsites/
+/bin/cp donjon/* /opt/verb/donjon/
+
+
+##### END SCRIPTS #########
+# Set and refresh the current version into inklists
+/bin/sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
+. /opt/verb/conf/inklists/verberverno
+/bin/echo "Verber upgraded to v${VERNO}"
+else
+/bin/echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
+fi
+
+##############END#UPGRADE#PATCH#
+
+UPGRADE_PATCH_VERNO=0.87.03
+if [ $(/bin/echo ${UPGRADE_PATCH_VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") -gt $(/bin/echo ${VERNO} | /bin/sed -e "s/\.//g" | /bin/sed -e "s/^0*//g") ] ; then
+CLEAN_PATCH_VERNO=$(/bin/echo $UPGRADE_PATCH_VERNO | /bin/sed -e "s/\.//g")
+PCLdoc="$(/bin/cat <<UPCL
+Patch ${UPGRADE_PATCH_VERNO} Changelog:
+- Removing old verb domains
+- Updates to Certbot
+UPCL
+)"
+/bin/echo "$PCLdoc"
+# So we can call a specific version later if needed
+eval "v$CLEAN_PATCH_VERNO='$(/bin/echo "$PCLdoc")'"
+
+# Move to working directory of the patch
+if [ -d "/opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/" ]; then
+cd /opt/verb/${VUPDATE_REPO}/${UPGRADE_PATCH_VERNO}/; fi
+
+# Run the update scripts for this patch
+
+##### SCRIPTS GO HERE #####
+# Remove .pink & .city
+if [ -d "/etc/inkcert/le/live/${pinkURI}" ]; then
+/bin/rm -rf /etc/inkcert/le/live/${pinkURI}
+/bin/rm -rf /etc/inkcert/le/archive/${pinkURI}
+/bin/rm -f /etc/inkcert/le/renewal/${pinkURI}.conf
+/bin/rm -f /etc/apache2/sites-available/*${pinkURI}.conf
+/bin/rm -f /etc/apache2/sites-enabled/*${pinkURI}.conf
+/bin/rm -f /opt/verb/conf/inkcert/cli-ini/cli.${pinkURI}.ink
+/bin/rm -f /opt/verb/conf/inkcert/cli-ini/siteinkcert.*${pinkURI}
+/bin/rm -rf /var/www/html/pink
+/bin/rm -rf /var/www/html/pink.pink
+/bin/sed -i "/pinkURI/d" /opt/verb/conf/siteurilist
+fi
+if [ -d "/etc/inkcert/le/live/${cityURI}" ]; then
+/bin/rm -rf /etc/inkcert/le/live/${cityURI}
+/bin/rm -rf /etc/inkcert/le/archive/${cityURI}
+/bin/rm -f /etc/inkcert/le/renewal/${cityURI}.conf
+/bin/rm -f /etc/apache2/sites-available/*${cityURI}.conf
+/bin/rm -f /etc/apache2/sites-enabled/*${cityURI}.conf
+/bin/rm -f /opt/verb/conf/inkcert/cli-ini/cli.${cityURI}.ink
+/bin/rm -f /opt/verb/conf/inkcert/cli-ini/siteinkcert.*${cityURI}
+/bin/rm -rf /var/www/html/city
+/bin/rm -rf /var/www/html/city.city
+/bin/sed -i "/cityURI/d" /opt/verb/conf/siteurilist
+fi
+
+# Fix a bug
+/bin/sed -i "s/inkserve/ink, serve/" /opt/verb/conf/inkcert/cli-ini/*.ini
+
+# inkCert
+/bin/cp donjon/* /opt/verb/donjon/
+
+# cron timing
+if [ -f "/etc/cron.d/inkcertrenewcbcron" ]; then
+  /bin/echo '4 4 * * * root /opt/verb/donjon/inkcertcb-renew-all.sh' > /etc/cron.d/inkcertrenewcbcron
+  /bin/chmod 0644 /etc/cron.d/inkcertrenewcbcron
+fi
+
+##### END SCRIPTS #########
+# Set and refresh the current version into inklists
+/bin/sed -i "s/VERNO=.*/VERNO=\"${UPGRADE_PATCH_VERNO}\"/g" /opt/verb/conf/inklists/verberverno
+. /opt/verb/conf/inklists/verberverno
+/bin/echo "Verber upgraded to v${VERNO}"
+else
+/bin/echo "${UPGRADE_PATCH_VERNO} patch not necessary..."
+fi
+
 ##############END#UPGRADE#PATCH#
 
 
@@ -556,4 +283,4 @@ fi
 /opt/verb/serfs/setsecure; wait
 
 # Finish
-echo "Verber at v${VERNO} framework from ${SITEUPDATEREPO}."
+/bin/echo "Verber at v${VERNO} framework from ${SITEUPDATEREPO}."

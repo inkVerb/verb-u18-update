@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This restores a backup .vbak file from Nextcloud backed-up using backupnextcloud
 
@@ -27,27 +26,27 @@ if [ -e "/opt/verb/conf/vapp.nextcloud" ]; then
 . /opt/verb/conf/vapp.nextcloud
 cd /var/www/vapps/nextcloud/data
 /opt/verb/serfs/mysqlvappout vapp.nextcloud; wait
-cp /opt/verb/conf/vapp.nextcloud .
+/bin/cp /opt/verb/conf/vapp.nextcloud .
 cd /var/www/vapps/nextcloud
 /opt/verb/serfs/vtxzin data
-mv data.vtxz verb.nextcloud.restore-originalbackedup.vbak
-mv verb.nextcloud.restore-originalbackedup.vbak /var/www/vip/
-rm -rf /var/www/vapps/nextcloud/data
+/bin/mv data.vtxz verb.nextcloud.restore-originalbackedup.vbak
+/bin/mv verb.nextcloud.restore-originalbackedup.vbak /var/www/vip/
+/bin/rm -rf /var/www/vapps/nextcloud/data
 fi
 
 # Unpack the file
 cd /var/www/vip
-mv ${FILENAME} data.vtxz
+/bin/mv ${FILENAME} data.vtxz
 /opt/verb/serfs/vtxzout data
 cd data
-rm -f index.html
-rm -f nextcloud.log
-rm -rf updater-data
+/bin/rm -f index.html
+/bin/rm -f nextcloud.log
+/bin/rm -rf updater-data
 cd ..
-cp /var/www/vapps/nextcloud/data/index.html data/
-cp /var/www/vapps/nextcloud/data/nextcloud.log data/
-rm -rf /var/www/vapps/nextcloud/data
-mv data /var/www/vapps/nextcloud/
+/bin/cp /var/www/vapps/nextcloud/data/index.html data/
+/bin/cp /var/www/vapps/nextcloud/data/nextcloud.log data/
+/bin/rm -rf /var/www/vapps/nextcloud/data
+/bin/mv data /var/www/vapps/nextcloud/
 
 # Restore and include the app config
 . /var/www/vapps/nextcloud/data/vapp.nextcloud
@@ -56,18 +55,17 @@ OLDDBASE="${APPDBASE}"
 
 # Restore the database
 cd /var/www/vapps/nextcloud/data
-mv ${OLDDBASE}.sql ${APPDBASE}.sql; wait
+/bin/mv ${OLDDBASE}.sql ${APPDBASE}.sql; wait
 /opt/verb/serfs/mysqlin ${APPDBASE}; wait
-rm -f ${APPDBASE}.sql
+/bin/rm -f ${APPDBASE}.sql
 
 # Own
-chown -R www-data:www-data /var/www/vapps/nextcloud
+/bin/chown -R www-data:www-data /var/www/vapps/nextcloud
 
 # Finish
-echo "Owncloud's user data has been restored and all its backup files removed from this server.
+/bin/echo "Owncloud's user data has been restored and all its backup files removed from this server.
 
 A backup of the previous Nextcloud data on this server has been saved in the vip folder just in case.
 
 You will probably need to log into Nextcloud as an admin to disable and re-enable apps that show \"enabled\" but are not working.
 "
-

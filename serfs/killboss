@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This deletes a boss and its home folder.
 
@@ -14,5 +13,5 @@ DELBOSSUSER=$1
 userdel ${DELBOSSUSER}
 
 # Remove directories and web symlink
-rm -rf /home/${DELBOSSUSER}
+/bin/rm -rf /home/${DELBOSSUSER}
 

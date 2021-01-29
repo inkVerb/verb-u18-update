@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This changes the password for an existing fossil user
 
@@ -24,5 +23,5 @@ cd /var/www/vip/fossil
 # Change the password
 fossil user password ${OLDUSER} ${NEWPASS} --repository ${OLDFOSSIL}.fossil
 
-echo "New ${OLDFOSSIL}.fossil password set for ${OLDUSER}.
+/bin/echo "New ${OLDFOSSIL}.fossil password set for ${OLDUSER}.
 Available on web at fossil.${vipURI}/${OLDFOSSIL}.cgi"

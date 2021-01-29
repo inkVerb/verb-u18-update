@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This backs up a database for a specific app
 
@@ -18,8 +17,8 @@
 
 
 APPNAME=$1
-if [ -z "$2" ]; then
-SECNAME=$(pwgen -s -1 12)
+if [ -z "$2" ] || [ "$2" = "-nl" ]; then
+SECNAME=$(/usr/bin/pwgen -s -1 12)
 else
 SECNAME=$2
 fi
@@ -32,23 +31,22 @@ fi
 # Export the database
 cd /var/www/vip
 /opt/verb/serfs/mysqlex ${APPDBASE}; wait
-mv /var/www/vip/${APPDBASE}.sql /var/www/vip/verb.${APPDBASE}.${SECNAME}.vbak.sql
+/bin/mv /var/www/vip/sql/${APPDBASE}.sql /var/www/vip/sql/verb.${APPDBASE}.${SECNAME}.vbak.sql
 
 # Finish
-if [ "$3" = "-nl" ]; then
-echo "The database for ${APPNAME} has been backed up to the 'vip' folder.
+if [ "$3" = "-nl" ] || [ "$2" = "-nl" ]; then
+/bin/echo "The database for ${APPNAME} has been backed up to the 'vip/sql/' folder.
 
 Note that the app remains live.
 "
 exit 0
 fi
 
-ln -s /var/www/vip/verb.${APPDBASE}.${SECNAME}.vbak.sql /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
-chown -R www-data:www-data /var/www/html/${SITESERVE}.serve/${SERVEDIR}/verb.${APPDBASE}.${SECNAME}.vbak.sql
-echo "The database for ${APPNAME} has been backed up and can be downloaded at:
+/bin/ln -sfn /var/www/vip/sql/verb.${APPDBASE}.${SECNAME}.vbak.sql /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
+/bin/chown -R www-data:www-data /var/www/html/${SITESERVE}.serve/${SERVEDIR}/verb.${APPDBASE}.${SECNAME}.vbak.sql
+/bin/echo "The database for ${APPNAME} has been backed up and can be downloaded at:
 
 https://${SERVEPATH}/verb.${APPDBASE}.${SECNAME}.vbak.sql
 
 Note that the app remains live.
 "
-

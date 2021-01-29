@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets the symlink for a vapp from the html/ folder to the vapps/ folder
 
@@ -17,69 +16,75 @@ VAPPNAME=$1
 case ${VAPPNAME} in
 
 ampache)
-rm -rf /var/www/html/kiwi.ampache
-ln -s /var/www/vapps/${VAPPNAME} /var/www/html/kiwi.ampache
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/kiwi.ampache
+/bin/ln -s /var/www/vapps/${VAPPNAME} /var/www/html/kiwi.ampache
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 fossil)
-rm -rf /var/www/html/vip.fossil
-ln -sfn /var/www/vip/${VAPPNAME} /var/www/html/vip.fossil
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/vip.fossil
+/bin/ln -sfn /var/www/vip/${VAPPNAME} /var/www/html/vip.fossil
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 mediawiki)
-rm -rf /var/www/html/ink.wiki
-ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.wiki
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/ink.wiki
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.wiki
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 net2ftp)
-rm -rf /var/www/html/vip.net2ftp
-ln -s /var/www/vapps/${VAPPNAME} /var/www/html/vip.net2ftp
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/vip.net2ftp
+/bin/ln -s /var/www/vapps/${VAPPNAME} /var/www/html/vip.net2ftp
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 nextcloud)
-rm -rf /var/www/html/blue.nc
-ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/blue.nc
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/blue.nc
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/blue.nc
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 orangehrm)
-rm -rf /var/www/html/red.hrm
-ln -s /var/www/vapps/${VAPPNAME} /var/www/html/red.hrm
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/red.hrm
+/bin/ln -s /var/www/vapps/${VAPPNAME} /var/www/html/red.hrm
+/bin/echo "${VAPPNAME} symlink is set."
+;;
+
+owa)
+/bin/rm -rf /var/www/html/red.owa
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/red.owa
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 owncloud)
-rm -rf /var/www/html/blue.owncloud
-ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/blue.owncloud
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/blue.owncloud
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/blue.owncloud
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 suitecrm)
-rm -rf red.crm
-ln -s /var/www/vapps/${VAPPNAME} /var/www/html/red.crm
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf red.crm
+/bin/ln -s /var/www/vapps/${VAPPNAME} /var/www/html/red.crm
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 october.inkblog)
-rm -rf /var/www/html/ink.blog
-ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.blog
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/ink.blog
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.blog
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 wp.inkbb)
-rm -rf /var/www/html/ink.bb
-ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.bb
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/ink.bb
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.bb
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 wp.inkblog)
-rm -rf /var/www/html/ink.blog
-ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.blog
-echo "${VAPPNAME} symlink is set."
+/bin/rm -rf /var/www/html/ink.blog
+/bin/ln -sfn /var/www/vapps/${VAPPNAME} /var/www/html/ink.blog
+/bin/echo "${VAPPNAME} symlink is set."
 ;;
 
 esac

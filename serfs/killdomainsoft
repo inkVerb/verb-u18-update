@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This "soft" kills a domain added with adddomain or adddomaincgi
 ## This removes the root Apache file, html/ symlink, root DNS declarations, and the root domain inkCert-LE declaration, but not other entire configs, such as the inkCert-LE config file that may apply to subdomains.
@@ -22,19 +21,19 @@
 KILLDOMAIN=$1
 
 # Remove Apache server config files
-rm -f /etc/apache2/sites-enabled/${KILLDOMAIN}.conf
-rm -f /etc/apache2/sites-available/${KILLDOMAIN}.conf
-apache2ctl graceful
+/bin/rm -f /etc/apache2/sites-enabled/${KILLDOMAIN}.conf
+/bin/rm -f /etc/apache2/sites-available/${KILLDOMAIN}.conf
+/usr/sbin/apache2ctl graceful
 
 # Remove from inkCert
-sed -i "s/${KILLDOMAIN}, //g" /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
+/bin/sed -i "s/${KILLDOMAIN}, //g" /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
 
 # Remove Root Site Defaults from inkDNS
-sed -i "/; Root Site Defaults/,/;; End Root Site Defaults/d" /opt/verb/conf/inkdns/zones/db.${KILLDOMAIN}
-echo ";;; Root Site Defauls removed" >> /opt/verb/conf/inkdns/zones/db.${KILLDOMAIN}
+/bin/sed -i "/; Root Site Defaults/,/;; End Root Site Defaults/d" /opt/verb/conf/inkdns/zones/db.${KILLDOMAIN}
+/bin/echo ";;; Root Site Defauls removed" >> /opt/verb/conf/inkdns/zones/db.${KILLDOMAIN}
 
 # Remove http folder symlinks
-rm -f /var/www/html/${KILLDOMAIN}
+/bin/rm -f /var/www/html/${KILLDOMAIN}
 
 # Restart
 /etc/init.d/postfix reload

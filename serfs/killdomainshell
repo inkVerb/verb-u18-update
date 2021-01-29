@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This completely removes a domain's inkCert, Letsencrypt, inkDNS, and inkDKIM (OpenDKIM) profiles
 ## This does NOT:
@@ -23,7 +22,7 @@ KILLDOMSHELL=$1
 /opt/verb/serfs/killinkdkim ${KILLDOMSHELL}; wait
 
 # Finish
-echo "No more papers...
+/bin/echo "No more papers...
 
 The inkCert, inkDNS, and inkDKIM profiles for ${KILLDOMSHELL} have been deleted.
 "

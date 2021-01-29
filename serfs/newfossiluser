@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates a new fossil available at fossil.your-name.verb.vip/FOSSIL-NAME.cgi
 ## Prereq: fossil
@@ -26,5 +25,5 @@ cd /var/www/vip/fossil
 # Add the user
 fossil user new ${NEWUSER} ${NEWEMAIL} ${NEWPASS} --repository ${OLDFOSSIL}.fossil
 
-echo "New user ${NEWUSER} added to ${OLDFOSSIL}.fossil.
+/bin/echo "New user ${NEWUSER} added to ${OLDFOSSIL}.fossil.
 Available on web at fossil.${vipURI}/${OLDFOSSIL}.cgi"

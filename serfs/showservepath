@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This displays the Verber service download URL
 
@@ -10,5 +9,5 @@
 
 . /opt/verb/conf/sitenameip
 
-echo "${SERVEPATH}"
+/bin/echo "${SERVEPATH}"
 

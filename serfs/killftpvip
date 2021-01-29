@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This deletes an ftp vip and his vsftpd folder and home folder
 
@@ -14,4 +13,4 @@ DELFTPGURU=$1
 userdel ${DELFTPGURU}
 
 # Remove directory
-rm -rf /home/${DELFTPGURU}
+/bin/rm -rf /home/${DELFTPGURU}

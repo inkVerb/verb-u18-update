@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This revokes MySQL users' boss permissions for web apps that require boss access upon install
 ## Current intended apps include Ampache, SuiteCRM
@@ -16,11 +15,11 @@ APPNAME=$1
 # Include the config
 . /opt/verb/conf/vapp.${APPNAME}
 
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 REVOKE ALL PRIVILEGES ON *.* FROM '${APPDDBUSR}'@'localhost';
 REVOKE GRANT OPTION ON *.* FROM '${APPDDBUSR}'@'localhost';
 GRANT ALL PRIVILEGES ON ${APPDBASE}.* TO '${APPDDBUSR}'@'localhost' IDENTIFIED BY '${APPDDBPAS}';
 FLUSH PRIVILEGES;"
 
 # Finish
-echo "Finished. Database user now has normal permissions."
+/bin/echo "Finished. Database user now has normal permissions."

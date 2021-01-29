@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates the CA Verber/Inker master "authority" keys that this CA Verber/Inker uses to sign the host key on the same CA Verber/Inker itself and that Clients recognize
 ## This is used by inknetinstallca (Run by itselt, this only refreshes from when inknetinstallca first used this)
@@ -14,7 +13,7 @@
 
 # Check and include the config
 if [ ! -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
-echo "Out of order. This is not a CA Verber yet.
+/bin/echo "Out of order. This is not a CA Verber yet.
 
 First run inknetinstallca
 "
@@ -26,12 +25,12 @@ fi
 
 # CA Client signing keys
 cd ~/.ssh/inknet/ca/
-rm -f in_ca_${IAMCANAME}_key
+/bin/rm -f in_ca_${IAMCANAME}_key
 ssh-keygen -N "" -f in_ca_${IAMCANAME}_key
 ## Link to the download web folder
-cp -f in_ca_${IAMCANAME}_key.pub /var/www/html/${IAMCAHOST}/inknet/
-chown -R www-data:www-data /var/www/html/${IAMCAHOST}/inknet/
+/bin/cp -f in_ca_${IAMCANAME}_key.pub /var/www/html/${IAMCAHOST}/inknet/
+/bin/chown -R www-data:www-data /var/www/html/${IAMCAHOST}/inknet/
 
 # Finish
-echo "Go change the world! New master keys have been created for this CA Verber."
+/bin/echo "Go change the world! New master keys have been created for this CA Verber."
 

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This adds a Vrk/Verber Client's public SSH key to "authorized_hosts" on the CA Verber
 ## If the key is not included in the initial command, it will be read interactively.
@@ -27,25 +26,25 @@ VINAME=$2
 VCKEY=$3
 # Determine vrk or verber
 if [ "${VTYPE}" = "vrk" ]; then
-VCNAME="$(echo ${VINAME} | sed 's/\./_/g' | sed 's/@/_/g' )"
+VCNAME="$(/bin/echo ${VINAME} | sed 's/\./_/g' | sed 's/@/_/g' )"
 fi
 if [ "${VTYPE}" = "verber" ]; then
-VCNAME="$(echo ${VINAME} | sed 's/\./_/g')"
-VCHOST="$(echo ${VINAME} | sed 's/_/\./g')"
-VCURI="$(echo ${VCHOST} | rev | cut -d'.' -f-3 | rev)"
+VCNAME="$(/bin/echo ${VINAME} | sed 's/\./_/g')"
+VCHOST="$(/bin/echo ${VINAME} | sed 's/_/\./g')"
+VCURI="$(/bin/echo ${VCHOST} | rev | cut -d'.' -f-3 | rev)"
 fi
 
 if [ "${VTYPE}" != "vrk" ] && [ "${VTYPE}" != "verber" ] ; then
-echo "You need to specify \"vrk\" or \"verber\". Read the instructions."; exit 8; fi
+/bin/echo "You need to specify \"vrk\" or \"verber\". Read the instructions."; exit 8; fi
 
 # Check if the Client has been added
 if [ "${VTYPE}" = "vrk" ]; then
  if [ ! -e "/opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
- echo "You must add the Client first using: inknetaddvrkclient."; exit 8; fi
+ /bin/echo "You must add the Client first using: inknetaddvrkclient."; exit 8; fi
 fi
 if [ "${VTYPE}" = "verber" ]; then
  if [ ! -e "/opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf" ]; then
- echo "You must add the Client first using: inknetaddverberclient."; exit 8; fi
+ /bin/echo "You must add the Client first using: inknetaddverberclient."; exit 8; fi
 fi
 
 # Include the configs
@@ -57,7 +56,7 @@ if [ "${VTYPE}" = "verber" ]; then
 
 # Prompt for the copy-paste
 if [ -z "${VCKEY}" ]; then
-echo "
+/bin/echo "
  Activate Client key area...
 
 A key looks something like this, but longer, notice front and end:
@@ -69,7 +68,7 @@ read CPKEY
 VCKEY="${CPKEY}"
 fi
 if [ -z "${VCKEY}" ]; then
-echo "
+/bin/echo "
  Activate Client key area...
 
 A key looks something like this, but longer, notice front and end:
@@ -81,23 +80,23 @@ read CPKEY
 VCKEY="${CPKEY}"
 fi
 if [ -z "${VCKEY}" ]; then
-echo "You aren't entering a key. I quit."; exit 5; fi
+/bin/echo "You aren't entering a key. I quit."; exit 5; fi
 
 # Add the key
 if [ "${VTYPE}" = "vrk" ]; then
-echo "${VCKEY}" >> /opt/ivapp/inknet/vrker/${CLIENTUSERNAME}/.ssh/authorized_keys
+/bin/echo "${VCKEY}" >> /opt/ivapp/inknet/vrker/${CLIENTUSERNAME}/.ssh/authorized_keys
 fi
 if [ "${VTYPE}" = "verber" ]; then
-echo "${VCKEY}.${VCURI}" >> /opt/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
+/bin/echo "${VCKEY}.${VCURI}" >> /opt/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
 ## Remove any duplication of the URI
-sed -i "s/${VCURI}\.${VCURI}/${VCURI}/" /opt/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
+/bin/sed -i "s/${VCURI}\.${VCURI}/${VCURI}/" /opt/ivapp/inknet/verber/${CLIENTUSERNAME}/.ssh/authorized_keys
 fi
 
 # Finish
-echo "Success! The Client key for ${CLIENTURI} has been added."
+/bin/echo "Success! The Client key for ${CLIENTURI} has been added."
 
 ## Serf message
-echo "
+/bin/echo "
 Now, you need to run inknetpackclientpkg
 
 Follow the instructions."

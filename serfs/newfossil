@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates a new fossil available at fossil.your-name.verb.vip/FOSSIL-NAME.cgi
 ## Prereq: fossil
@@ -29,13 +28,13 @@ fossil new ${NEWFOSSIL}.fossil --admin-user ${NEWUSER}
 fossil user password ${NEWUSER} ${NEWPASS} --repository ${NEWFOSSIL}.fossil
 
 # Write the .cgi file
-echo "#!/usr/bin/fossil
+/bin/echo "#!/usr/bin/fossil
 repository: /fossil/${NEWFOSSIL}.fossil" > ${NEWFOSSIL}.cgi
-chmod 750 ${NEWFOSSIL}.cgi
+/bin/chmod 750 ${NEWFOSSIL}.cgi
 
 # Final chown to allow database to be writable
-chown -R www-data:www-data /var/www/vip/fossil
+/bin/chown -R www-data:www-data /var/www/vip/fossil
 
-echo "${NEWFOSSIL}.fossil created.
+/bin/echo "${NEWFOSSIL}.fossil created.
 Available on web at fossil.${vipURI}/${NEWFOSSIL}.cgi"
 

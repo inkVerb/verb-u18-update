@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets up a WordPress vapp .htaccess file to be "normal", NOT for multisite
 
@@ -15,10 +14,10 @@
 WPDOMAIN=$1
 
 # Remove the old WordPress declarations
-sed -i '/^# BEGIN WordPress*/,/^# END WordPress/d' /var/www/vapps/wp.${WPDOMAIN}/.htaccess
+/bin/sed -i '/^# BEGIN WordPress*/,/^# END WordPress/d' /var/www/vapps/wp.${WPDOMAIN}/.htaccess
 
 # Put in the new .htaccess settings
-echo "# BEGIN WordPress ##inkVerb
+/bin/echo "# BEGIN WordPress ##inkVerb
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
@@ -30,5 +29,5 @@ RewriteRule . /index.php [L]
 # END WordPress" >> /var/www/vapps/wp.${WPDOMAIN}/.htaccess
 
 # Finish
-echo ".htaccess file for http://${WPDOMAIN} is set to normal, NOT WP Multisite, use."
+/bin/echo ".htaccess file for http://${WPDOMAIN} is set to normal, NOT WP Multisite, use."
 

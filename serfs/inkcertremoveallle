@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This runs inkcertaddle for all domains and subdomains
 ## Prerequesite: Certs must be installed via inkCert or this will do nothing.
@@ -16,11 +15,10 @@
 
 # For any/all sub-domains
 ## Get the name of each subdomain .conf file available
-find . -name "*.${DOMAIN}.conf"|while read findsitesubdomain; do
+find . -name "*.${DOMAIN}.conf" | while read findsitesubdomain; do
 ## Strip the .conf extension
  sitesubdomain=$(basename ${findsitesubdomain} .conf)
 ## Run inkCertAddLE per site config
  /opt/verb/serfs/inkcertremovele ${sitesubdomain}
 wait
 done
-

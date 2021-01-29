@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This displays the settings and info for this Verber
 ## This is useful for many things, including Clients that need name and IP to connect to it
@@ -16,7 +15,7 @@
 . /opt/verb/conf/inklists/verberverno
 
 # Display info
-echo "Here you go. This Verber's info...
+/bin/echo "Here you go. This Verber's info...
 IP: ${SITEIP}
 Namespace: ${SITENAME}
 Primary TLD: ${SITETLD}

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This removes an existing domain inkDNS zone file from this Verber
 
@@ -15,12 +14,12 @@ DNSDOMAIN=$1
 
 # Check if added
 if [ -e "/opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}" ]; then
-echo "The domain ${DNSDOMAIN} zone file has not been created. Use inkdnsadddomain to add it."
+/bin/echo "The domain ${DNSDOMAIN} zone file has not been created. Use inkdnsadddomain to add it."
 exit 0; fi
 
 # Remove the records
-rm -f /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}
-rm -f /opt/verb/conf/inkdns/zones/nv.${DNSDOMAIN}
+/bin/rm -f /opt/verb/conf/inkdns/zones/db.${DNSDOMAIN}
+/bin/rm -f /opt/verb/conf/inkdns/zones/nv.${DNSDOMAIN}
 
 # Refresh zones & delete the global rDNS entry
 if [ -f "/opt/verb/conf/inkdns/inkdnsstatus" ]; then
@@ -29,4 +28,4 @@ if [ -f "/opt/verb/conf/inkdns/inkdnsstatus" ]; then
 /opt/verb/serfs/inkdnsrefreshbind; fi; fi
 
 # Finish
-echo "${DNSDOMAIN} DNS zone file removed."
+/bin/echo "${DNSDOMAIN} DNS zone file removed."

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This adds a Verber Client for this inkNet CA Verber to host
 ## This can be run to update an existing config
@@ -21,35 +20,35 @@
 if [ -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
 . /opt/verb/conf/inknet/ca.verber.cnf
  if [ "${INKNETSTATUS}" != "INSTALLED" ]; then
-echo "inkNet not quite installed. First, run inknetinstallca"
+/bin/echo "inkNet not quite installed. First, run inknetinstallca"
 exit 0
  fi
 else
-echo "inkNet not installed. First, run inknetinstallca"
+/bin/echo "inkNet not installed. First, run inknetinstallca"
 exit 0
 fi
 
 ICHOST=$1
 ADDIP=$2
-ADDHOST="$(echo ${ICHOST} | sed 's/_/\./g')"
-ADDNAME="$(echo ${ICHOST} | sed 's/\./_/g')"
-ADDURI="$(echo ${ADDHOST} | rev | cut -d'.' -f-3 | rev)"
-URINAME="$(echo ${ADDURI} | sed 's/\./_/g')"
+ADDHOST="$(/bin/echo ${ICHOST} | sed 's/_/\./g')"
+ADDNAME="$(/bin/echo ${ICHOST} | sed 's/\./_/g')"
+ADDURI="$(/bin/echo ${ADDHOST} | rev | cut -d'.' -f-3 | rev)"
+URINAME="$(/bin/echo ${ADDURI} | sed 's/\./_/g')"
 
 if [ -z ${2} ]; then
-echo "Dude. You need both options. Read the instructions."
+/bin/echo "Dude. You need both options. Read the instructions."
 exit 0
 fi
-ADDAPG=$(pwgen -1 -0 -A 4)
+ADDAPG=$(/usr/bin/pwgen -1 -0 -A 4)
 ## Truncate the new username to fit appendage before the 32 character limit
-CUTUSERNAME=$(echo ${URINAME} | cut -c1-28)
+CUTUSERNAME=$(/bin/echo ${URINAME} | cut -c1-28)
 # New username based on user, random appendage, and computer name
 ADDUSERNAME=${CUTUSERNAME}${ADDAPG}
-ADDPASSWORD=$(pwgen -1 -s 15)
+ADDPASSWORD=$(/usr/bin/pwgen -1 -s 15)
 
 # Just in case user already exists
 if [ -f /opt/verb/conf/inknet/verber/client.verber.${ADDNAME}.cnf ]; then
-echo "Umm... How do I say this...
+/bin/echo "Umm... How do I say this...
 
 It looks like you have already done this for this verber. A config already exists for that Verber name.
 
@@ -65,10 +64,10 @@ fi
 
 # Create the config
 if [ ! -d "/opt/verb/conf/inknet/verber" ]; then
-mkdir -p /opt/verb/conf/inknet/verber; fi
+/bin/mkdir -p /opt/verb/conf/inknet/verber; fi
 . /opt/verb/conf/siteport
 ADDLOGINPORT=${SITEPORT}
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 # inkNet config, verb.ink
 ## This contains information about a Verber Client's credentials used in signing SSH keys for inkNet on this CA Verber
 
@@ -86,13 +85,13 @@ CLIENTPORT=\"${ADDLOGINPORT}\"
 wait
 
 # Create the inkNet Client tool links
-ln -sfn /opt/verb/tools/verber /opt/ivapp/inknet/verber/${ADDUSERNAME}/tools
+/bin/ln -sfn /opt/verb/tools/verber /opt/ivapp/inknet/verber/${ADDUSERNAME}/tools
 
 # Finish
-echo " \"${ADDHOST}\" has been added as a Verber Client."
+/bin/echo " \"${ADDHOST}\" has been added as a Verber Client."
 
 ## Serf message
-echo "
+/bin/echo "
 Now, you need to add the client ssh-rsa key via: inknetaddclientkey
 
 Then follow instructions.

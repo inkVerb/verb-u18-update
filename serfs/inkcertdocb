@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This batch runs inkCert-Certbot request and install scripts for a given domain, including inkVerb namespace domains
 ## It also applies to all subdomains for that domain
@@ -18,17 +17,21 @@ DOMAIN=$1
 
 # Check variables
 if [ -z ${1} ]; then
-echo "You need to specify a domain. Read the instructions."; exit 0
+/bin/echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 
 # Request and get the certs
 /opt/verb/serfs/inkcertreqcb ${DOMAIN}; wait
 
 # Install the certs
-/opt/verb/serfs/inkcertaddallcb ${DOMAIN}; wait
+if /bin/grep -q "INKCERTED=NO" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${DOMAIN}; then
+  if [ -e /etc/inkcert/le/live/${DOMAIN} ]; then
+    /opt/verb/serfs/inkcertaddallcb ${DOMAIN}; wait
+  fi
+fi
 
 # Finish
-echo "
+/bin/echo "
 Excellent!
 Verify above exits - IMPORTANT NOTES: ... - Congratulations!
 

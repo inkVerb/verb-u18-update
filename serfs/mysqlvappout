@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This exports a MySQL database using an existing vapp config
 ## The vapp config file must me located in ~/verb/conf
@@ -19,5 +18,5 @@ VAPPCONF=$1
 . /opt/verb/conf/${VAPPCONF}
 
 # Export the database
-mysqldump --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${APPDBASE} > ${APPDBASE}.sql
+/usr/bin/mysqldump --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${APPDBASE} > ${APPDBASE}.sql
 

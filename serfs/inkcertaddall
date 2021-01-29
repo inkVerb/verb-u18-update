@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This runs inkcertaddle for all domains and subdomains
 ## Prerequesite: inkcertreq
@@ -22,7 +21,7 @@ CERTDOMAIN=$2
 
 # Check variables
 if [ -z ${1} ]; then
-echo "You need to specify a domain. Read the instructions."; exit 0
+/bin/echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 
 # Set variable for same certificate as domain (most all scenarios)
@@ -46,7 +45,7 @@ wait
 done
 
 # Finish
-echo "
+/bin/echo "
 Done. ${CERTDOMAIN} certs installed for ${SITEDOMAIN}.
 "
 

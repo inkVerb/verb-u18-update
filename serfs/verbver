@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbKnight! verb.ink
-#set -e
 
 # This displays the current Verber version number
 
@@ -9,5 +8,5 @@
 
 . /opt/verb/conf/inklists/verberverno
 . /opt/verb/conf/sitenameip
-echo "${SITEUPDATEREPO} ${VERNO}"
+/bin/echo "${SITEUPDATEREPO} ${VERNO}"
 

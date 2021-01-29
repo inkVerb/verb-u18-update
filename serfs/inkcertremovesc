@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This script removes the Apache credentials and certificates for inkCert Self-Cert certs for a domain and replaces the Snakeoil certificate
 ## It applies only to one domain/subdomain at a time
@@ -23,23 +22,26 @@
 DOMAIN=$1
 
 # Check Apache config status
-if grep -Fq "#INKVERB-INKCERT=DONE_SC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
-echo "Removing inkCert-IC configs from ${DOMAIN}..."
+if /bin/grep -Fq "#INKVERB-INKCERT=DONE_SC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+/bin/echo "Removing inkCert-IC configs from ${DOMAIN}..."
 else
- if grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${DOMAIN}.conf ; then
-  echo "Apache configs use inkCert-LE. Use: inkcertremovele"
+ if /bin/grep -Fq "#INKVERB-INKCERT=DONE_LE" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  /bin/echo "Apache configs use inkCert-LE. Use: inkcertremovele"
   exit 8
- elif grep -Fq "#INKVERB-INKCERT=DONE_CB" /etc/apache2/sites-available/${DOMAIN}.conf ; then
-  echo "Apache configs use inkCert-Certbot. Use: inkcertremovecb"
+ elif /bin/grep -Fq "#INKVERB-INKCERT=DONE_CB" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  /bin/echo "Apache configs use inkCert-Certbot. Use: inkcertremovecb"
   exit 8
-elif grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
-  echo "Apache configs use inkCert Proper. Use: inkcertremovesc"
+ elif /bin/grep -Fq "#INKVERB-INKCERT=DONE_CBDIGOC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  /bin/echo "Apache configs use inkCert Proper. Use: inkcertremovecbdigoc"
   exit 8
- elif grep -Fq "#INKVERB-INKCERT=NO" /etc/apache2/sites-available/${DOMAIN}.conf ; then
-  echo "inkCert certs aren't setup. Nothing to do."
+ elif /bin/grep -Fq "#INKVERB-INKCERT=DONE_IC" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  /bin/echo "Apache configs use inkCert Proper. Use: inkcertremovesc"
+  exit 8
+ elif /bin/grep -Fq "#INKVERB-INKCERT=NO" /etc/apache2/sites-available/${DOMAIN}.conf ; then
+  /bin/echo "inkCert certs aren't setup. Nothing to do."
   exit 0
  else
-  echo "Something's really wrong. No inkCert, no non-inkCert either. I quit."
+  /bin/echo "Something's really wrong. No inkCert, no non-inkCert either. I quit."
   exit 6
  fi
 fi
@@ -48,34 +50,34 @@ fi
 ## Check that the certs are no longer live
 if [ ! -d /etc/inkcert/live/${DOMAIN} ]; then
 ## Uncomment the Snakeoil cert configs
-sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/SSLCertificateFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
-sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/SSLCertificateKeyFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
+/bin/sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateFile/SSLCertificateFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
+/bin/sed -i "s/#INKVERB-INKCERT-COMMENT-SSLCertificateKeyFile/SSLCertificateKeyFile/g" /etc/apache2/sites-available/${DOMAIN}.conf
 
 ## Remove the inkCert cert lines
-sed -i '/^#INKVERB-INKCERT=DONE_SC/,/^#INKVERB-INKCERT-stop/{/^#INKVERB-INKCERT=DONE_IC/!{/^#INKVERB-INKCERT-stop/!d}}' /etc/apache2/sites-available/${DOMAIN}.conf
-sed -i '/#INKVERB-INKCERT=DONE_SC/#INKVERB-INKCERT=INK_REMOVED/' /etc/apache2/sites-available/${DOMAIN}.conf
-sed -i '/#INKVERB-INKCERT-stop/d' /etc/apache2/sites-available/${DOMAIN}.conf
-apache2ctl graceful
+/bin/sed -i '/#INKVERB-INKCERT=DONE_SC/,/#INKVERB-INKCERT-stop/{/#INKVERB-INKCERT=DONE_IC/!{/#INKVERB-INKCERT-stop/!d}}' /etc/apache2/sites-available/${DOMAIN}.conf
+/bin/sed -i 's/#INKVERB-INKCERT=DONE_SC/#INKVERB-INKCERT=INK_NO_REMOVED/' /etc/apache2/sites-available/${DOMAIN}.conf
+/bin/sed -i '/#INKVERB-INKCERT-stop/d' /etc/apache2/sites-available/${DOMAIN}.conf
+/usr/sbin/apache2ctl graceful
 
 ## Note to the config
-sed -i "s/INKCERTED=DONE_SC/INKCERT=NO_REMOVED_SC/" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${DOMAIN}
+/bin/sed -i "s/INKCERTED=DONE_SC/INKCERTED=NO_REMOVED_SC/" /opt/verb/conf/inkcert/cli-ini/siteinkcert.${DOMAIN}
 
 ## Remove the certs
 for i in /etc/inkcert/sc/live/${DOMAIN}/*.pem
 do
-rm  "$(readlink -f $i)"
-rm "$i"
+/bin/rm  "$(readlink -f $i)"
+/bin/rm "$i"
 done
-rm -rf /etc/inkcert/sc/live/${DOMAIN}
+/bin/rm -rf /etc/inkcert/sc/live/${DOMAIN}
 
 # Finish
-echo "inkCert has been uninstalled from ${DOMAIN}. Using Snakeoil certs."
+/bin/echo "inkCert has been uninstalled from ${DOMAIN}. Using Snakeoil certs."
 exit 0
 else
 
 # If they are live
-echo "Something's wrong...
+/bin/echo "Something's wrong...
 
-The certs still seem to be live. Did you first run inkcertrevoke or sumply run inkcertundo?
+The certs still seem to be live. Did you first run inkcertrevoke or simply run inkcertundo?
 "
 fi

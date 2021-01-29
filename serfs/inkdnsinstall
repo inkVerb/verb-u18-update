@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This installs Bind DNS for managing DNS records in the inkDNS zone file on this Verber
 ## This makes the server itself tha authoritative DNS server with a default/optional backup serfer
@@ -19,7 +18,7 @@
 if [ -f /opt/ink/conf/inkdns/inkdnsstatus ]; then
 . /opt/ink/conf/inkdns/inkdnsstatus
  if [ "${INKDNSSTAT}" = "INSTALLED" ]; then
-echo "inkDNS already installed."
+/bin/echo "inkDNS already installed."
 exit 2
  fi
 fi
@@ -32,51 +31,51 @@ fi
 /opt/verb/serfs/inkdnssetinker
 
 # Install Bind
-apt install -y net-tools bind9 bind9utils
-ufw allow bind9
+/usr/bin/apt-get install -y net-tools bind9 bind9utils
+/usr/sbin/ufw allow bind9
 
 # Backup settings
 cd /etc/bind
-mv named.conf.options named.conf.options.original
+/bin/mv named.conf.options named.conf.options.original
 
 # Config
-cp -f /opt/verb/conf/inkdns/named.conf.options /etc/bind/
-chown bind:bind /etc/bind/named.conf.options
-chmod 644 /etc/bind/named.conf.options
+/bin/cp -f /opt/verb/conf/inkdns/named.conf.options /etc/bind/
+/bin/chown bind:bind /etc/bind/named.conf.options
+/bin/chmod 644 /etc/bind/named.conf.options
 
 # Set the NS domains
-sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/zones/*
-sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/*
-sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/zones/*
-sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/*
-sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /opt/verb/conf/inkdns/zones/*
-sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /opt/verb/conf/inkdns/*
-sed -i "s/ns3\.DNSDOMAIN286/${SITE2INKERDNS}/g" /opt/verb/conf/inkdns/zones/*
-sed -i "s/ns3\.DNSDOMAIN286/${SITE2INKERDNS}/g" /opt/verb/conf/inkdns/*
+/bin/sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/zones/*
+/bin/sed -i "s/DNSID286\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/*
+/bin/sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/zones/*
+/bin/sed -i "s/ns1\.DNSDOMAIN286/${hostURI}/g" /opt/verb/conf/inkdns/*
+/bin/sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /opt/verb/conf/inkdns/zones/*
+/bin/sed -i "s/ns2\.DNSDOMAIN286/${SITEINKERDNS}/g" /opt/verb/conf/inkdns/*
+/bin/sed -i "s/ns3\.DNSDOMAIN286/${SITE2INKERDNS}/g" /opt/verb/conf/inkdns/zones/*
+/bin/sed -i "s/ns3\.DNSDOMAIN286/${SITE2INKERDNS}/g" /opt/verb/conf/inkdns/*
 
 ## DEV: FYI apparmor permissions are here: /etc/apparmor.d/usr.sbin.named
 
 # DNS serial number
-echo '0 0 * * * root /opt/verb/conf/inkdns/rmserial.sh > /dev/null 2>&1' > /etc/cron.d/dnsserial
-chmod 0644 /etc/cron.d/dnsserial
-echo '#!/bin/sh
-rm -f /opt/verb/conf/inkdns/serial' > /opt/verb/conf/inkdns/rmserial.sh
-chmod 750 /opt/verb/conf/inkdns/rmserial.sh
+/bin/echo '0 0 * * * root /opt/verb/donjon/rmserial.sh > /dev/null 2>&1' > /etc/cron.d/dnsserial
+/bin/chmod 0644 /etc/cron.d/dnsserial
+/bin/echo '#!/bin/sh
+/bin/rm -f /opt/verb/conf/inkdns/serial' > /opt/verb/donjon/rmserial.sh
+/bin/chmod 750 /opt/verb/donjon/rmserial.sh
 
 # include the verb file
-echo '// Below added by #inkVerb-inkDNS' >> /etc/bind/named.conf.local
-echo 'include "/etc/bind/named.conf.rdns";' >> /etc/bind/named.conf.local
-echo 'include "/etc/bind/named.conf.verb";' >> /etc/bind/named.conf.local
+/bin/echo '// Below added by #inkVerb-inkDNS' >> /etc/bind/named.conf.local
+/bin/echo 'include "/etc/bind/named.conf.rdns";' >> /etc/bind/named.conf.local
+/bin/echo 'include "/etc/bind/named.conf.verb";' >> /etc/bind/named.conf.local
 
 # Allow the port
-ufw allow 53
-ufw allow bind9
+/usr/sbin/ufw allow 53
+/usr/sbin/ufw allow bind9
 
 # Restart
 /etc/init.d/bind9 restart
 
 # Config
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 
 INKDNSSTAT=INSTALLED
 " > /opt/verb/conf/inkdns/inkdnsstatus
@@ -85,4 +84,4 @@ INKDNSSTAT=INSTALLED
 /opt/verb/serfs/inkdnsrefreshbind
 
 # Finish
-echo "inkDNS installed."
+/bin/echo "inkDNS installed."

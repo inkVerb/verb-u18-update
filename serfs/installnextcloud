@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This downloads and installs Nextcloud manually from inkisaverb.com/repo and linnks it to ....verb.blue
 
@@ -25,105 +24,81 @@ LATREP=$1
 DBASE=$2
 DBUSER=$3
 DBPASSWORD=$4
-CLEANNAME=$(echo $CVAPPNAME | sed -e 's/\.//g')
+CLEANNAME=$(/bin/echo $CVAPPNAME | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
 if [ -f /opt/verb/conf/vapp.${CVAPPNAME} ]; then
-echo "This is already installed."
+/bin/echo "This is already installed."
 exit 0; fi
 ## Directory
 if [ -d /var/www/vapps/${CVAPPNAME} ]; then
-echo "Nextcloud already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
+/bin/echo "Nextcloud already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
 exit 8; fi
 
 # Do it
 cd /var/www/vapps
 ## Get and unpack
-echo "Getting Nextcloud, this could take a minute or so..."
+/bin/echo "Getting Nextcloud, this could take a minute or so..."
 ### Repo version ('stable' inkVerb recommendation)
 if [ ${LATREP}="repo" ]; then
 /opt/verb/serfs/inkget ${CVAPPNAME}; wait
 ### Check
 /opt/verb/serfs/inkget ${CVAPPNAME} check
 if [ "$?" = 4 ]; then
-echo "Repo failed to retrieve the file."
+/bin/echo "Repo failed to retrieve the file."
 exit 4; fi
 if [ ! -f ${CVAPPNAME}.vtxz ]; then
-echo "Failed to retrieve from the repo."
+/bin/echo "Failed to retrieve from the repo."
 exit 4; fi
 
-rm -rf nextcloud
+/bin/rm -rf ${CVAPPNAME}
 /opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
 ### Latest Release Candidate version (default)
 elif [ -z ${1} ] || [ ${LATREP}="latest" ]; then
-wget https://download.nextcloud.com/server/daily/latest.tar.bz2
+/usr/bin/wget https://download.nextcloud.com/server/daily/latest.tar.bz2
 if [ ! -f latest.tar.bz2 ]; then
-echo "Can't download Nextcloud. I quit."
+/bin/echo "Can't download Nextcloud. I quit."
 exit 4; fi
 
-rm -rf nextcloud
-tar -xvjf latest.tar.bz2
-rm -f latest.tar.bz2
+/bin/rm -rf nextcloud
+/bin/tar -xvjf latest.tar.bz2
+/bin/rm -f latest.tar.bz2
 fi
 ## Install it
 /opt/verb/serfs/setvapplinkon ${CVAPPNAME}; wait
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
-chown -R www-data:www-data /var/www/html/blue.nc; wait
+/bin/chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
+/bin/chown -R www-data:www-data /var/www/html/blue.nc; wait
 ## Run the Nextcloud script
 /opt/verb/donjon/nextcloudprep.sh; wait
 ## Verify ownership
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
+/bin/chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}; wait
 
 ## Set up cron for updates (manage the crontab files directly)
-echo '*/15 * * * *  www-data php -f /var/www/vapps/nextcloud/cron.php' > /etc/cron.d/nextcloud
-chmod 0644 /etc/cron.d/nextcloud
-
-#Okay way, not best
-### See this thread: https://stackoverflow.com/questions/4880290/how-do-i-create-a-crontab-through-a-script
-#echo '*/15  *  *  *  * php -f /var/www/vapps/nextcloud/cron.php' > /var/spool/cron/crontabs/www-data
-#chown /var/spool/cron/crontabs/www-data:crontab www-data
-#chmod 600 /var/spool/cron/crontabs/www-data
-
-### A Python solution that doesn't work (https://github.com/nextcloud/news-updater)
-#apt install -y python3-setuptools
-#cd /var/www/vapps
-#git clone https://github.com/nextcloud/news-updater.git
-#sed -i "s/useCronUpdates.*/useCronUpdates = false/" nextcloud/data/news/config/config.ini
-#echo "python3 -m nextcloud_news_updater /var/www/vapps/nextcloud
-#" > /etc/cron.d/nextcloud
-#chmod 0644 /etc/cron.d/nextcloud
-
-### Good Webcron service, but not compatible with the News plugin
-#echo '*/15  *  *  *  * wget -q -O - \"https://nc.${blueURI}/cron.php?refresh=yes\"' >/dev/null 2>&1
-#" > /etc/cron.d/nextcloud
-#chmod 0644 /etc/cron.d/nextcloud
-
-### Wrong way, doesn't work because cron should not run www-data jobs
-#echo '*/15  *  *  *  * www-data php /var/www/vapps/nextcloud/cron.php' > /etc/cron.d/nextcloud
-#chmod 0644 /etc/cron.d/nextcloud
+/bin/echo '*/15 * * * *  www-data php -f /var/www/vapps/nextcloud/cron.php' > /etc/cron.d/nextcloud
+/bin/chmod 0644 /etc/cron.d/nextcloud
 
 # Auto database
 if [ -z ${4} ]; then
-DBPASSWORD=$(pwgen -s -1 10); fi
+DBPASSWORD=$(/usr/bin/pwgen -s -1 10); fi
 if [ -z ${2} ]; then
-DBASE=${CLEANNAME}$(pwgen -s -1 6); fi
+DBASE=${CLEANNAME}$(/usr/bin/pwgen -s -1 6); fi
 if [ -z ${3} ]; then
 DBUSER=${DBASE}; fi
 
 # Create the database and credentials
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
 FLUSH PRIVILEGES;"
 
 # Write the config for backup
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
 APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}
 
-echo "These are setup:
+/bin/echo "These are setup:
 
 Database user: ${DBUSER}
 Database password: ${DBPASSWORD}

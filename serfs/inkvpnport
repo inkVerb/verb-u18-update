@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets the inkVPN server port number
 ## If the port is not set in the first argument, the default "1194" will be used
@@ -14,7 +13,7 @@
 
 # Set the default port
 if [ -z "$1" ]; then
- echo "Option not specified, OK, using default..."
+ /bin/echo "Option not specified, OK, using default..."
  NEWPORTADDR="1194"
 else
  NEWPORTADDR="$1"
@@ -22,29 +21,29 @@ fi
 
 # Disable the old port
 . /opt/verb/conf/inkvpn/inkvpnstatus
-ufw deny ${INKVPNPORT}
+/usr/sbin/ufw deny ${INKVPNPORT}
 
 # Implement the new port
-sed -i "s/INKVPNPORT=.*/INKVPNPORT=${NEWPORTADDR}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNPORT=.*/INKVPNPORT=${NEWPORTADDR}/" /opt/verb/conf/inkvpn/inkvpnstatus
 . /opt/verb/conf/inkvpn/inkvpnstatus
-sed -i "s/^port.*/port ${INKVPNPORT}/" /etc/openvpn/server.conf
-ufw allow from any to any port ${INKVPNPORT} proto udp
-ufw allow ${INKVPNPORT}
+/bin/sed -i "s/^port.*/port ${INKVPNPORT}/" /etc/openvpn/server.conf
+/usr/sbin/ufw allow from any to any port ${INKVPNPORT} proto udp
+/usr/sbin/ufw allow ${INKVPNPORT}
 ## If a client file already exists
-if [ -f "/opt/verb/conf/inkvpn/certificates/clients/client.ovpn" ]; then
-sed -i "s/^remote ${hostURI}.*/remote ${hostURI} ${INKVPNPORT}/" /opt/verb/conf/inkvpn/certificates/clients/client.ovpn
+if [ -f "/opt/openvpn/certificates/clients/client.ovpn" ]; then
+/bin/sed -i "s/^remote ${hostURI}.*/remote ${hostURI} ${INKVPNPORT}/" /opt/openvpn/certificates/clients/client.ovpn
 fi
 ## Restart the OpenVPNserver if already installed
 if [ "${INKVPNINSTALLED}" = "INSTALLED_OPENVPN" ]; then
-  systemctl restart openvpn@server
+  /bin/systemctl restart openvpn@server
 ## Check status for the record
-  if [ "$(systemctl is-active openvpn@server)" = "active" ]; then
-    echo "Good to go! Systemctl check on inkVPN says \"active\"!"
+  if [ "$(/bin/systemctl is-active openvpn@server)" = "active" ]; then
+    /bin/echo "Good to go! Systemctl check on inkVPN says \"active\"!"
   else
-    echo "Something's wrong. Systemctl says OpenVPN is not active. I quit."; exit 6
+    /bin/echo "Something's wrong. Systemctl says OpenVPN is not active. I quit."; exit 6
   fi
 fi
 
 #Finish
 /opt/verb/serfs/inkvpnclientdl
-echo "inkVPN port now set to: ${NEWPORTADDR}"
+/bin/echo "inkVPN port now set to: ${NEWPORTADDR}"

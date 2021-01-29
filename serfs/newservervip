@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates a user who can read everything on the server and has a vip symlink in the home folder
 
@@ -12,13 +11,13 @@ NEWFILEGURU=$1
 NEWUSERPASS=$2
 
 # Create the user with password
-adduser ${NEWFILEGURU} --gecos ",,," --disabled-password
-echo "${NEWFILEGURU}:${NEWUSERPASS}" | chpasswd
+/usr/sbin/adduser ${NEWFILEGURU} --gecos ",,," --disabled-password
+/bin/echo "${NEWFILEGURU}:${NEWUSERPASS}" | chpasswd
 
 ## This was created with the following base script
-# sudo adduser myuser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
-# echo "myuser:password" | sudo chpasswd
+# sudo /usr/sbin/adduser myuser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+# /bin/echo "myuser:password" | sudo chpasswd
 
 # Create the www symlink
-ln -s /var/www/vip /home/${NEWFILEGURU}/vip
+/bin/ln -s /var/www/vip /home/${NEWFILEGURU}/vip
 

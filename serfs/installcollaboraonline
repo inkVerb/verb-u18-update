@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This Collabora Online to be used with Nextcloud
 ## Thanks for the awesome instructions from: https://nextcloud.com/collaboraonline/
@@ -24,7 +23,7 @@ fi
 
 # Check if already installed
 if [ -f /opt/verb/conf/vapp.${CVAPPNAME} ]; then
-echo "This is already installed. I quit."
+/bin/echo "This is already installed. I quit."
 exit 0; fi
 
 # Make sure Docker is installed
@@ -36,24 +35,24 @@ docker pull collabora/code
 docker run -t -d -p 127.0.0.1:${PORT}:${PORT} -e "domain=nc.${blueURI}" --restart always --cap-add MKNOD collabora/code
 
 # Firewall
-ufw allow ${PORT}
+/usr/sbin/ufw allow ${PORT}
 
 # Apache2
 ## Enable mods
-a2enmod proxy
-a2enmod proxy_wstunnel
-a2enmod proxy_http
-a2enmod ssl
+/usr/sbin/a2enmod proxy
+/usr/sbin/a2enmod proxy_wstunnel
+/usr/sbin/a2enmod proxy_http
+/usr/sbin/a2enmod ssl
 ## Reload
-apache2ctl graceful
+/usr/sbin/apache2ctl graceful
 
 # Write the config for status
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 COVAPPSTATUS=\"INSTALLED\"
 COPORT=${PORT}
 COHOST=\"nc.${blueURI}\"" > /opt/verb/conf/vapp.${CVAPPNAME}
 
-echo "Collabora Online is now installed...
+/bin/echo "Collabora Online is now installed...
 
 Next:
 1. Login as an admin to https://nc.${blueURI} to enable the Collabora Online office app.

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This adds inkDKIM (OpenDKIM) records for a specific domain in the inkDKIM records
 ## This DOES NOT add the records to inkDNS zone files
@@ -14,18 +13,21 @@
 
 DKIMDOMAIN=$1
 
+# See if already added
+if [ -d "/etc/opendkim/keys/${DKIMDOMAIN}" ]; then
+/bin/echo "Those DKIM keys already exist, doing nothing."
+exit 0; fi
+
 # Create the declared domain key
-mkdir -p /etc/opendkim/keys/${DKIMDOMAIN}
+/bin/mkdir -p /etc/opendkim/keys/${DKIMDOMAIN}
 cd /etc/opendkim/keys/${DKIMDOMAIN}
-opendkim-genkey -r -S -s inkdkim -d ${DKIMDOMAIN}
-chmod 660 inkdkim.private
-chown root:opendkim inkdkim.private
-chown opendkim:opendkim inkdkim.private
+/usr/bin/opendkim-genkey -r -S -s inkdkim -d ${DKIMDOMAIN}
+/bin/chmod 660 inkdkim.private
+/bin/chown -R opendkim:opendkim /etc/opendkim
 
 # Add the new domain key to the config files
-echo "inkdkim._domainkey.${DKIMDOMAIN} ${DKIMDOMAIN}:inkdkim:/etc/opendkim/keys/${DKIMDOMAIN}/inkdkim.private" >> /etc/opendkim/KeyTable
-echo "${DKIMDOMAIN} inkdkim._domainkey.${DKIMDOMAIN}" >> /etc/opendkim/SigningTable
-echo "${DKIMDOMAIN}" >> /etc/opendkim/TrustedHosts
-systemctl reload opendkim
-systemctl reload postfix
-
+/bin/echo "inkdkim._domainkey.${DKIMDOMAIN} ${DKIMDOMAIN}:inkdkim:/etc/opendkim/keys/${DKIMDOMAIN}/inkdkim.private" >> /etc/opendkim/KeyTable
+/bin/echo "${DKIMDOMAIN} inkdkim._domainkey.${DKIMDOMAIN}" >> /etc/opendkim/SigningTable
+/bin/echo "${DKIMDOMAIN}" >> /etc/opendkim/TrustedHosts
+/bin/systemctl reload opendkim
+/bin/systemctl reload postfix

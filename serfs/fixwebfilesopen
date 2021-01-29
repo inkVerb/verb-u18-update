@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This adds the necessary minimal .htaccess file to a web folder so all its files can be read
 ## The "URI web path" is relative to the www/html/ folder; it must already exist.
@@ -17,29 +16,29 @@ WEBPATH=$1
 
 # If it doesn't exist
 if [ ! -d "/var/www/html/${WEBPATH}" ]; then
-echo "This web folder does not exist. Doing nothing."
+/bin/echo "This web folder does not exist. Doing nothing."
 exit 8
 fi
 
 # If another .htaccess already exists
 if [ -f "/var/www/html/${WEBPATH}/.htaccess" ]; then
-echo "A .htaccess file already exists for this web path. Over-write it and alter the course of the known universe?
+/bin/echo "A .htaccess file already exists for this web path. Over-write it and alter the course of the known universe?
 Type \"yes\" to continue, anything else to quit."
 read YESANSWER
  if [ "${YESANSWER}" != "yes" ]; then
-echo "Quitting."
+/bin/echo "Quitting."
 exit 3
  fi
 fi
 
 # Do it
-echo "allow from all
+/bin/echo "allow from all
 Options +Indexes
 IndexOptions +FancyIndexing
 " > /var/www/html/${WEBPATH}/.htaccess
 
-chown -R www-data:www-data /var/www/html/${WEBPATH}
+/bin/chown -R www-data:www-data /var/www/html/${WEBPATH}
 
 # Finish
-echo "The contents of ${WEBPATH} are now available to the public!"
+/bin/echo "The contents of ${WEBPATH} are now available to the public!"
 

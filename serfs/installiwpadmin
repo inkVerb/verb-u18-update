@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This downloads and installs the InfiniteWP Server to a new directory to an existing domain in the .../html/ folder
 ## For security, this does NOT install to a pre-defined inkVerb subdomain, ie iwp.name.verb.ink. The site has too much control and must be set differently.
@@ -21,21 +20,21 @@ DIRECTORY=$3
 DBASE=$4
 DBUSER=$5
 DBPASSWORD=$6
-CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
+CLEANNAME=$(/bin/echo $DOMAIN | sed -e 's/\.//g')
 
 # Check that the directory doesn't already exist
 if [ -d /var/www/html/${DOMAIN}/${DIRECTORY} ]; then
-echo "That directory already exists for that domain. Choose a different directory."
+/bin/echo "That directory already exists for that domain. Choose a different directory."
 exit 8; fi
 
 # Options
 if [ -z ${1} ]; then
-echo "You must designate a domain."
+/bin/echo "You must designate a domain."
 exit 8; fi
 
 # Check email is set
 if [ -z ${2} ]; then
-echo "You must set an email for the repo package in InfiniteWP-Admin."
+/bin/echo "You must set an email for the repo package in InfiniteWP-Admin."
 exit 8; fi
 
 
@@ -48,44 +47,44 @@ cd /var/www/vapps
 ### Check
 /opt/verb/serfs/inkget ${CVAPPNAME} check
 if [ "$?" = 4 ]; then
-echo "Repo failed to retrieve the file."
+/bin/echo "Repo failed to retrieve the file."
 exit 4; fi
 if [ ! -f ${CVAPPNAME}.vtxz ]; then
-echo "Failed to retrieve from the repo."
+/bin/echo "Failed to retrieve from the repo."
 exit 4; fi
 
 ## Auto options
 if [ -z ${3} ]; then
-DIRECTORY=iwp$(pwgen -s -1 1); fi
+DIRECTORY=iwp$(/usr/bin/pwgen -s -1 1); fi
 if [ -z ${6} ]; then
-DBPASSWORD=$(pwgen -s -1 10); fi
+DBPASSWORD=$(/usr/bin/pwgen -s -1 10); fi
 if [ -z ${4} ]; then
-DBASE=iwp$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 5); fi
+DBASE=iwp$(/bin/echo $CLEANNAME | cut -c1-23)$(/usr/bin/pwgen -s -1 5); fi
 if [ -z ${5} ]; then
 DBUSER=${DBASE}; fi
 
 /opt/verb/serfs/vtxzout ${CVAPPNAME}; wait
-mv ${CVAPPNAME} ${DOMAIN}
-mv ${CVAPPNAME} ${CVAPPNAME}.${DOMAIN}
-ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}/${DIRECTORY}
+/bin/mv ${CVAPPNAME} ${DOMAIN}
+/bin/mv ${CVAPPNAME} ${CVAPPNAME}.${DOMAIN}
+/bin/ln -sfn /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}/${DIRECTORY}
 
 # Create the database and credentials
-mysql --login-path=local -e "
+/usr/bin/mysql --login-path=local -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
 FLUSH PRIVILEGES;"
 
 # Write the config for backup
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
 APPDDBPAS=${DBPASSWORD}
 IWPADMIN_DIRECTORY=\"${DIRECTORY}\"" > /opt/verb/conf/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Reset all permissions
-chown -R www-data:www-data /var/www/html/${DOMAIN}/${DIRECTORY}; wait
+/bin/chown -R www-data:www-data /var/www/html/${DOMAIN}/${DIRECTORY}; wait
 
-echo "${DOMAIN} now has the InfiniteWP Admin Panel.
+/bin/echo "${DOMAIN} now has the InfiniteWP Admin Panel.
 These are setup:
 
 Database: ${DBASE}

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This puts the login credentials into the right place for a Verber
 ## This assumes that the key has been already uploaded to the CA, signed, downloaded from the CA, and put on this Verber in the www/vip folder
@@ -19,27 +18,27 @@ cd ~/
 
 # If sec path not specified in command line
 if [ -z ${1} ]; then
-echo "Please copy-paste the code the CA Verber gave you, then press Enter."
+/bin/echo "Please copy-paste the code the CA Verber gave you, then press Enter."
 read SECPATH
 fi
 if [ -z "$SECPATH" ]; then
-echo "Please copy-paste the code the CA Verber gave you, then press Enter."
+/bin/echo "Please copy-paste the code the CA Verber gave you, then press Enter."
 read SECPATH
 fi
 if [ -z "$SECPATH" ]; then
-echo "You aren't entering the path. I quit."; exit 5; fi
+/bin/echo "You aren't entering the path. I quit."; exit 5; fi
 
 # Download the package
-wget -q https://${CAVERBERHOST}/inknet/${SECPATH}/${CLIENTNAME}.ink --no-check-certificate
+/usr/bin/wget -q https://${CAVERBERHOST}/inknet/${SECPATH}/${CLIENTNAME}.ink --no-check-certificate
 
 # Unpack
-mv ${CLIENTNAME}.ink ${CLIENTNAME}.vtxz
+/bin/mv ${CLIENTNAME}.ink ${CLIENTNAME}.vtxz
 /opt/verb/serfs/vtxzout ${CLIENTNAME}
-rm -f ${CLIENTNAME}.vtxz
+/bin/rm -f ${CLIENTNAME}.vtxz
 . ~/${CLIENTNAME}/verbername
-cp ~/${CLIENTNAME}/client.verber.${CLIENTNAME}.cnf /opt/verb/conf/inknet/client.${VERBERNAME}.inker.login.cnf
-rm -rf ${CLIENTNAME}
+/bin/cp ~/${CLIENTNAME}/client.verber.${CLIENTNAME}.cnf /opt/verb/conf/inknet/client.${VERBERNAME}.inker.login.cnf
+/bin/rm -rf ${CLIENTNAME}
 
 # Finish
-echo "The CA-signed cert for this Verber has been installed. This Verber may now use inkNet to connect to the Inker for other services, such as inkCert."
+/bin/echo "The CA-signed cert for this Verber has been installed. This Verber may now use inkNet to connect to the Inker for other services, such as inkCert."
 

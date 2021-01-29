@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates and adds a MySQL database using an existing vapp config
 ## The vapp config file must me located in ~/verb/conf
@@ -16,11 +15,11 @@ VAPPCONF=$1
 . /opt/verb/conf/${VAPPCONF}
 
 # Create a dummy database as a frame
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE ${APPDBASE};
 GRANT ALL PRIVILEGES ON ${APPDBASE}.* TO '${APPDDBUSR}'@'localhost' IDENTIFIED BY '${APPDDBPAS}';
 FLUSH PRIVILEGES;"
 
 # Import the database
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${APPDBASE} < ${APPDBASE}.sql
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf ${APPDBASE} < ${APPDBASE}.sql
 

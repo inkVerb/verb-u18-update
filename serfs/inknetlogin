@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This logs into a CA Verber
 ## You can use the name or the URI, host.namespace.verb.ink or host_namespace_verb_ink
@@ -15,7 +14,7 @@
 
 # Check & include the config
 if [ ! -f /opt/verb/conf/inknet/inker.client.cnf ]; then
-echo "This is not yet connected to a CA Verber via inkNet."
+/bin/echo "This is not yet connected to a CA Verber via inkNet."
 exit 8; fi
 
 # Include the correct configs
@@ -25,7 +24,7 @@ if [ "$1" = "CA1" ]; then
 . /opt/verb/conf/inknet/client.${CAVERBERNAME}.inker.login.cnf
 else
 CAV2HOST=$1
-CAV2NAME="$(echo ${CAV2HOST} | sed 's/\./_/g')"
+CAV2NAME="$(/bin/echo ${CAV2HOST} | sed 's/\./_/g')"
 . /opt/verb/conf/inknet/2cav.${CAV2NAME}.cnf
 fi
 
@@ -36,5 +35,5 @@ SAILCOMMAND=$2
 ##DEV: Done by the user ${CLIENTSAILOR} with no password. This may not be executed correctly. Delete this DEV note if this script works.
 ## Follow these instructions https://www.cyberciti.biz/open-source/command-line-hacks/linux-run-command-as-different-user/
 runuser -l ${CLIENTSAILOR} -c "ssh -o HostName=${CAVERBERHOST} -p ${CLIENTPORT} ${CLIENTUSERNAME}@${CAVERBERIP}"
-echo "Done."
+/bin/echo "Done."
 

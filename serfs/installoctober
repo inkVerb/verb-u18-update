@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This downloads and installs OctoberCMS as a vapp with www/html/DOMAIN.TLD link from newdomain
 ## October actually resides in www/vapps/october.DOMAIN.TLD
@@ -21,22 +20,22 @@ DOMAIN=$1
 DBASE=$2
 DBUSER=$3
 DBPASSWORD=$4
-CLEANNAME=$(echo $DOMAIN | sed -e 's/\.//g')
+CLEANNAME=$(/bin/echo $DOMAIN | sed -e 's/\.//g')
 
 # Check if already installed
 ## Config
 if [ -f /opt/verb/conf/vapp.${CVAPPNAME}.${DOMAIN} ]; then
-echo "This is already installed."
+/bin/echo "This is already installed."
 exit 0; fi
 ## Directory
 if [ -d /var/www/vapps/${CVAPPNAME}.${DOMAIN} ]; then
-echo "That October site already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
+/bin/echo "That October site already exists in the system. If it isn't working, look deeper on the server. For now, doing nothing."
 exit 8; fi
 
 
 # Options
 if [ -z ${1} ]; then
-echo "You must designate a domain."
+/bin/echo "You must designate a domain."
 exit 8; fi
 
 # Include the config file
@@ -46,121 +45,121 @@ exit 8; fi
 cd /var/www/vapps
 git clone https://github.com/octobercms/install
 if [ ! -d install ]; then
-echo "Can't download OctoberCMS. I quit."
+/bin/echo "Can't download OctoberCMS. I quit."
 exit 4; fi
 
 # Auto database
 if [ -z ${4} ]; then
-DBPASSWORD=$(pwgen -s -1 10); fi
+DBPASSWORD=$(/usr/bin/pwgen -s -1 10); fi
 if [ -z ${2} ]; then
-DBASE=oct$(echo $CLEANNAME | cut -c1-23)$(pwgen -s -1 6); fi
+DBASE=oct$(/bin/echo $CLEANNAME | cut -c1-23)$(/usr/bin/pwgen -s -1 6); fi
 if [ -z ${3} ]; then
 DBUSER=${DBASE}; fi
 
-mv install ${CVAPPNAME}.${DOMAIN}
+/bin/mv install ${CVAPPNAME}.${DOMAIN}
 
 ## Install main themes and plugins
 ### Plugins
 cd ${DOMAIN}/plugins
-wget https://github.com/rainlab/user-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/pages-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/anand-patel/oc-wysiwyg-editors/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/gergo85/oc-backend-plus/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/blog-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/vojtasvoboda/oc-userbanned-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/gergo85/oc-devtools/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/theone74/oc-telegram-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/googleanalytics-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/location-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/user-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/builder-plugin/archive/master.zip
-unzip master.zip
-rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/user-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/pages-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/anand-patel/oc-wysiwyg-editors/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/gergo85/oc-backend-plus/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/blog-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/vojtasvoboda/oc-userbanned-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/gergo85/oc-devtools/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/theone74/oc-telegram-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/googleanalytics-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/location-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/user-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/builder-plugin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
 ### Themes
 cd ../themes
-wget https://github.com/octobercms/october/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/goeroe/semantic-october-sass/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rustytheitgod/Rusty-OctoberCMS-Bootstrap4-Blank/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/Hambern/octobercms.blank-bootstrap-4/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/laratify/laratify-octobercms-octaskin/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/rainlab/vanilla-theme/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/responsiv/flat-theme/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/jtherczeg/multi-theme/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/ChadStrat/travu-theme/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/jtherczeg/corlate-theme/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/jacoweb/freelanceTheme/archive/master.zip
-unzip master.zip
-rm -f master.zip
-wget https://github.com/jacoweb/AgencyTheme/archive/master.zip
-unzip master.zip
-rm -f master.zip
+/usr/bin/wget https://github.com/octobercms/october/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/goeroe/semantic-october-sass/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rustytheitgod/Rusty-OctoberCMS-Bootstrap4-Blank/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/Hambern/octobercms.blank-bootstrap-4/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/laratify/laratify-octobercms-octaskin/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/rainlab/vanilla-theme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/responsiv/flat-theme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/jtherczeg/multi-theme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/ChadStrat/travu-theme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/jtherczeg/corlate-theme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/jacoweb/freelanceTheme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
+/usr/bin/wget https://github.com/jacoweb/AgencyTheme/archive/master.zip
+/usr/bin/unzip master.zip
+/bin/rm -f master.zip
 ## Setup links
-rm -f /var/www/html/${DOMAIN}; wait
-ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}; wait
-ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/vip/_webapps/; wait
-chown -R www-data:www-data /var/www/html/${DOMAIN}; wait
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}; wait
+/bin/rm -f /var/www/html/${DOMAIN}; wait
+/bin/ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /var/www/html/${DOMAIN}; wait
+/bin/ln -s /var/www/vapps/${CVAPPNAME}.${DOMAIN} /srv/vip/_webapps/; wait
+/bin/chown -R www-data:www-data /var/www/html/${DOMAIN}; wait
+/bin/chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}; wait
 
 # Create the database and credentials
-mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
+/usr/bin/mysql --defaults-extra-file=/opt/verb/conf/mysqlboss.cnf -e "
 CREATE DATABASE  ${DBASE};
 GRANT ALL PRIVILEGES ON ${DBASE}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASSWORD}';
 FLUSH PRIVILEGES;"
 ## MySQL port (may not be necessary, so commented)
-#ufw allow 3306
+#/usr/sbin/ufw allow 3306
 
 # Write the config for backup
-echo "#!/bin/sh
+/bin/echo "#!/bin/sh
 APPDBASE=${DBASE}
 APPDDBUSR=${DBUSER}
 APPDDBPAS=${DBPASSWORD}" > /opt/verb/conf/vapp.${CVAPPNAME}.${DOMAIN}
 
 # Reset all permissions
-chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
+/bin/chown -R www-data:www-data /var/www/vapps/${CVAPPNAME}.${DOMAIN}
 
-echo "These are setup for OctoberCMS:
+/bin/echo "These are setup for OctoberCMS:
 
 Database Type: MySQL
 MySQL Host: localhost

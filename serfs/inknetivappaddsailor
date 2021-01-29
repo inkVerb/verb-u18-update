@@ -15,8 +15,8 @@ ADDINIVSAILOR=$1
 wait
 
 # Create the inkNet Client tool links
-rm -rf /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
-ln -sfn /opt/verb/tools/sailor /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
-mkdir -p /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}/.ssh
-chown -R ${ADDINIVSAILOR}:${ADDINIVSAILOR} /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}
+/bin/rm -rf /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
+/bin/ln -sfn /opt/verb/tools/sailor /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}/tools
+/bin/mkdir -p /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}/.ssh
+/bin/chown -R ${ADDINIVSAILOR}:${ADDINIVSAILOR} /opt/ivapp/inknet/sailor/${ADDINIVSAILOR}
 

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This script creates a new boss user that is a sudoer who can can boss serfs
 
@@ -16,17 +15,17 @@ NEWBOSS=$1
 NEWBOSSPASS=$2
 
 # Add the new user
-adduser ${NEWBOSS} --gecos ",,," --disabled-password
-echo "${NEWBOSS}:${NEWBOSSPASS}" | chpasswd
+/usr/sbin/adduser ${NEWBOSS} --gecos ",,," --disabled-password
+/bin/echo "${NEWBOSS}:${NEWBOSSPASS}" | chpasswd
 usermod -a -G sudo ${NEWBOSS}
 usermod -a -G www-data ${NEWBOSS}
-ln -s /opt/verb/boss /home/${NEWBOSS}/
+/bin/ln -s /opt/verb/boss /home/${NEWBOSS}/
 ## User privilege specification
 setfacl -R -m user:${NEWBOSS}:rwx /home/${NEWBOSS}
-echo '# Added by newboss inkVerb serf' >> /etc/sudoers
-echo '${NEWBOSS}  ALL=(ALL:ALL) ALL' >> /etc/sudoers
+/bin/echo '# Added by newboss inkVerb serf' >> /etc/sudoers
+/bin/echo '${NEWBOSS}  ALL=(ALL:ALL) ALL' >> /etc/sudoers
 
 # Finished
-echo "The boss user ${NEWBOSS} has been created.
+/bin/echo "The boss user ${NEWBOSS} has been created.
 Log in using 'ssh ${NEWBOSS}@${SITEIP} -p ${SITEPORT}'
 "

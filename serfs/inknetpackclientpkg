@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates the package with username and password for the Client to download and install.
 ## Prerequisite: inknetaddverberclient/inknetaddvrkclient (the requesting client must already exist on this serveer as an inkNet jailed user)
@@ -27,27 +26,27 @@
 
 VTYPE=$1
 ICNAME=$2
-VCNAME="$(echo ${ICNAME} | sed 's/\./_/g' | sed 's/@/_/g' )"
+VCNAME="$(/bin/echo ${ICNAME} | sed 's/\./_/g' | sed 's/@/_/g' )"
 
 # Check variables
 if [ -z ${2} ]; then
-echo "You must enter a name. Check the instructions."; exit 5; fi
+/bin/echo "You must enter a name. Check the instructions."; exit 5; fi
 
 # Check if the Client has been added
 if [ "${VTYPE}" = "vrk" ]; then
  if [ ! -e "/opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf" ]; then
- echo "You must add the Client first using: inknetaddvrkclient."
+ /bin/echo "You must add the Client first using: inknetaddvrkclient."
  exit 8
  fi
 fi
 if [ "${VTYPE}" = "verber" ]; then
  if [ ! -e "/opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf" ]; then
- echo "You must add the Client first using: inknetaddverberclient."
+ /bin/echo "You must add the Client first using: inknetaddverberclient."
  exit 8
  fi
 fi
 if [ "${VTYPE}" != "verber" ] && [ "${VTYPE}" != "vrk" ]; then
-echo "You must properly specify verber or vrk."; exit 5; fi
+/bin/echo "You must properly specify verber or vrk."; exit 5; fi
 
 # Include the configs
 if [ "${VTYPE}" = "vrk" ]; then
@@ -58,32 +57,32 @@ if [ "${VTYPE}" = "verber" ]; then
 
 # Create the working directory
 if [ ! -f ~/.ssh/inknet/${VCNAME} ]; then
-mkdir ~/.ssh/inknet/${VCNAME}
+/bin/mkdir ~/.ssh/inknet/${VCNAME}
 fi
 
 # Put everything in a temporary, restricted downloadable directory
-SECPATH=$(pwgen -1 -s 10)
+SECPATH=$(/usr/bin/pwgen -1 -s 10)
 ## Add the Client username configs
 if [ "${VTYPE}" = "vrk" ]; then
-cp /opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
-echo "#!/bin/sh
+/bin/cp /opt/verb/conf/inknet/vrk/client.vrk.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
+/bin/echo "#!/bin/sh
 VERBERNAME=${IAMCANAME}" > ~/.ssh/inknet/${VCNAME}/verbername
 fi
 if [ "${VTYPE}" = "verber" ]; then
-cp /opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
-echo "#!/bin/sh
+/bin/cp /opt/verb/conf/inknet/verber/client.verber.${VCNAME}.cnf ~/.ssh/inknet/${VCNAME}/
+/bin/echo "#!/bin/sh
 VERBERNAME=${IAMCANAME}" > ~/.ssh/inknet/${VCNAME}/verbername
 fi
 cd ~/.ssh/inknet/
 /opt/verb/serfs/vtxzin ${VCNAME}
-rm -rf ${VCNAME}
-mkdir /var/www/html/${IAMCAHOST}/inknet/${SECPATH}
-mv ${VCNAME}.vtxz ${VCNAME}.ink
-mv ${VCNAME}.ink /var/www/html/${IAMCAHOST}/inknet/${SECPATH}
+/bin/rm -rf ${VCNAME}
+/bin/mkdir /var/www/html/${IAMCAHOST}/inknet/${SECPATH}
+/bin/mv ${VCNAME}.vtxz ${VCNAME}.ink
+/bin/mv ${VCNAME}.ink /var/www/html/${IAMCAHOST}/inknet/${SECPATH}
 
 # For non-IP Vrk Stations
 if [ "${CLIENTIP}" = "NOT_SET" ]; then
-echo "
+/bin/echo "
 <Files ${VCNAME}.ink>
  AuthType Basic
  AuthName \"Password Protected Area\"
@@ -91,10 +90,10 @@ echo "
  Require valid-user
 </Files>
 " > /var/www/html/${IAMCAHOST}/inknet/${SECPATH}/.htaccess
-SECNAME=$(pwgen -1 -s 15)
-SECPASS=$(pwgen -1 -s 15)
-echo "${SECNAME}:${SECPASS}" > /var/www/html/${IAMCAHOST}/inknet/${SECPATH}/.htpasswd
-echo "Great! Now, hurry up and get the file from this URL:
+SECNAME=$(/usr/bin/pwgen -1 -s 15)
+SECPASS=$(/usr/bin/pwgen -1 -s 15)
+/bin/echo "${SECNAME}:${SECPASS}" > /var/www/html/${IAMCAHOST}/inknet/${SECPATH}/.htpasswd
+/bin/echo "Great! Now, hurry up and get the file from this URL:
  https://${IAMCAHOST}/${SECPATH}/inknet/${VCNAME}.ink
 
  Login:    ${SECNAME}
@@ -105,15 +104,15 @@ echo "Great! Now, hurry up and get the file from this URL:
 
 # For IP Vrk Stations and Verbers
 else
-echo "
+/bin/echo "
 <Files ${VCNAME}.ink>
  Order deny,allow
  Deny from all
  Allow from ${CLIENTIP}
 </Files>
 " > /var/www/html/${IAMCAHOST}/inknet/${SECPATH}/.htaccess
-chown -R www-data:www-data /var/www/html/${IAMCAHOST}/inknet/${SECPATH}/
-echo "Great! Now, hurry up and enter this code with inknetaddcavpkg: ${SECPATH}
+/bin/chown -R www-data:www-data /var/www/html/${IAMCAHOST}/inknet/${SECPATH}/
+/bin/echo "Great! Now, hurry up and enter this code with inknetaddcavpkg: ${SECPATH}
 
  It expires in about 30 minutes. Hurry!
 "

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This turns off a tld of the verb sites, such as verb.red, but not the other verb.tld sites, all are on before running this
 ## This removes the symlink in apache2/sites-enabled
@@ -14,7 +13,7 @@
 
 SITEOFF=$1
 
-rm -f /etc/apache2/sites-enabled/*.verb.${SITEOFF}.conf
-sed -i "s/VERB${SITEOFF}=.*/VERB${SITEOFF}=false/g" /opt/verb/conf/sitetldstatus
-apache2ctl graceful
+/bin/rm -f /etc/apache2/sites-enabled/*.verb.${SITEOFF}.conf
+/bin/sed -i "s/VERB${SITEOFF}=.*/VERB${SITEOFF}=false/g" /opt/verb/conf/sitetldstatus
+/usr/sbin/apache2ctl graceful
 

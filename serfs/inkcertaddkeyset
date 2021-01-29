@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This unpacks the certificates from the CA and moves files where they need to go
 ## The .ict file produced by inkCert's Intermediate CA should be uploaded to /etc/inkcert/req/. Links to this folder are in verb/req and vip/req for convenience.
@@ -19,20 +18,20 @@ ICTFILENAME=$2
 
 # Unpack the file
 cd /etc/inkcert
-mv ${ICTFILENAME} ${DOMAIN}.vtxz
+/bin/mv ${ICTFILENAME} ${DOMAIN}.vtxz
 /opt/verb/serfs/vtxzout ${DOMAIN}
-mv ${DOMAIN} req/
+/bin/mv ${DOMAIN} req/
 
 # Move files in place
-mkdir /etc/inkcert/live/${DOMAIN}
-cp csr/${DOMAIN}/${DOMAIN}.key.pem /etc/inkcert/live/${DOMAIN}/
-chmod 600 /etc/inkcert/live/${DOMAIN}/${DOMAIN}.key.pem
-cp req/${DOMAIN}/${DOMAIN}.cert.pem /etc/inkcert/live/${DOMAIN}/
-cp req/${DOMAIN}/ca-chain.cert.pem /etc/inkcert/live/${DOMAIN}/
+/bin/mkdir /etc/inkcert/live/${DOMAIN}
+/bin/cp csr/${DOMAIN}/${DOMAIN}.key.pem /etc/inkcert/live/${DOMAIN}/
+/bin/chmod 600 /etc/inkcert/live/${DOMAIN}/${DOMAIN}.key.pem
+/bin/cp req/${DOMAIN}/${DOMAIN}.cert.pem /etc/inkcert/live/${DOMAIN}/
+/bin/cp req/${DOMAIN}/ca-chain.cert.pem /etc/inkcert/live/${DOMAIN}/
 shred -f -x req/${DOMAIN}/${DOMAIN}.cert.pem
 shred -f -x req/${DOMAIN}/interm.inkcert.cert.pem
 shred -f -x req/${DOMAIN}/ca.inkcert.cert.pem
 shred -f -x req/${DOMAIN}/${DOMAIN}.chain.pem
 shred -f -x csr/${DOMAIN}/${DOMAIN}.key.pem
-rm -f req/${DOMAIN}.csr.pem
+/bin/rm -f req/${DOMAIN}.csr.pem
 

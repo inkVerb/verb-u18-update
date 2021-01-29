@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This finalizes branding changes after the LocalSettings.php file has been uploaded to the mediawiki folder
 
@@ -12,11 +11,11 @@
 . /opt/verb/conf/sitenameip
 
 # Download and establish wordpress in the server to pre-created domain
-cp /opt/verb/conf/lab/mediawiki/resources/assets/verbwiki.png /var/www/vapps/mediawiki/resources/assets/
-sed -i "s/wiki.png/verbwiki.png/g" /var/www/vapps/mediawiki/LocalSettings.php
+/bin/cp /opt/verb/conf/lab/mediawiki/resources/assets/verbwiki.png /var/www/vapps/mediawiki/resources/assets/
+/bin/sed -i "s/wiki.png/verbwiki.png/g" /var/www/vapps/mediawiki/LocalSettings.php
 # Move from vip/MediaWiki to the settings file
-mv /var/www/vip/LocalSettings.php /var/www/vapps/mediawiki/
-rm -rf /var/www/vapps/mediawiki/mw-config
+/bin/mv /var/www/vip/LocalSettings.php /var/www/vapps/mediawiki/
+/bin/rm -rf /var/www/vapps/mediawiki/mw-config
 
-echo "
+/bin/echo "
 Post install finished."

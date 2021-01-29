@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This creates and signs the host key for this CA Verber
 ## This is used by inknetinstallca (Run by itselt, this only refreshes from when inknetinstallca first used this)
@@ -15,7 +14,7 @@
 
 # Check if CA
 if [ ! -f /opt/verb/conf/inknet/ca.verber.cnf ]; then
-echo "Out of order. This is not a CA Verber yet.
+/bin/echo "Out of order. This is not a CA Verber yet.
 
 First run inknetinstallca
 "
@@ -32,9 +31,9 @@ ssh-keygen -s ~/.ssh/inknet/ca/in_ca_${IAMCANAME}_key -N "" -I in_cav_${IAMCANAM
 ### Now exists: /etc/ssh/inknet/in_cav_${CAVERBERNAME}_key-cert.pub
 
 # Restart
-systemctl reload ssh
-systemctl reload sshd
+/bin/systemctl reload ssh
+/bin/systemctl reload sshd
 
 # Finish
-echo "A new hostkey has been created and signed for this CA Verber."
+/bin/echo "A new hostkey has been created and signed for this CA Verber."
 

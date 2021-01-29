@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This displays the inkDKIM information in OpenDKIM for a specific domain so it can be added to an opendkim txt record in the DNS file
 ## inkDKIM is the inkVerb method of handling OpenDKIM keys
@@ -11,5 +10,5 @@
 
 DOMAIN=$1
 
-echo $(cat /etc/opendkim/keys/${DOMAIN}/inkdkim.txt)
+/bin/echo $(/bin/cat /etc/opendkim/keys/${DOMAIN}/inkdkim.txt)
 

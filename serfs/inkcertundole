@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This batch runs a revoke and uninstall of inkCert-Letsencrypt certs for a domain and replaces the Snakeoil certificate
 ## It also applies to all subdomains for that domain
@@ -18,12 +17,11 @@ DOMAIN=$1
 
 # Check variables
 if [ -z ${1} ]; then
-echo "You need to specify a domain. Read the instructions."; exit 0
+/bin/echo "You need to specify a domain. Read the instructions."; exit 0
 fi
 
-# Request and get the certs
+# Revoke the certs
 /opt/verb/serfs/inkcertrevokele ${DOMAIN}
 
-# Install the certs
-/opt/verb/serfs/inkcertremoveallle ${DOMAIN}
-
+# Remove the certs
+/opt/verb/serfs/inkcertremovele ${DOMAIN}

@@ -4,4 +4,4 @@
 phpDir=$(ls /etc/php)
 phpVers=(${phpDir})
 IFS=$'\n'
-echo "${phpVers[*]}" | sort -nr | head -n1
+/bin/echo "${phpVers[*]}" | sort -nr | head -n1

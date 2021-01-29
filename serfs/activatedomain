@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This activates a domain to work with either the FTP-accessible domains/ directory or a vapp
 
@@ -9,7 +8,7 @@
 
 # Eg:
 ## ./activatedomain inkisaverb.com				# activate inkisaverb.com for the FTP domains/ directory
-## ./activatedomain inkisaverb.com drupal.inkisaverb.com	# activate inkisaverb.com for the Drupal vapp
+## ./activatedomain inkisaverb.com october.inkisaverb.com	# activate inkisaverb.com for the October vapp
 
 
 DOMAIN=$1
@@ -17,17 +16,17 @@ VAPPNM=$2
 
 if [ -n ${2} ]; then
 then
-    rm -rf /var/www/html/${DOMAIN}
-    ln -sfn /var/www/vapps/${VAPPNM} /var/www/html/${DOMAIN}
-    echo "${VAPPNM} vapp active at ${DOMAIN}."
+    /bin/rm -rf /var/www/html/${DOMAIN}
+    /bin/ln -sfn /var/www/vapps/${VAPPNM} /var/www/html/${DOMAIN}
+    /bin/echo "${VAPPNM} vapp active at ${DOMAIN}."
 exit 0
 fi
 
 if [ -z ${2} ]; then
 then
-    rm -rf /var/www/html/${DOMAIN}
-    ln -sfn /var/www/domains/${DOMAIN} /var/www/html/
-    echo "${DOMAIN} domain active."
+    /bin/rm -rf /var/www/html/${DOMAIN}
+    /bin/ln -sfn /var/www/domains/${DOMAIN} /var/www/html/
+    /bin/echo "${DOMAIN} domain active."
 exit 0
 fi
 

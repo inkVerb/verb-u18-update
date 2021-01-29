@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This activates the repo....verb.vip folder so the web will provide an index
 
@@ -16,25 +15,11 @@
 . /opt/verb/conf/sitenameip
 . /opt/verb/conf/siteurilist
 
-if [ "$1" = "-h" ]
-then
-    echo "Usage: ./activaterepo [on/off]
-
-Examples:
- ./activaterepo on
- ./activaterepo off
-
- allowed arguments:
- on	(repo.${vipURI} becomes a web-accessible folder)
- off	(repo.${vipURI} returns to a redirect to ${inkURI})"
-exit 0
-fi
-
 if [ "$1" = "on" ]
 then
     rm -rf /var/www/html/vip.repo
-    ln -sfn /var/www/vip/repo /var/www/html/vip.repo
-    echo "repo on."
+    /bin/ln -sfn /var/www/vip/repo /var/www/html/vip.repo
+    /bin/echo "repo on."
 exit 0
 fi
 
@@ -42,7 +27,7 @@ if [ "$1" = "off" ]
 then
     rm -f /var/www/html/vip.repo
     cp -R /var/www/html/0ne /var/www/html/vip.repo
-    echo "repo off."
+    /bin/echo "repo off."
 exit 0
 fi
 

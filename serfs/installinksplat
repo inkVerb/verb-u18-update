@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This installs the inkSplat Dovecot utility, moving marked spapm to the Junk folder and learning spam
 ## This was largely informed by:
@@ -22,47 +21,48 @@
 # Check status
 . /opt/verb/conf/sitemailpath
 if [ ${SITEMAILSTATUS} = "VMAIL_SERVER" ] || [ ${SITEMAILSTATUS} = "EMAIL_BACKUP_MX" ] || [ ${SITEMAILSTATUS} = "PMAIL_SERVER" ]; then
-  echo "A mail server is already installed, all is well, continuing..."
+  /bin/echo "A mail server is already installed, all is well, continuing..."
 else
-  echo "No mail server installed yet. Do that first. I quit."
+  /bin/echo "No mail server installed yet. Do that first. I quit."
 exit 0; fi
 
 if [ ${INKSPLAT} = "INSTALLED" ]; then
-  echo "inkSplat already installed. Doing nothing."
+  /bin/echo "inkSplat already installed. Doing nothing."
 exit 0;fi
 
 # Install Sieve & the Pigeonhole package (on Debian it is: managesieved, https://wiki2.dovecot.org/Pigeonhole/Installation)
-apt install dovecot-sieve dovecot-managesieved -y
+/usr/bin/apt-get install dovecot-sieve dovecot-managesieved -y
 
 # Setup the plugins and their files
-echo "# List the Sieve plugin (for moving spam and using colored priority tags/flags)
+/bin/echo "# List the Sieve plugin (for moving spam and using colored priority tags/flags)
 ## From: https://wiki.dovecot.org/Pigeonhole/Sieve/Examples
 plugin {
     sieve = /etc/dovecot/sieve/inksplat.sieve
 }" > /etc/dovecot/conf.d/90-plugin.conf
-chmod 640 /etc/dovecot/conf.d/90-plugin.conf
-echo '
+/bin/chmod 640 /etc/dovecot/conf.d/90-plugin.conf
+/bin/echo '
 # inkSplat utility set
 !include_try inksplat.conf' >> /etc/dovecot/dovecot.conf
-cp /opt/verb/conf/lab/inksplat/inksplat.conf /etc/dovecot/
-chown -R vmail:dovecot /etc/dovecot/inksplat.conf
-chown 640 /etc/dovecot/inksplat.conf
-mkdir -p /etc/dovecot/sieve
-chown -R vmail:dovecot /etc/dovecot/sieve
-chmod 750 /etc/dovecot/sieve
-cp /opt/verb/conf/lab/inksplat/inksplat.sieve /etc/dovecot/sieve/
-chmod 640 /etc/dovecot/sieve/inksplat.sieve
-mkdir -p /usr/lib/dovecot/sieve
-cp /opt/verb/conf/lab/inksplat/report-spam.sieve /usr/lib/dovecot/sieve/
-cp /opt/verb/conf/lab/inksplat/report-ham.sieve /usr/lib/dovecot/sieve/
-chmod 644 /usr/lib/dovecot/sieve/*.sieve
-cp /opt/verb/conf/lab/inksplat/sa-learn-spam.sh /usr/lib/dovecot/sieve/
-cp /opt/verb/conf/lab/inksplat/sa-learn-ham.sh /usr/lib/dovecot/sieve/
-chmod 755 /usr/lib/dovecot/sieve/*.sh
+/bin/cp /opt/verb/conf/lab/inksplat/inksplat.conf /etc/dovecot/
+/bin/chown -R vmail:dovecot /etc/dovecot/inksplat.conf
+/bin/chown 640 /etc/dovecot/inksplat.conf
+/bin/mkdir -p /etc/dovecot/sieve
+/bin/chown -R vmail:dovecot /etc/dovecot/sieve
+/bin/chmod 750 /etc/dovecot/sieve
+/bin/cp /opt/verb/conf/lab/inksplat/inksplat.sieve /etc/dovecot/sieve/
+/bin/chmod 640 /etc/dovecot/sieve/inksplat.sieve
+/bin/mkdir -p /usr/lib/dovecot/sieve
+/bin/cp /opt/verb/conf/lab/inksplat/report-spam.sieve /usr/lib/dovecot/sieve/
+/bin/cp /opt/verb/conf/lab/inksplat/report-ham.sieve /usr/lib/dovecot/sieve/
+/bin/chmod 644 /usr/lib/dovecot/sieve/*.sieve
+/bin/cp /opt/verb/conf/lab/inksplat/sa-learn-spam.sh /usr/lib/dovecot/sieve/
+/bin/cp /opt/verb/conf/lab/inksplat/sa-learn-ham.sh /usr/lib/dovecot/sieve/
+/bin/chmod 755 /usr/lib/dovecot/sieve/*.sh
 
 # Restart
-systemctl restart dovecot
+/bin/systemctl restart dovecot
 
 # Finished
-sed -i "s/INKSPLAT=.*/INKSPLAT=\"INSTALLED\"/" /opt/verb/conf/sitemailpath
-echo "inkSplat email tagging & filtering for Dovecot installed."
+/bin/sed -i "s/INKSPLAT=.*/INKSPLAT=\"INSTALLED\"/" /opt/verb/conf/sitemailpath
+/bin/echo "inkSplat email tagging & filtering for Dovecot installed."
+

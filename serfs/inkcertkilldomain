@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This removes all inkCert files entirely for inkCert-LE and inkCert Proper
 
@@ -11,9 +10,9 @@
 KILLDOMAIN=$1
 
 # Remove inkCert configs
-rm -f /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMSHELL}.ini
-rm -f /opt/verb/conf/inkcert/cli-ini/siteinkcert.${KILLDOMSHELL}
-rm -f /etc/inkcert/cli.${KILLDOMAIN}.ini
-rm -rf /etc/inkcert/le/live/${KILLDOMAIN}
-rm -rf /etc/inkcert/live/${KILLDOMAIN}
+/bin/rm -f /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMSHELL}.ini
+/bin/rm -f /opt/verb/conf/inkcert/cli-ini/siteinkcert.${KILLDOMSHELL}
+/bin/rm -f /etc/inkcert/cli.${KILLDOMAIN}.ini
+/bin/rm -rf /etc/inkcert/le/live/${KILLDOMAIN}
+/bin/rm -rf /etc/inkcert/live/${KILLDOMAIN}
 

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This kills a subdomain after it has been added with addsubdomain or addsubdomaincgi
 
@@ -19,20 +18,20 @@ KILLDOMAIN=$2
 KILLSUBDOMAIN=${KILLSUB}.${KILLDOMAIN}
 
 # Remove Apache server config files
-rm -f /etc/apache2/sites-available/${KILLSUBDOMAIN}.conf
-rm -f /etc/apache2/sites-enabled/${KILLSUBDOMAIN}.conf
-apache2ctl graceful
+/bin/rm -f /etc/apache2/sites-available/${KILLSUBDOMAIN}.conf
+/bin/rm -f /etc/apache2/sites-enabled/${KILLSUBDOMAIN}.conf
+/usr/sbin/apache2ctl graceful
 
 # Remove from inkCert
-sed -i "s/, ${KILLSUBDOMAIN}//g" /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
+/bin/sed -i "s/, ${KILLSUBDOMAIN}//g" /opt/verb/conf/inkcert/cli-ini/cli.${KILLDOMAIN}.ini
 
 # Remove http folder symlinks
-rm -f /var/www/html/${KILLSUBDOMAIN}
+/bin/rm -f /var/www/html/${KILLSUBDOMAIN}
 
 # Restart
 /etc/init.d/postfix reload
 /etc/init.d/postfix restart
 
 # Finish
-echo "${KILLSUBDOMAIN} has been removed. But, the folder in www/domains still exists for a VIP to access."
+/bin/echo "${KILLSUBDOMAIN} has been removed. But, the folder in www/domains still exists for a VIP to access."
 

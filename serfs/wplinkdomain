@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This links a domain to it's wp location in vapps
 ## It is useful for backup restore wordpress instances, inclusion in scripts, or other backend server work
@@ -12,7 +11,7 @@
 
 DOMAIN=$1
 
-rm -f /var/www/html/${DOMAIN}
-ln -s /var/www/vapps/wp.${DOMAIN} /var/www/html/${DOMAIN}
-chown -R www-data:www-data /var/www/html/${DOMAIN}
+/bin/rm -f /var/www/html/${DOMAIN}
+/bin/ln -s /var/www/vapps/wp.${DOMAIN} /var/www/html/${DOMAIN}
+/bin/chown -R www-data:www-data /var/www/html/${DOMAIN}
 

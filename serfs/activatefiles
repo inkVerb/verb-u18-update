@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This activates the files....verb.vip folder so the web will provide an index
 ## Prerequisite: installvsftpd
@@ -16,25 +15,11 @@
 # Include the config
 . /opt/verb/conf/siteurilist
 
-if [ "$1" = "-h" ]
-then
-    echo "Usage: ./activatefiles [on/off]
-
-Examples:
- ./activatefiles on
- ./activatefiles off
-
- allowed arguments:
- on	(files.${vipURI} becomes a web-accessible folder)
- off	(files.${vipURI} returns to a redirect to ${inkURI})"
-exit 0
-fi
-
 if [ "$1" = "on" ]
 then
     rm -rf /var/www/html/vip.files
-    ln -sfn /var/www/vip/files /var/www/html/vip.files
-    echo "files on."
+    /bin/ln -sfn /var/www/vip/files /var/www/html/vip.files
+    /bin/echo "files on."
 exit 0
 fi
 
@@ -42,7 +27,7 @@ if [ "$1" = "off" ]
 then
     rm -f /var/www/html/vip.files
     cp -R /var/www/html/0ne /var/www/html/vip.files
-    echo "files off."
+    /bin/echo "files off."
 exit 0
 fi
 

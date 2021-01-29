@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This adds a new subdomain to become newsub.your-name.verb.one, and enables CGI.
 
@@ -15,16 +14,16 @@
 NEWONESUB=$1
 
 # Copy and prepare Apache server config files
-cp /opt/verb/conf/site-files/conf/newonesubcgi.conf /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf 
-sed -i "s/newonesub/${NEWONESUB}/g" /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf
-sed -i "s/oneURI286/${oneURI}/g" /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf
-cp -R /opt/verb/conf/site-files/newonesubdir /var/www/one/${NEWONESUB}
-chown -R www-data:www-data /var/www/one/${NEWONESUB}
-a2ensite ${NEWONESUB}.${oneURI}
-apache2ctl graceful
-cp /var/www/html/one/index-newonesub.php /var/www/html/one/index-${NEWONESUB}.php
-chown -R www-data:www-data /var/www/html/one
+/bin/cp /opt/verb/conf/site-files/conf/newonesubcgi.conf /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf 
+/bin/sed -i "s/newonesub/${NEWONESUB}/g" /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf
+/bin/sed -i "s/oneURI286/${oneURI}/g" /etc/apache2/sites-available/${NEWONESUB}.${oneURI}.conf
+/bin/cp -R /opt/verb/conf/site-files/newonesubdir /var/www/one/${NEWONESUB}
+/bin/chown -R www-data:www-data /var/www/one/${NEWONESUB}
+/usr/sbin/a2ensite ${NEWONESUB}.${oneURI}
+/usr/sbin/apache2ctl graceful
+/bin/cp /var/www/html/one/index-newonesub.php /var/www/html/one/index-${NEWONESUB}.php
+/bin/chown -R www-data:www-data /var/www/html/one
 
 # inkCert, at end of the "domains =" line
-sed -i "/^domains =/ s/$/, ${NEWONESUB}.${oneURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${oneURI}.ini
+/bin/sed -i "/^domains =/ s/$/, ${NEWONESUB}.${oneURI}/" /opt/verb/conf/inkcert/cli-ini/cli.${oneURI}.ini
 

@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This deletes the config files for a secondary CA Verber
 
@@ -14,10 +13,10 @@
 
 
 FULLKILLNAME=$1
-KILLCAVERBERNAME=$(echo $FULLKILLNAME | cut -c1-18)
+KILLCAVERBERNAME=$(/bin/echo $FULLKILLNAME | cut -c1-18)
 
-rm /opt/verb/conf/inknet/2cav.${KILLCAVERBERNAME}.cnf
+/bin/rm /opt/verb/conf/inknet/2cav.${KILLCAVERBERNAME}.cnf
 
 # Finish
-echo "The secondary CA Verber credentials for ${KILLCAVERBERNAME} have been deleted."
+/bin/echo "The secondary CA Verber credentials for ${KILLCAVERBERNAME} have been deleted."
 

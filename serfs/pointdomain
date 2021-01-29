@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This forwards an already-created domain to another URI
 
@@ -14,37 +13,18 @@
 
 FWDDOM=$1
 DEST=$2
+ORIG_DEST="$(find /var/www/html/${FWDDOM} -prune -printf "%l\n")"
 
-# In the event of index.php
-if [ -f /var/www/html/${FWDDOM}/index.php ]; then
-mv /var/www/html/${FWDDOM}/index.php /var/www/html/${FWDDOM}/index.php.vback
-echo "${FWDDOM}'s index.php file has been moved to index.php.vback."
-fi
+# Prepare
+/bin/mkdir -p /var/www/forwards/${FWDDOM}
+/bin/rm -f /var/www/html/${FWDDOM}
+/bin/ln -sfn /var/www/forwards/${FWDDOM} /var/www/html/
 
 # Set and own
-echo "<?php header(\"Location: ${DEST}\"); die(); ?>
-//#inkVerb-pointdomain" > /var/www/html/${FWDDOM}/index.php
-chown -R www-data:www-data /var/www/html/${FWDDOM}
-
-# In the event of index.php
-if [ -e /var/www/html/${FWDDOM}/index.php.vback ]; then
-echo "//#inkVerb-php" >> /var/www/html/${FWDDOM}/index.php
-fi
-
-# In the event of index.html
-if [ -f /var/www/html/${FWDDOM}/index.html ]; then
-mv /var/www/html/${FWDDOM}/index.html /var/www/html/${FWDDOM}/index.html.vback
-echo "//#inkVerb-html" >> /var/www/html/${FWDDOM}/index.php
-echo "${FWDDOM}'s index.html file has been moved to index.html.vback."
-fi
-
-# In the event of index.htm
-if [ -f /var/www/html/${FWDDOM}/index.htm ]; then
-mv /var/www/html/${FWDDOM}/index.htm /var/www/html/${FWDDOM}/index.htm.vback
-echo "//#inkVerb-htm" >> /var/www/html/${FWDDOM}/index.php
-echo "${FWDDOM}'s index.htm file has been moved to index.htm.vback."
-fi
+/bin/echo "<?php header(\"Location: ${DEST}\"); die(); ?>" > /var/www/forwards/${FWDDOM}/index.php
+/bin/echo "FORWARD=\"${DEST}\"" > /var/www/forwards/${FWDDOM}/config
+/bin/echo "OLD_DEST=\"${ORIG_DEST}\"" >> /var/www/forwards/${FWDDOM}/config
+/bin/chown -R www-data:www-data /var/www/forwards/${FWDDOM}
 
 # Finish
-echo "${FWDDOM} now forwarding to ${DEST}"
-
+/bin/echo "${FWDDOM} now forwarding to ${DEST}"

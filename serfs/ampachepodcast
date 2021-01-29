@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This activates and deactivates the podcast feature in Ampache
 
@@ -14,7 +13,7 @@
 
 if [ "$1" = "-h" ]
 then
-    echo "Usage: ./activatepodcast [on/off]
+    /bin/echo "Usage: ./activatepodcast [on/off]
 
 Examples:
  ./activatepodcast on
@@ -26,7 +25,7 @@ fi
 if [ "$1" = "on" ]
 then
     sed -i "s/;podcast = \"false\"/podcast = \"true\"/g" /var/www/vapps/ampache/config/ampache.cfg.php
-    echo "Ampcache podcast on.
+    /bin/echo "Ampcache podcast on.
 
 1. Configure Podcast settings in: Admin > Server Config > System.
 2. Add a new Podcast local Catalog in: Admin > Catalogs > Add Catalog.
@@ -38,6 +37,6 @@ fi
 if [ "$1" = "off" ]
 then
     sed -i "s/podcast = \"true\"/;podcast = \"false\"/g" /var/www/vapps/ampache/config/ampache.cfg.php
-    echo "Ampcache podcast off."
+    /bin/echo "Ampcache podcast off."
 exit 0
 fi

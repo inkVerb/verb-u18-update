@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This displays the inkNet Client info to be used by a Client by inknetaddverberclient
 
@@ -12,15 +11,15 @@
 if [ -f /opt/verb/conf/inknet/inker.client.cnf ]; then
 . /opt/verb/conf/inknet/inker.client.cnf
  if [ -n "${CLIENTHOST}" ]; then
- echo "Here's the info for this Client Verber..."
+ /bin/echo "Here's the info for this Client Verber..."
  else
- echo "This is not a Client. No info to show.
+ /bin/echo "This is not a Client. No info to show.
 First run: inknetmakeverberclient
 "
  exit 8
  fi
 else
-echo "This is not a Client. No info to show.
+/bin/echo "This is not a Client. No info to show.
 First run: inknetmakeverberclient
 "
 exit 8
@@ -30,7 +29,7 @@ fi
 . /opt/verb/conf/sitenameip
 
 # Display info
-echo " Your Client info:
+/bin/echo " Your Client info:
 
 Host: ${CLIENTHOST}
 Name: ${CLIENTNAME}

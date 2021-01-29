@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This adds/updates the Ryuki child theme of Ryu to an existing WordPress installation
 
@@ -14,10 +13,10 @@ DOMAIN=$1
 # Check if installed
 if [ ! -d /var/www/html/${DOMAIN}/wp-content ]; then
  if [ ! -d /var/www/html/${DOMAIN} ]; then
- echo "${DOMAIN} is not even installed. That domain needs to be installed and have WordPress. Do those, then try again."
+ /bin/echo "${DOMAIN} is not even installed. That domain needs to be installed and have WordPress. Do those, then try again."
  exit 8
  else
- echo "${DOMAIN} is installed, but does not have WordPress. Install WordPress to that domain, then try again."
+ /bin/echo "${DOMAIN} is installed, but does not have WordPress. Install WordPress to that domain, then try again."
  exit 8
  fi
 fi
@@ -27,5 +26,5 @@ cd /var/www/html/${DOMAIN}/wp-content/themes
 git clone https://github.com/cfinke/Ryuki.git
 
 # Finish
-echo "Ryuki theme installed and updated."
+/bin/echo "Ryuki theme installed and updated."
 

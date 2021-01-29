@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This backs up the RoundCube app, including folders and database, in to one vbak file that can be downloaded
 ## This may not be important, but is available just in case.
@@ -14,7 +13,7 @@
 
 
 if [ -z "$1" ]; then
-SECNAME=$(pwgen -s -1 12)
+SECNAME=$(/usr/bin/pwgen -s -1 12)
 else
 SECNAME=$1
 fi
@@ -28,30 +27,29 @@ cd /var/www/email/roundcube
 /opt/verb/serfs/mysqlex rcmail; wait
 
 # Copy the config
-cp /opt/verb/conf/sitemailpath /var/www/email/roundcube/sitemailpath-old
-cp /opt/verb/conf/sitemailpass /var/www/email/roundcube/sitemailpass-old
-cp /opt/verb/conf/sitenameip /var/www/email/roundcube/sitenameip-old
+/bin/cp /opt/verb/conf/sitemailpath /var/www/email/roundcube/sitemailpath-old
+/bin/cp /opt/verb/conf/sitemailpass /var/www/email/roundcube/sitemailpass-old
+/bin/cp /opt/verb/conf/sitenameip /var/www/email/roundcube/sitenameip-old
 
 # Pack the directory
 cd /var/www/email
 /opt/verb/serfs/vtxzin roundcube
-mv roundcube.vtxz verb.roundcube.${SECNAME}.vbak
+/bin/mv roundcube.vtxz verb.roundcube.${SECNAME}.vbak
 
 # Move to web-download area
-mv verb.roundcube.${SECNAME}.vbak /var/www/vip/
-chown -R www-data:www-data /var/www/html/${nameURI}/verb.roundcube.${SECNAME}.vbak
+/bin/mv verb.roundcube.${SECNAME}.vbak /var/www/vip/
+/bin/chown -R www-data:www-data /var/www/html/${nameURI}/verb.roundcube.${SECNAME}.vbak
 
 if [ "$2" = "-nl" ]; then
-echo "The email server data has been backed up to the 'vip' folder.
+/bin/echo "The email server data has been backed up to the 'vip' folder.
 Note that the email server remains live."
 exit 0
 fi
 
-ln -s /var/www/vip/verb.roundcube.${SECNAME}.vbak /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
-echo "The email server data has been backed up to the 'vip' folder and can also be downloaded at
+/bin/ln -sfn /var/www/vip/verb.roundcube.${SECNAME}.vbak /var/www/html/${SITESERVE}.serve/${SERVEDIR}/
+/bin/echo "The email server data has been backed up to the 'vip' folder and can also be downloaded at
 
 http://${SERVEPATH}/verb.roundcube.${SECNAME}.vbak
 
 Note that the email server remains live.
 "
-

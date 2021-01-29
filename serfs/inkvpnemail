@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets the inkVPN client and server email address
 ## This is used by inkvpninstall but can also be used by itself
@@ -15,14 +14,14 @@
 
 # Set the email variable
 if [ -z "$1" ]; then
- echo "Option not specified, OK, using default..."
+ /bin/echo "Option not specified, OK, using default..."
  NEWEMAILADDR="vpn@${nameURI}"
 else
  NEWEMAILADDR="$1"
 fi
 
 # Do it
-sed -i "s/INKVPNCLIENTEMAIL=.*/INKVPNCLIENTEMAIL=${NEWEMAILADDR}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNCLIENTEMAIL=.*/INKVPNCLIENTEMAIL=${NEWEMAILADDR}/" /opt/verb/conf/inkvpn/inkvpnstatus
 
 #Finish
-echo "inkVPN email now set to: ${NEWEMAILADDR}"
+/bin/echo "inkVPN email now set to: ${NEWEMAILADDR}"

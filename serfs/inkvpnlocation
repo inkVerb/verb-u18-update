@@ -1,6 +1,5 @@
 #!/bin/bash
 #inkVerbSerf! verb.ink
-#set -e
 
 # This sets the inkVPN client and server location infornation
 ## This can be used by itself
@@ -18,7 +17,7 @@
 
 # Set the email variable
 if [ -z "$5" ]; then
- echo "All five options not specified, OK, using defaults..."
+ /bin/echo "All five options not specified, OK, using defaults..."
  NEWINKVPNCOUNTR="US"
  NEWINKVPNPROVIN="CA"
  NEWINKVPNCITY="SanFrancisco"
@@ -33,15 +32,15 @@ else
 fi
 
 # Do it
-sed -i "s/INKVPNCOUNTR=.*/INKVPNCOUNTR=${NEWINKVPNCOUNTR}/" /opt/verb/conf/inkvpn/inkvpnstatus
-sed -i "s/INKVPNPROVIN=.*/INKVPNPROVIN=${NEWINKVPNPROVIN}/" /opt/verb/conf/inkvpn/inkvpnstatus
-sed -i "s/INKVPNCITY=.*/INKVPNCITY=${NEWINKVPNCITY}/" /opt/verb/conf/inkvpn/inkvpnstatus
-sed -i "s/INKVPNORG=.*/INKVPNORG=${NEWINKVPNORG}/" /opt/verb/conf/inkvpn/inkvpnstatus
-sed -i "s/INKVPNOU=.*/INKVPNOU=${NEWINKVPNOU}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNCOUNTR=.*/INKVPNCOUNTR=${NEWINKVPNCOUNTR}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNPROVIN=.*/INKVPNPROVIN=${NEWINKVPNPROVIN}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNCITY=.*/INKVPNCITY=${NEWINKVPNCITY}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNORG=.*/INKVPNORG=${NEWINKVPNORG}/" /opt/verb/conf/inkvpn/inkvpnstatus
+/bin/sed -i "s/INKVPNOU=.*/INKVPNOU=${NEWINKVPNOU}/" /opt/verb/conf/inkvpn/inkvpnstatus
 
 #Finish
 . /opt/verb/conf/inkvpn/inkvpnstatus
-echo "inkVPN Locale info now set to:
+/bin/echo "inkVPN Locale info now set to:
 ${INKVPNCOUNTR}
 ${INKVPNPROVIN}
 ${INKVPNCITY}

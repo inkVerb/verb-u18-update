@@ -1,6 +1,5 @@
 #!/bin/sh
 #inkVerbSerf! verb.ink
-#set -e
 
 # This script runs inkcertdocb for all native Verber domains... verb.ink, verb.blue, etc.
 
@@ -14,8 +13,8 @@
 . /opt/verb/conf/sitetldstatus
 
 # Verify that it's not a domain Dod Verber
-if grep -Fq "SITENAME=DOMAIN_MOD-" /opt/verb/conf/sitenameip; then
-echo "Domain.MOD Verber NOTICE:
+if /bin/grep -Fq "SITENAME=DOMAIN_MOD-" /opt/verb/conf/sitenameip; then
+/bin/echo "Domain.MOD Verber NOTICE:
 This is a Domain Mod Verber. Certbot won't run for so many domains in too short of a time.
 
 You must run inkcertdocb one at a time for each uri, once you reach quota, wait a few days to continue.
